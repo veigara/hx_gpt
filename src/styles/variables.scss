@@ -1,0 +1,22 @@
+:root {
+
+
+  --theme-aside-width: 80px;
+  --theme-header-height: 50px;
+  --theme-border-color-light: linear-gradient(to bottom,rgb(142, 115, 242), rgb(90, 131, 244) );
+  --theme-logo-text-color: #ffffff;
+
+  --theme-menu-text-color: #333333;
+  --theme-menu-bg-color: linear-gradient(to bottom,rgb(142, 115, 242), rgb(90, 131, 244) );
+  --theme-menu-border-color: linear-gradient(to bottom,rgb(142, 115, 242), rgb(90, 131, 244) );
+  --theme-menu-hover-color:  #ffffff;
+  --theme-menu-hover-bg-color: rgb(198, 196, 255);
+
+  --theme-header-bg-color:  #ffffff;
+  --theme-header-text-color: #ffffff;
+  --theme-header-hover-color: rgba(0, 0, 0, 0.1);
+
+  --theme-main-bg-color:linear-gradient(to right,rgb(146, 146, 246), rgb(213, 220, 255) );
+  --theme-card-bg-color:linear-gradient(to bottom,rgb(241, 240, 253), rgb(255, 255, 255) );
+
+}
