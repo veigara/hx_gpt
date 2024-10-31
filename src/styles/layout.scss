@@ -70,7 +70,7 @@ a:hover {
 
       .el-card {
         border-radius: 12px;
-        min-height: calc(100vh - 18px);
+        min-height: calc(100vh - 18px - var(--theme-header-height));
 
         .el-card__body {
           background: var(--theme-card-bg-color)
