@@ -9,6 +9,7 @@ import SvgIcon from '@/components/svg-icon'
 import 'vxe-table/lib/style.css'
 
 import '@/icons/iconfont/iconfont'
+import '@/icons/iconfont/iconfont2'
 import 'element-plus/dist/index.css'
 import '@/styles/index.scss'
 
