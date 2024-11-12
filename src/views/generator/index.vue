@@ -1,7 +1,7 @@
 <template>
 	<el-card class="chat_card" body-style="padding: 0px;">
 		<el-container>
-			<el-aside width="260px" class="chat_card_aside">
+			<el-aside width="260px" class="chat_card_aside" v-if="chatHistoryDisplay">
 				<el-row>
 					<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;">
 						<template #prefix>
@@ -16,7 +16,8 @@
 								:class="{ 'history_listItem_active': selectedHistory === item.id }"
 								v-for="item in historys" :key="item.id" @click="selectHistoryItem(item.id)">
 								<span class="history_listItem_content">{{ item.content }}</span>
-								<el-popover :visible="item.show == true" placement="right-start" :show-arrow="false" style="padding: 0px;">
+								<el-popover :visible="item.show == true" placement="right-start" :show-arrow="false"
+									style="padding: 0px;">
 									<div class="history-menu">
 										<div class="history-menu-item">
 
@@ -40,309 +41,125 @@
 				</div>
 			</el-aside>
 			<el-main class="chat_card_main">
+				<div class="chat_history_expend" @click="chatHistoryDisplay = !chatHistoryDisplay">
+					<svg-icon icon="icon-arrow-expand" v-if="!chatHistoryDisplay"></svg-icon>
+					<svg-icon icon="icon-arrow-fold" v-if="chatHistoryDisplay"></svg-icon>
+				</div>
+				<!--头部-->
 				<div style="height: 40px;border-bottom: 1px solid #ebeef5;">
 					<el-row style="padding: 0px 20px;">
 						<el-col :span="16">
-							<el-select v-model="selectMode" placeholder="Select" size="lager" style="width: 240px">
-								<el-option v-for="item in modes" :key="item.value" :label="item.label"
-									:value="item.detailsInfo">
-
-
-									<div class="model-option-container">
-										<span class="model-label">{{ item.label }}</span>
-										<span class="model-details-info" :title="item.detailsInfo">
-											<el-tooltip placement="right">
-												<template #content>
-													{{ item.detailsInfo }}
-												</template>
-												<span>{{ item.detailsInfo }}</span>
-											</el-tooltip>
-										</span>
-									</div>
-
-
-								</el-option>
-							</el-select>
 						</el-col>
 						<el-col :span="8">
 						</el-col>
 					</el-row>
 				</div>
-			</el-main>
-			<el-aside width="300px" class="chat_card_aside" v-if="commandCenterFlag">
-				<el-row class="chat_card_aside_title">
-					<el-col :span="16" class="command_title">指令中心</el-col>
-					<el-col :span="8">
-						<div class="command_close" title="关闭" @click="closeCommandCenter">
-							<svg-icon icon="icon-close"></svg-icon>
+				<!--内容-->
+				<div
+					style="height: calc(100vh - 270px - var(--theme-header-height));max-width: 1150px;margin: 16px auto;">
+					<el-scrollbar max-height="100%" style="width: 100%;">
+						<div>
+							<div class="ans_item">
+								<div class="ans_item_avatar">
+									<!--回答头像-->
+									<div>
+										<el-button >
+											<template #icon>
+												<svg-icon icon="icon-user" ></svg-icon>
+											</template>
+										</el-button>
+									</div>
+								</div>
+								<!--回答内容-->
+								<div class="ans_item_content">
+									<div>有什么可以帮你的吗</div>
+								</div>
+							</div>
+							<!---问题--->
+							<div class="question_item">
+								<div class="question_item_container">
+									<!--问题头像-->
+									<div class="question_item_avatar">
+										<el-button @mouseover="questionEdit = true"
+											@mouseleave="questionEdit = false">
+											<template #icon>
+												<svg-icon icon="icon-edit"  v-if="questionEdit"></svg-icon>
+												<svg-icon icon="icon-user" v-else></svg-icon>
+											</template>
+										</el-button>
+									</div>
+									<!--问题内容-->
+								<div class="question_item_content">
+									<div>有什么可以帮你的吗</div>
+								</div>
+								</div>
+							</div>
 						</div>
-					</el-col>
-				</el-row>
-				<el-row>
-					<el-col :span="20">
-						<el-tabs v-model="activeTab" type="card" @tab-click="handleTabClick" class="custom-tabs">
-							<!-- 可见Tabs -->
-							<el-tab-pane v-for="tab in visibleTabs" :key="tab.name" :label="tab.label"
-								:name="tab.name" />
-						</el-tabs>
-					</el-col>
-					<el-col :span="4">
-						<!-- 下拉菜单 -->
-						<el-dropdown @command="handleDropdownCommand">
-							<div style="cursor: pointer;"> <svg-icon icon="icon-menu"></svg-icon></div>
-							<template #dropdown>
-								<el-dropdown-menu>
-									<el-dropdown-item v-for="(tab, index) in tabs" :key="tab.name" :command="index">{{
-										tab.label
-									}}</el-dropdown-item>
-								</el-dropdown-menu>
-							</template>
-						</el-dropdown>
-					</el-col>
-				</el-row>
-				<el-row style="width: 100%;">
-					<!-- 显示主题内容 -->
-					<!--对话--->
-					<el-col :span="24" v-show="activeTab == '1'">
-						<el-collapse v-model="chat_model">
-							<el-collapse-item title="模型API-KEY" name="1">
-								<div>
-									<el-input type="password" placeholder="模型API-KEY" show-password />
-								</div>
-							</el-collapse-item>
-							<el-collapse-item title="Prompt" name="2">
-								<div class="chat_tilte_bg">
-									System prompt
-								</div>
-								<el-input clearable type="textarea" :rows="5" placeholder="System prompt" />
-							</el-collapse-item>
-							<el-collapse-item title="知识库" name="3">
-								<div>
-									<el-upload class="upload-demo" drag
-										action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15" multiple>
-										<svg-icon icon="icon-cloud-upload"
-											style="font-size: 50px;"><upload-filled /></svg-icon>
-										<div class="el-upload__text">
-											Drop file here or click to upload
-										</div>
-										<template #tip>
-											<div class="el-upload__tip">
-												jpg/png files with a size less than 500kb
-											</div>
-										</template>
-									</el-upload>
-								</div>
-								<div>
-									<el-button type="primary" style="background: #615ced;width: 100%;">总结</el-button>
-								</div>
-							</el-collapse-item>
-						</el-collapse>
-					</el-col>
-					<!--参数--->
-					<el-col :span="24" v-show="activeTab == '2'">
-						<!--temperature-->
-						<el-row>
-							<el-col :span="12" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template #content> 用于控制输出概率分布“平滑度”的参数。<br />
-										它影响着模型生成文本的随机性和多样性。<br />
-										当温度值较高（例如1.0以上）：生成的文本更加随机和多样化。<br />
-										当温度值较低（例如0.5以下）：生成的文本更加确定和集中。
-									</template>
-									<span>temperaturer</span>
-								</el-tooltip></el-col>
-						</el-row>
-						<el-row class="slider_margin_left_10">
-							<!--滑块-->
-							<el-slider v-model="parmars.temperature" input-size="small" show-input :step="0.1" :min="0"
-								:max="2" />
-						</el-row>
-						<!--top-p-->
-						<el-row>
-							<el-col :span="24" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template #content> 核采样（Nucleus Sampling）。<br />
-										它与 temperature 参数类似，都是用来调节生成文本的随机性和创造性。<br />
-										p
-										较小（例如0.1）：选择的词汇子集较小，生成的文本更加确定和集中，因为模型只会从概率最高的少数词汇中选择。这可能导致生成的文本更加保守和连贯，但缺乏多样性。<br />
-										p
-										较大（例如0.9）：选择的词汇子集较大，生成的文本更加随机和多样化，因为模型可以从更多的词汇中选择。这可能导致生成的文本更加创造性和有趣，但也可能降低连贯性。
-									</template>
-									<span>top-p</span>
-								</el-tooltip></el-col>
-						</el-row>
-						<el-row class="slider_margin_left_10">
-							<!--滑块-->
-							<el-slider v-model="parmars.top_p" input-size="small" show-input :step="0.1" size="small"
-								:min="0" :max="1" />
-						</el-row>
-						<!--n choices-->
-						<el-row>
-							<el-col :span="24" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template #content> 从多个候选选项中选择 n 个选项的过程
-									</template>
-									<span>n choices</span>
-								</el-tooltip></el-col>
-						</el-row>
-						<el-row class="slider_margin_left_10">
-							<!--滑块-->
-							<el-slider v-model="parmars.n_choices" input-size="small" show-input :step="1" size="small"
-								:min="1" :max="10" />
-						</el-row>
-						<!--max_context-->
-						<el-row>
-							<el-col :span="24" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template #content>模型在处理输入序列时所能考虑的最大上下文长度。<br />
-										如果上下文窗口太短，生成的文本可能会缺乏连贯性；如果太长，计算成本会增加。
-									</template>
-									<span>max context</span>
-								</el-tooltip></el-col>
-						</el-row>
-						<el-row class="slider_margin_left_10">
-							<!--滑块-->
-							<el-slider v-model="parmars.max_context" input-size="small" show-input :step="1"
-								size="small" :min="1024" :max="100000" />
-						</el-row>
-						<!--max generations-->
-						<el-row>
-							<el-col :span="24" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template
-										#content>指模型在生成文本时的最大步数或最大长度。<br />具体来说，它定义了模型在生成过程中最多可以生成多少个词或字符。<br />一旦达到这个限制，生成过程就会停止。
-									</template>
-									<span>max generations</span>
-								</el-tooltip></el-col>
-						</el-row>
-						<el-row class="slider_margin_left_10">
-							<!--滑块-->
-							<el-slider v-model="parmars.max_generations" input-size="small" show-input :step="1"
-								size="small" :min="1024" :max="100000" />
-						</el-row>
-						<!--presence penalty-->
-						<el-row>
-							<el-col :span="24" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template
-										#content>是一种用于调整模型生成文本时已出现词汇的惩罚机制。<br />通过对已出现过的词汇施加惩罚，可以减少这些词汇再次出现的概率，从而提高生成文本的多样性和连贯性。<br />这种惩罚是基于词汇是否已经出现过，而不是出现的频率。<br />主要用于减少已出现词汇的再次出现，从而使生成的文本更加多样化和连贯。
-
-									</template>
-									<span>presence penalty</span>
-								</el-tooltip></el-col>
-						</el-row>
-						<el-row class="slider_margin_left_10">
-							<!--滑块-->
-							<el-slider v-model="parmars.presence_penalty" input-size="small" show-input :step="0.01"
-								size="small" :min="-2" :max="2" />
-						</el-row>
-						<!--frequency penalty-->
-						<el-row>
-							<el-col :span="24" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template
-										#content>一种用于调整模型生成文本时重复词汇出现频率的技术。<br />通过对频繁出现的词汇施加惩罚，可以减少这些词汇在生成文本中的重复出现，从而使生成的文本更加多样化和自然。
-										<br />针对词汇在生成过程中出现的频率进行惩罚。具体来说，模型会根据每个词汇在生成过程中已经出现的次数来调整其概率。
-									</template>
-									<span>frequency penalty</span>
-								</el-tooltip></el-col>
-						</el-row>
-						<el-row class="slider_margin_left_10">
-							<!--滑块-->
-							<el-slider v-model="parmars.frequency_penalty" input-size="small" show-input :step="0.01"
-								size="small" :min="-2" :max="2" />
-						</el-row>
-						<!--logit bias-->
-						<el-row>
-							<el-col :span="24" class="chat_tilte_bg">
-								<el-tooltip placement="left">
-									<template #content>一个用于调整模型生成文本时特定词汇的概率的技术。<br />通过对某些词汇的 logit
-										值进行偏置，可以影响模型生成这些词汇的可能性。<br />这对于控制生成文本的内容、风格或避免某些不希望出现的词汇非常有用。
-									</template>
-									<span>logit bias</span>
-								</el-tooltip></el-col>
-							<el-col :span="24" style="margin-top: 5px;"><el-input :rows="2" type="textarea"
-									v-model="parmars.logit_bias" placeholder="word:likelihood" /></el-col>
-						</el-row>
-					</el-col>
-					<!--其他--->
-					<el-scrollbar :max-height="computedMaxHeight">
-						<el-col style="margin-right: 10px;" :span="24" v-show="activeTab != '1' && activeTab != '2'">
-							<ul>
-								<li class="chat_listItem" v-for="item in syspromts">
-									<el-row>
-										<el-tooltip effect="dark" :content="item.content" placement="left">
-											<el-row>
-												<el-col :span="24" class="chat_listItem_title"><span>{{ item.title
-														}}</span></el-col>
-												<el-col :span="24" class="chat_listItem_content">
-													<span>{{ item.content }}</span>
-												</el-col>
-											</el-row>
-
-										</el-tooltip>
-									</el-row>
-								</li>
-							</ul>
-						</el-col>
 					</el-scrollbar>
-				</el-row>
-			</el-aside>
+				</div>
+				<!--尾部-->
+				<div class="chat_main_plane">
+					<div class="chat_main_plane_icon">
+						<!--上传-->
+						<div class="chat_main_plane_space">
+							<el-popover placement="top" trigger="hover" :show-arrow="false">
+								<template #reference>
+									<el-button title="上传" @click="uploadIcon = !uploadIcon" round>
+										<template #icon>
+											<svg-icon icon="icon-upload"></svg-icon>
+										</template>
+									</el-button>
+								</template>
+								<div class="history-menu">
+									<el-tooltip effect="light" content="支持PDF、World、Execl,最大100M" placement="right"
+										:offset="-5">
+										<div class="history-menu-item">
+											<span><svg-icon icon="icon-upload-flie" /></span>上传文档
+										</div>
+									</el-tooltip>
+									<el-tooltip effect="light" content="上传1张不超过10M的PNG/JPG的图片" placement="right"
+										:offset="-5">
+										<div class="history-menu-item"
+											style="color: #181818 !important; border-top: none ;">
+											<span><svg-icon icon="icon-upload-image" /></span>上传图片
+										</div>
+									</el-tooltip>
+								</div>
+							</el-popover>
+						</div>
+						<!--对话设置-->
+					</div>
+
+					<div class="chat_main_plane_label">
+						<el-scrollbar :max-height="100" style="width: 100%;">
+							<div class="chat_textarea">
+								<el-input v-model="chat_msg" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"
+									input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
+									placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令">
+								</el-input>
+							</div>
+						</el-scrollbar>
+						<div class="chat_input_send">
+							<el-button color="#626aef">
+								<div style="margin-right: 5px;">
+									<svg-icon icon="icon-send_right" />
+								</div>
+								发送
+							</el-button>
+						</div>
+
+					</div>
+
+				</div>
+			</el-main>
 		</el-container>
 	</el-card>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed,onMounted,onUnmounted  } from 'vue'
+import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
+import { Search } from '@element-plus/icons-vue'
 
-import { IHooksOptions } from '@/hooks/interface'
-import { useCrud } from '@/hooks'
-import Import from './import.vue'
-import Edit from './edit.vue'
-import Generator from './generator.vue'
-import { useTableSyncApi } from '@/api/table'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useDownloadApi } from '@/api/generator'
-import { ta } from 'element-plus/es/locale';
-import { template } from 'xe-utils'
-
-const commandCenterFlag = ref(true)
-// 定义关闭方法
-const closeCommandCenter = () => {
-	// 关闭 Command
-	commandCenterFlag.value = false;
-};
-
-interface Tab {
-	name: string;
-	label: string;
-}
-
-const activeTab = ref<string>('1'); // 初始活动Tab的name
-const tabs = ref<Tab[]>([
-	{ name: '1', label: '对话' },
-	{ name: '2', label: '参数' },
-	{ name: '3', label: '办公助理' },
-	{ name: '4', label: 'More' },
-	{ name: '5', label: 'Tab 4' },
-	{ name: '6', label: 'Tab 5' },
-	{ name: '7', label: 'Tab 6' },
-]);
-const visibleTabsCount = 4; // 可见Tabs的数量
-const tabOffset = ref<number>(0); // Tabs滚动的偏移量
-// 模型对话数据
-const chat_model = ref({})
-// 参数
-const parmars = ref({
-	temperature: 0.5,
-	top_p: 0.9,
-	n_choices: 1,
-	max_context: 8197,
-	max_generations: 89000,
-	presence_penalty: 0,
-	frequency_penalty: 0,
-	logit_bias: ''
-})
 // 其他syspromt
 const syspromts = ref([
 	{
@@ -444,45 +261,10 @@ const modes = ref([
 
 ])
 // 选中模型
-const selectMode = ref({})
+//const selectMode = ref({})
 
-const visible = ref(false)
+//const visible = ref(false)
 
-// 处理Tab点击事件（这里可以扩展为需要的逻辑）
-const handleTabClick = (tab: any, ev: Event) => {
-	// 点击最后一个向右移动
-	if (tab.props.name == visibleTabs.value[visibleTabs.value.length - 1].name) {
-		scrollRight()
-	}
-	// 点击第一个向前移动
-	if (tab.props.name == visibleTabs.value[0].name) {
-		scrollLeft()
-	}
-};
-
-// 处理下拉菜单命令
-const handleDropdownCommand = (command: number) => {
-	tabOffset.value = command;
-	activeTab.value = tabs.value[command].name
-};
-
-// 计算可见Tabs
-const visibleTabs = computed(() => tabs.value.slice(tabOffset.value, tabOffset.value + visibleTabsCount));
-
-
-// 滚动到左边的Tab
-const scrollLeft = () => {
-	if (tabOffset.value > 0) {
-		tabOffset.value--;
-	}
-};
-
-// 滚动到右边的Tab
-const scrollRight = () => {
-	if (tabOffset.value + visibleTabsCount < tabs.value.length + (tabs.value.length > visibleTabsCount ? 1 : 0)) {
-		tabOffset.value++;
-	}
-};
 
 // 点击历史记录 
 const selectHistoryItem = (item: string) => {
@@ -519,71 +301,35 @@ const closeHistoryMenu = () => {
 }
 
 // 点击空白关闭历史记录菜单
-const closeHistoryMounted= onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
+const closeHistoryMounted = onMounted(() => {
+	document.addEventListener('click', handleClickOutside);
 });
 
-const closeHistoryUnmounted=  onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+const closeHistoryUnmounted = onUnmounted(() => {
+	document.removeEventListener('click', handleClickOutside);
 });
- 
-const handleClickOutside = (event:any) => {
-  modes.value.forEach(item => {
-    if (!event.target.closest('.el-popover')) {
-		closeHistoryMenu()
-    }
-  });
+
+const handleClickOutside = (event: any) => {
+	modes.value.forEach(item => {
+		if (!event.target.closest('.el-popover')) {
+			closeHistoryMenu()
+		}
+	});
 };
-const state: IHooksOptions = reactive({
-	dataListUrl: '/gen/table/page',
-	deleteUrl: '/gen/table',
-	queryForm: {
-		tableName: ''
-	}
-})
 
-const importRef = ref()
-const editRef = ref()
-const generatorRef = ref()
+// 关闭历史记录siber
+const chatHistoryDisplay = ref(true)
 
-const importHandle = (id?: number) => {
-	importRef.value.init(id)
-}
+// 上传图标显示
+const uploadIcon = ref(false)
 
-const editHandle = (id?: number) => {
-	editRef.value.init(id)
-}
+// 对话
+const chat_msg = ref('')
 
-const generatorHandle = (id?: number) => {
-	generatorRef.value.init(id)
-}
+// 问题头像
+const questionEdit = ref(false)
 
-const downloadBatchHandle = () => {
-	const tableIds = state.dataListSelections ? state.dataListSelections : []
 
-	if (tableIds.length === 0) {
-		ElMessage.warning('请选择生成代码的表')
-		return
-	}
-
-	useDownloadApi(tableIds)
-}
-
-const syncHandle = (row: any) => {
-	ElMessageBox.confirm(`确定同步数据表${row.tableName}吗?`, '提示', {
-		confirmButtonText: '确定',
-		cancelButtonText: '取消',
-		type: 'warning'
-	})
-		.then(() => {
-			useTableSyncApi(row.id).then(() => {
-				ElMessage.success('同步成功')
-			})
-		})
-		.catch(() => { })
-}
-
-const { getDataList, selectionChangeHandle, sizeChangeHandle, currentChangeHandle, deleteBatchHandle } = useCrud(state)
 </script>
 
 
@@ -599,6 +345,8 @@ const { getDataList, selectionChangeHandle, sizeChangeHandle, currentChangeHandl
 	background-color: rgb(246, 247, 251);
 	min-height: calc(100vh - 19px - var(--theme-header-height));
 	padding: 20px 0px;
+	top: 0px;
+	position: relative;
 }
 
 .chat_card {
@@ -817,7 +565,7 @@ const { getDataList, selectionChangeHandle, sizeChangeHandle, currentChangeHandl
 	.history-menu-item>span {
 		font-size: 20px;
 		margin-right: 8px;
-		margin-left:8px;
+		margin-left: 8px;
 	}
 }
 
@@ -830,4 +578,146 @@ const { getDataList, selectionChangeHandle, sizeChangeHandle, currentChangeHandl
 	color: #e63224;
 }
 
+.chat_history_expend {
+	position: absolute;
+	top: 0;
+	left: 0px;
+	height: 100%;
+	width: 14px;
+	background-color: rgba(0, 0, 0, 0);
+	cursor: pointer;
+	transition: all ease 0.3s;
+	display: flex;
+	align-items: center;
+	z-index: 999;
+}
+
+.chat_main_plane {
+	height: 115px;
+	border-top: 1px solid #ebeef5;
+	padding: 10px;
+	padding-top: 10px;
+}
+
+.chat_main_plane_icon {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+
+	.chat_main_plane_space {
+		margin-right: 10px;
+	}
+}
+
+.chat_main_plane_label {
+	margin-top: 10px !important;
+	cursor: text;
+	border-radius: 15px;
+	border: 1.2px solid #ebeef5;
+	align-items: flex-end;
+	display: flex;
+	flex: 1;
+	margin: 0 auto;
+	overflow: auto;
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	background-color: white;
+}
+
+
+.chat_main_plane_label:has(.el-textarea__inner:focus) {
+	border: 1px solid #626aef;
+}
+
+.chat_textarea {
+	height: 100%;
+	position: relative;
+	width: calc(100% - 50px)
+}
+
+.chat_input_send {
+	align-items: center;
+	bottom: 7px;
+	color: #fff;
+	cursor: pointer;
+	display: flex;
+	flex-shrink: 0;
+	justify-content: center;
+	position: absolute;
+	right: 7px;
+}
+
+:deep .el-textarea__inner {
+	resize: none !important;
+	padding: 0px;
+}
+
+.ans_item {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.ans_item_avatar :deep .el-button {
+	padding: 8px 8px;
+}
+
+.ans_item_content {
+	background: #fff;
+	border: 1px solid transparent;
+	border-radius: 12px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	position: relative;
+	box-sizing: border-box;
+	max-width: 100%;
+	margin-top: 10px;
+	border-radius: 10px;
+	padding: 10px;
+	font-size: 14px;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	user-select: text;
+	word-break: break-word;
+	transition: all ease 0.3s;
+}
+
+.question_item {
+	display: flex;
+	flex-direction: row-reverse;
+}
+.question_item >.question_item_container{
+	align-items: flex-end;
+}
+
+.question_item_avatar{
+	flex-direction: row-reverse;
+}
+
+.question_item_content{
+	background: #e0dfff;
+	border: 1px solid transparent;
+	border-radius: 12px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	position: relative;
+	box-sizing: border-box;
+	max-width: 100%;
+	margin-top: 10px;
+	border-radius: 10px;
+	padding: 10px;
+	font-size: 14px;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	user-select: text;
+	word-break: break-word;
+	transition: all ease 0.3s;
+}
 </style>
