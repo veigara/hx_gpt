@@ -40,6 +40,7 @@
 					</el-scrollbar>
 				</div>
 			</el-aside>
+		
 			<el-main class="chat_card_main">
 				<div class="chat_history_expend" @click="chatHistoryDisplay = !chatHistoryDisplay">
 					<svg-icon icon="icon-arrow-expand" v-if="!chatHistoryDisplay"></svg-icon>
@@ -56,23 +57,30 @@
 				</div>
 				<!--内容-->
 				<div
-					style="height: calc(100vh - 270px - var(--theme-header-height));max-width: 1150px;margin: 16px auto;">
+					style="height: calc(100vh - 270px - var(--theme-header-height));">
 					<el-scrollbar max-height="100%" style="width: 100%;">
-						<div>
+						<div style="max-width: 1150px;margin: 16px auto;">
 							<div class="ans_item">
 								<div class="ans_item_avatar">
 									<!--回答头像-->
 									<div>
-										<el-button >
+										<el-button>
 											<template #icon>
-												<svg-icon icon="icon-user" ></svg-icon>
+												<svg-icon icon="icon-user"></svg-icon>
 											</template>
 										</el-button>
 									</div>
 								</div>
 								<!--回答内容-->
 								<div class="ans_item_content">
-									<div>有什么可以帮你的吗</div>
+									<!-- <div v-html="renderedContent(chat_msg.str)" class="markdown-body"
+										style="font-size: small"></div> -->
+										<TextComponent
+											ref="textRef"
+											:text="chat_msg.str"
+											:loading="false"
+											:asRawText = "false"
+											/>
 								</div>
 							</div>
 							<!---问题--->
@@ -80,23 +88,23 @@
 								<div class="question_item_container">
 									<!--问题头像-->
 									<div class="question_item_avatar">
-										<el-button @mouseover="questionEdit = true"
-											@mouseleave="questionEdit = false">
+										<el-button @mouseover="questionEdit = true" @mouseleave="questionEdit = false">
 											<template #icon>
-												<svg-icon icon="icon-edit"  v-if="questionEdit"></svg-icon>
+												<svg-icon icon="icon-edit" v-if="questionEdit"></svg-icon>
 												<svg-icon icon="icon-user" v-else></svg-icon>
 											</template>
 										</el-button>
 									</div>
 									<!--问题内容-->
-								<div class="question_item_content">
-									<div>有什么可以帮你的吗</div>
-								</div>
+									<div class="question_item_content">
+										<div>有什么可以帮你的吗</div>
+									</div>
 								</div>
 							</div>
 						</div>
 					</el-scrollbar>
 				</div>
+			
 				<!--尾部-->
 				<div class="chat_main_plane">
 					<div class="chat_main_plane_icon">
@@ -157,8 +165,13 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
+import { reactive, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
+import markdownIt from 'markdown-it'
+import 'github-markdown-css';
+import { common, createStarryNight } from '@wooorm/starry-night'
+import { toHtml } from 'hast-util-to-html'
+import TextComponent from '@/components/Message/Text.vue'
 
 // 其他syspromt
 const syspromts = ref([
@@ -324,11 +337,87 @@ const chatHistoryDisplay = ref(true)
 const uploadIcon = ref(false)
 
 // 对话
-const chat_msg = ref('')
+const chat_msg = ref({ str: '', html: '' })
 
 // 问题头像
 const questionEdit = ref(false)
 
+//chat_msg.value.str = '以下为 Java 词汇命名工具的输出结果：\n\n1. 常量：\n   * MIN_TEMP_POINT_ID\n   * LOWEST_TEMP_NODE\n   * MIN_SENSOR_ID\n\n2. 变量：\n   * minTempSensorId\n   * lowestTempPointNo\n   * coldPointNum\n\n3. 包名：\n   * com.ei.kunlun.temperature\n   * com.ei.kunlun.sensor\n   * com.ei.kunlun.detect\n\n4. 抽象类：\n   * AbstractTempSensor\n   * AbstractDetectPoint\n   * BaseTemperatureMonitor\n\n5. 测试类：\n   * MinTempPointTest\n   * LowTempSensorTest\n   * DetectPointTest\n\n6. 异常类：\n   * TempOutOfRangeLowException\n   * SensorNotDetectedException\n   * DetectPointNotFoundException\n\n7. sql 字段名：\n   * min_temp_point_id\n   * lowest_temp_point_no\n   * low_temp_sensor_id'
+chat_msg.value.str = "简单示例：\n\n### Flask 后端 API\n\n创建一个名为 `app.py` 的文件，内容如下：\n``` python\nfrom flask import Flask, jsonify\n\napp = Flask(__name__)\n\n# 模拟数据\ndata = [\n    {\"id\": 1, \"name\": \"John\"},\n    {\"id\": 2, \"name\": \"Jane\"},\n]\n\n@app.route(\"/api/data\")\ndef get_data():\n    return jsonify(data)\n\nif __name__ == \"__main__\":\n    app.run(debug=True)\n ``` \n运行该应用程序，打开浏览器";
+const markdownItInstance = ref<markdownIt | null>(null);
+const starryNight = ref<any>(null)
+const isInitialized = ref(false);
+const htmlStr = ref('')
+
+// 异步初始化函数
+const initializeMarkdownIt = async () => {
+  try {
+    starryNight.value = await createStarryNight(common);
+    markdownItInstance.value = markdownIt({
+      highlight(value: any, lang: any) {
+        const scope = starryNight.value.flagToScope(lang);
+
+        const filterChildren = (children: any[]) => {
+          return children.filter(child => child.type === 'element' || child.type === 'text');
+        };
+
+        return toHtml({
+          type: 'element',
+          tagName: 'pre',
+          properties: {
+            className: scope
+              ? [
+                  'highlight',
+                  'highlight-' + scope.replace(/^source\./, '').replace(/\./g, '-')
+                ]
+              : undefined
+          },
+          children: scope
+            ? filterChildren(starryNight.value.highlight(value, scope).children)
+            : [{ type: 'text', value }]
+        });
+      }
+    });
+    isInitialized.value = true; // 设置初始化状态为 true
+  } catch (error) {
+    console.error('Failed to initialize markdownItInstance:', error);
+  }
+};
+
+// 在 onMounted 钩子中调用初始化函数
+onMounted(() => {
+  initializeMarkdownIt();
+});
+
+
+
+// 定义 covertHtml 方法
+const covertHtml = async (str: string) => {
+	
+  if (!isInitialized.value) {
+    await new Promise<void>((resolve) => {
+      const intervalId = setInterval(() => {
+        if (isInitialized.value) {
+          clearInterval(intervalId);
+          resolve();
+        }
+      }, 100);
+    });
+  }
+
+  if (markdownItInstance.value) {
+     markdownItInstance.value.render(str);
+  }
+  return str; // 如果 markdownItInstance 还未初始化，直接返回原始字符串
+};
+
+// 使用 computed 属性处理异步结果
+const renderedContent = computed(async (content) => {
+  return await covertHtml(content);
+});
+
+// 将 covertHtml 函数暴露给模板
+defineExpose({ covertHtml });
 
 </script>
 
@@ -597,6 +686,8 @@ const questionEdit = ref(false)
 	border-top: 1px solid #ebeef5;
 	padding: 10px;
 	padding-top: 10px;
+	max-width: 1150px;
+	margin: 16px auto;
 }
 
 .chat_main_plane_icon {
@@ -676,6 +767,7 @@ const questionEdit = ref(false)
 	box-sizing: border-box;
 	max-width: 100%;
 	margin-top: 10px;
+	margin-bottom: 10px;
 	border-radius: 10px;
 	padding: 10px;
 	font-size: 14px;
@@ -684,21 +776,23 @@ const questionEdit = ref(false)
 	user-select: text;
 	word-break: break-word;
 	transition: all ease 0.3s;
+	width: 100%;
 }
 
 .question_item {
 	display: flex;
 	flex-direction: row-reverse;
 }
-.question_item >.question_item_container{
+
+.question_item>.question_item_container {
 	align-items: flex-end;
 }
 
-.question_item_avatar{
+.question_item_avatar {
 	flex-direction: row-reverse;
 }
 
-.question_item_content{
+.question_item_content {
 	background: #e0dfff;
 	border: 1px solid transparent;
 	border-radius: 12px;
@@ -719,5 +813,19 @@ const questionEdit = ref(false)
 	user-select: text;
 	word-break: break-word;
 	transition: all ease 0.3s;
+}
+
+.markdown-body {
+	box-sizing: border-box;
+	min-width: 200px;
+	max-width: 980px;
+	margin: 0 auto;
+	padding: 45px;
+}
+
+@media (max-width: 767px) {
+	.markdown-body {
+		padding: 15px;
+	}
 }
 </style>
