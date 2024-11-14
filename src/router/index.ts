@@ -2,9 +2,9 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 
 export const menuRoutes: RouteRecordRaw[] = [
 	{
-		path: '/gen/generator',
-		name: 'Generator',
-		component: () => import('../views/generator/index.vue'),
+		path: '/chat',
+		name: 'Chat',
+		component: () => import('../views/chat/index.vue'),
 		meta: {
 			title: '对话',
 			icon: 'icon-wechat-fill'
@@ -26,7 +26,7 @@ export const constantRoutes: RouteRecordRaw[] = [
 	{
 		path: '/',
 		component: () => import('../layout/index.vue'),
-		redirect: '/gen/generator',
+		redirect: '/chat',
 		children: [...menuRoutes]
 	},
 	{

@@ -40,7 +40,7 @@
 					</el-scrollbar>
 				</div>
 			</el-aside>
-		
+
 			<el-main class="chat_card_main">
 				<div class="chat_history_expend" @click="chatHistoryDisplay = !chatHistoryDisplay">
 					<svg-icon icon="icon-arrow-expand" v-if="!chatHistoryDisplay"></svg-icon>
@@ -56,8 +56,7 @@
 					</el-row>
 				</div>
 				<!--内容-->
-				<div
-					style="height: calc(100vh - 270px - var(--theme-header-height));">
+				<div style="height: calc(100vh - 270px - var(--theme-header-height));">
 					<el-scrollbar max-height="100%" style="width: 100%;">
 						<div style="max-width: 1150px;margin: 16px auto;">
 							<div class="ans_item">
@@ -75,36 +74,55 @@
 								<div class="ans_item_content">
 									<!-- <div v-html="renderedContent(chat_msg.str)" class="markdown-body"
 										style="font-size: small"></div> -->
-										<TextComponent
-											ref="textRef"
-											:text="chat_msg.str"
-											:loading="false"
-											:asRawText = "false"
-											/>
+									<TextComponent ref="textRef" :text="chat_msg.system" :loading="false"
+										:asRawText="false" />
 								</div>
 							</div>
-							<!---问题--->
-							<div class="question_item">
-								<div class="question_item_container">
-									<!--问题头像-->
-									<div class="question_item_avatar">
-										<el-button @mouseover="questionEdit = true" @mouseleave="questionEdit = false">
+							<div v-for="historyItem in chat_msg.history">
+								<!---问题--->
+								<div class="question_item" v-if="historyItem.role == 'user'">
+									<div class="question_item_container">
+										<!--问题头像-->
+										<div class="question_item_avatar">
+											<el-button @mouseover="questionEdit = true"
+												@mouseleave="questionEdit = false">
+												<template #icon>
+													<svg-icon icon="icon-edit" v-if="questionEdit"></svg-icon>
+													<svg-icon icon="icon-user" v-else></svg-icon>
+												</template>
+											</el-button>
+										</div>
+										<!--问题内容-->
+										<div class="question_item_content">
+											<div>{{ historyItem.content }}</div>
+										</div>
+									</div>
+								</div>
+								<!---回答--->
+								<div class="ans_item" v-if="historyItem.role == 'assistant'">
+								<div class="ans_item_avatar">
+									<!--回答头像-->
+									<div>
+										<el-button>
 											<template #icon>
-												<svg-icon icon="icon-edit" v-if="questionEdit"></svg-icon>
-												<svg-icon icon="icon-user" v-else></svg-icon>
+												<svg-icon icon="icon-user"></svg-icon>
 											</template>
 										</el-button>
 									</div>
-									<!--问题内容-->
-									<div class="question_item_content">
-										<div>有什么可以帮你的吗</div>
-									</div>
+								</div>
+								<!--回答内容-->
+								<div class="ans_item_content">
+									<TextComponent ref="textRef" :text="historyItem.content" :loading="false"
+										:asRawText="false" />
 								</div>
 							</div>
+							</div>
+							
+
 						</div>
 					</el-scrollbar>
 				</div>
-			
+
 				<!--尾部-->
 				<div class="chat_main_plane">
 					<div class="chat_main_plane_icon">
@@ -167,10 +185,6 @@
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
-import markdownIt from 'markdown-it'
-import 'github-markdown-css';
-import { common, createStarryNight } from '@wooorm/starry-night'
-import { toHtml } from 'hast-util-to-html'
 import TextComponent from '@/components/Message/Text.vue'
 
 // 其他syspromt
@@ -337,87 +351,56 @@ const chatHistoryDisplay = ref(true)
 const uploadIcon = ref(false)
 
 // 对话
-const chat_msg = ref({ str: '', html: '' })
+// 定义 HistoryItem 接口
+interface HistoryItem {
+  role: string;
+  content: string;
+}
+
+interface historyChat{
+	system: string,
+	history: HistoryItem[],
+	model_name: string,
+	// single_turn: boolean,
+	// temperature: number,
+    // top_p: number,
+    // n_choices: number,
+    // stop_sequence: [],
+    // token_upper_limit: number,
+    // max_generation_token: number,
+    // presence_penalty:number,
+    // frequency_penalty: number,
+    // logit_bias: number,
+    // user_identifier: string,
+    // stream: true,
+    // metadata: {}
+}
+
+const chat_msg = ref<historyChat>()
+
+chat_msg.value= {
+	system: 'You are a helpful assistant.',
+	history: [
+		{
+			role: 'user',
+			content: 'python怎么使用vue前端项目'
+		},
+		{
+            role: "assistant",
+            content: "Python 可以与 Vue 前端项目集成的常见方式包括：\n\n1. 后端 API：使用 Flask 或 Django 等 Python 框架来创建 RESTful API，以提供数据给 Vue 应用程序。\n2. 服务端渲染 (SSR)：使用 Node.js 和 Express.js 作为服务端渲染层，使用 Python 作为数据处理层。\n3. Web 服务：使用 Python 的 Web 框架例如 Tornado 或 Pyramid 来提供一个 Web 服务，从而为 Vue 应用程序提供数据。\n\n下面是一个使用 Flask 和 Vue.js 的简单示例\n\n### Flask 后端 API\n\n创建一个名为 `app.py` 的文件，内容如下：\n```python\nfrom flask import Flask, jsonify\n\napp = Flask(__name__)\n\n# 模拟数据\ndata = [\n    {\"id\": 1, \"name\": \"John\"},\n    {\"id\": 2, \"name\": \"Jane\"},\n]\n\n@app.route(\"/api/data\")\ndef get_data():\n    return jsonify(data)\n\nif __name__ == \"__main__\":\n    app.run(debug=True)\n```\n运行该应用程序，打开浏览器，访问 `http://localhost:5000/api/data`，即可看到返回的 JSON 数据。\n\n### Vue.js 前端\n\n创建一个新的 Vue.js 项目，使用以下命令：\n```bash\nnpm install -g @vue/cli\nvue create vue-app\n```\n在 `src` 目录下创建一个名为 `api.js` 的文件，内容如下：\n```javascript\nimport axios from 'axios';\n\nconst api = axios.create({\n  baseURL: 'http://localhost:5000/api',\n});\n\nexport default api;\n```\n"
+        }
+		
+	],
+	model_name: 'llama-3.2-90b-vision-preview'
+}
+
+
+
+
+
 
 // 问题头像
 const questionEdit = ref(false)
-
-//chat_msg.value.str = '以下为 Java 词汇命名工具的输出结果：\n\n1. 常量：\n   * MIN_TEMP_POINT_ID\n   * LOWEST_TEMP_NODE\n   * MIN_SENSOR_ID\n\n2. 变量：\n   * minTempSensorId\n   * lowestTempPointNo\n   * coldPointNum\n\n3. 包名：\n   * com.ei.kunlun.temperature\n   * com.ei.kunlun.sensor\n   * com.ei.kunlun.detect\n\n4. 抽象类：\n   * AbstractTempSensor\n   * AbstractDetectPoint\n   * BaseTemperatureMonitor\n\n5. 测试类：\n   * MinTempPointTest\n   * LowTempSensorTest\n   * DetectPointTest\n\n6. 异常类：\n   * TempOutOfRangeLowException\n   * SensorNotDetectedException\n   * DetectPointNotFoundException\n\n7. sql 字段名：\n   * min_temp_point_id\n   * lowest_temp_point_no\n   * low_temp_sensor_id'
-chat_msg.value.str = "简单示例：\n\n### Flask 后端 API\n\n创建一个名为 `app.py` 的文件，内容如下：\n``` python\nfrom flask import Flask, jsonify\n\napp = Flask(__name__)\n\n# 模拟数据\ndata = [\n    {\"id\": 1, \"name\": \"John\"},\n    {\"id\": 2, \"name\": \"Jane\"},\n]\n\n@app.route(\"/api/data\")\ndef get_data():\n    return jsonify(data)\n\nif __name__ == \"__main__\":\n    app.run(debug=True)\n ``` \n运行该应用程序，打开浏览器";
-const markdownItInstance = ref<markdownIt | null>(null);
-const starryNight = ref<any>(null)
-const isInitialized = ref(false);
-const htmlStr = ref('')
-
-// 异步初始化函数
-const initializeMarkdownIt = async () => {
-  try {
-    starryNight.value = await createStarryNight(common);
-    markdownItInstance.value = markdownIt({
-      highlight(value: any, lang: any) {
-        const scope = starryNight.value.flagToScope(lang);
-
-        const filterChildren = (children: any[]) => {
-          return children.filter(child => child.type === 'element' || child.type === 'text');
-        };
-
-        return toHtml({
-          type: 'element',
-          tagName: 'pre',
-          properties: {
-            className: scope
-              ? [
-                  'highlight',
-                  'highlight-' + scope.replace(/^source\./, '').replace(/\./g, '-')
-                ]
-              : undefined
-          },
-          children: scope
-            ? filterChildren(starryNight.value.highlight(value, scope).children)
-            : [{ type: 'text', value }]
-        });
-      }
-    });
-    isInitialized.value = true; // 设置初始化状态为 true
-  } catch (error) {
-    console.error('Failed to initialize markdownItInstance:', error);
-  }
-};
-
-// 在 onMounted 钩子中调用初始化函数
-onMounted(() => {
-  initializeMarkdownIt();
-});
-
-
-
-// 定义 covertHtml 方法
-const covertHtml = async (str: string) => {
-	
-  if (!isInitialized.value) {
-    await new Promise<void>((resolve) => {
-      const intervalId = setInterval(() => {
-        if (isInitialized.value) {
-          clearInterval(intervalId);
-          resolve();
-        }
-      }, 100);
-    });
-  }
-
-  if (markdownItInstance.value) {
-     markdownItInstance.value.render(str);
-  }
-  return str; // 如果 markdownItInstance 还未初始化，直接返回原始字符串
-};
-
-// 使用 computed 属性处理异步结果
-const renderedContent = computed(async (content) => {
-  return await covertHtml(content);
-});
-
-// 将 covertHtml 函数暴露给模板
-defineExpose({ covertHtml });
 
 </script>
 
