@@ -13,11 +13,8 @@ import 'highlight.js/styles/atom-one-dark.css'
 import 'github-markdown-css';
 
 interface Props {
-  inversion?: boolean
-  error?: boolean
   text?: string
   loading?: boolean
-  asRawText?: boolean
 }
 
 const props = defineProps<Props>()
@@ -41,26 +38,13 @@ const mdi = new MarkdownIt({
 
 mdi.use(MdLinkAttributes, { attrs: { target: '_blank', rel: 'noopener' } }).use(MdKatex).use(MdMermaid)
 
-const wrapClass = computed(() => {
-  return [
-    'text-wrap',
-    'min-w-[20px]',
-    'rounded-md',
-    //isMobile.value ? 'p-2' : 'px-3 py-2',
-    props.inversion ? 'bg-[#d2f9d1]' : 'bg-[#f4f6f8]',
-    props.inversion ? 'dark:bg-[#a1dc95]' : 'dark:bg-[#1e1e20]',
-    props.inversion ? 'message-request' : 'message-reply',
-    { 'text-red-500': props.error },
-  ]
-})
+
 
 const text = computed(() => {
   const value = props.text ?? ''
-  if (!props.asRawText) {
-    // 对数学公式进行处理，自动添加 $$ 符号
-    const escapedText = escapeBrackets(escapeDollarNumber(value))
+  // 对数学公式进行处理，自动添加 $$ 符号
+  const escapedText = escapeBrackets(escapeDollarNumber(value))
     return mdi.render(escapedText)
-  }
   return value
 })
 
@@ -147,13 +131,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="text-black" :class="wrapClass">
+  <div class="text-black">
     <div ref="textRef" class="leading-relaxed break-words">
-      <div v-if="!inversion">
-        <div v-if="!asRawText" class="markdown-body" :class="{ 'markdown-body-generate': loading }" v-html="text" />
-        <div v-else class="whitespace-pre-wrap" v-text="text" />
+      <div>
+        <div v-if="!props.loading"  class="markdown-body"  v-html="text" />
+        <div v-else class="loading-container">
+          <div class="moving-div">
+            <svg-icon className="load-icon" icon="icon-loading"></svg-icon>
+          </div>
+        </div>
       </div>
-      <div v-else class="whitespace-pre-wrap" v-text="text" />
     </div>
   </div>
 </template>
@@ -222,5 +209,32 @@ pre {
     cursor: pointer;
     display: flex;
     align-items: center;
+}
+
+:deep .load-icon {
+  width: 100px !important;
+  height: 60px !important;
+}
+
+.loading-container {
+  position: relative;
+  width: 100%;
+  height: 40px;
+}
+
+.moving-div {
+  position: absolute;
+  width: 100px; /* 根据实际需求调整 */
+  height: 60px; /* 根据实际需求调整 */
+  animation: moveRight 5s linear infinite;
+}
+
+@keyframes moveRight {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(50vw);
+  }
 }
 </style>

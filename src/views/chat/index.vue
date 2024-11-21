@@ -57,11 +57,12 @@
 				</div>
 				<!--内容-->
 				<div style="height: calc(100vh - 270px - var(--theme-header-height));">
-					<el-scrollbar max-height="100%" style="width: 100%;">
+					<el-scrollbar max-height="100%" style="width: 100%;" ref="scrollbarRef">
 						<div style="max-width: 1150px;margin: 16px auto;">
+							<!--
 							<div class="ans_item">
 								<div class="ans_item_avatar">
-									<!--回答头像-->
+									回答头像
 									<div>
 										<el-button>
 											<template #icon>
@@ -70,14 +71,13 @@
 										</el-button>
 									</div>
 								</div>
-								<!--回答内容-->
+								回答内容
 								<div class="ans_item_content">
-									<!-- <div v-html="renderedContent(chat_msg.str)" class="markdown-body"
-										style="font-size: small"></div> -->
 									<TextComponent ref="textRef" :text="chat_msg.system" :loading="false"
 										:asRawText="false" />
 								</div>
 							</div>
+						-->
 							<div v-for="historyItem in chat_msg.history">
 								<!---问题--->
 								<div class="question_item" v-if="historyItem.role == 'user'">
@@ -100,24 +100,61 @@
 								</div>
 								<!---回答--->
 								<div class="ans_item" v-if="historyItem.role == 'assistant'">
-								<div class="ans_item_avatar">
-									<!--回答头像-->
-									<div>
-										<el-button>
-											<template #icon>
-												<svg-icon icon="icon-user"></svg-icon>
-											</template>
-										</el-button>
+									<div class="ans_item_avatar">
+										<!--回答头像-->
+										<div>
+											<el-button>
+												<template #icon>
+													<svg-icon icon="icon-user"></svg-icon>
+												</template>
+											</el-button>
+										</div>
+									</div>
+									<!--回答内容-->
+									<div class="ans_item_content">
+										<TextComponent ref="textRef" :text="historyItem.content" :loading="false"
+											:asRawText="false" />
 									</div>
 								</div>
-								<!--回答内容-->
-								<div class="ans_item_content">
-									<TextComponent ref="textRef" :text="historyItem.content" :loading="false"
-										:asRawText="false" />
+							</div>
+							<div v-for="data in chatBotDatas">
+								<!---问题--->
+								<div class="question_item">
+									<div class="question_item_container">
+										<!--问题头像-->
+										<div class="question_item_avatar">
+											<el-button @mouseover="questionEdit = true"
+												@mouseleave="questionEdit = false">
+												<template #icon>
+													<svg-icon icon="icon-edit" v-if="questionEdit"></svg-icon>
+													<svg-icon icon="icon-user" v-else></svg-icon>
+												</template>
+											</el-button>
+										</div>
+										<!--问题内容-->
+										<div class="question_item_content">
+											<div>{{ data.userCt }}</div>
+										</div>
+									</div>
+								</div>
+								<!---回答--->
+								<div class="ans_item">
+									<div class="ans_item_avatar">
+										<!--回答头像-->
+										<div>
+											<el-button>
+												<template #icon>
+													<svg-icon icon="icon-user"></svg-icon>
+												</template>
+											</el-button>
+										</div>
+									</div>
+									<!--回答内容-->
+									<div class="ans_item_content">
+										<TextComponent ref="textRef" :text="data.assistantCt" :loading="data.isLoading" />											
+									</div>
 								</div>
 							</div>
-							</div>
-							
 
 						</div>
 					</el-scrollbar>
@@ -159,14 +196,14 @@
 					<div class="chat_main_plane_label">
 						<el-scrollbar :max-height="100" style="width: 100%;">
 							<div class="chat_textarea">
-								<el-input v-model="chat_msg" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"
+								<el-input v-model="chatBotMst" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"
 									input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
 									placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令">
 								</el-input>
 							</div>
 						</el-scrollbar>
 						<div class="chat_input_send">
-							<el-button color="#626aef">
+							<el-button color="#626aef" @click="sendBotMsgClick">
 								<div style="margin-right: 5px;">
 									<svg-icon icon="icon-send_right" />
 								</div>
@@ -183,10 +220,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+import { reactive, ref, computed, onMounted, onUnmounted, watch,onUpdated, nextTick } from 'vue'
+import { ElNotification,ElScrollbar  } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
-
+import { useChatApi } from '@/api/chat'
 // 其他syspromt
 const syspromts = ref([
 	{
@@ -353,32 +390,32 @@ const uploadIcon = ref(false)
 // 对话
 // 定义 HistoryItem 接口
 interface HistoryItem {
-  role: string;
-  content: string;
+	role: string;
+	content: string;
 }
 
-interface historyChat{
+interface historyChat {
 	system: string,
 	history: HistoryItem[],
 	model_name: string,
 	// single_turn: boolean,
 	// temperature: number,
-    // top_p: number,
-    // n_choices: number,
-    // stop_sequence: [],
-    // token_upper_limit: number,
-    // max_generation_token: number,
-    // presence_penalty:number,
-    // frequency_penalty: number,
-    // logit_bias: number,
-    // user_identifier: string,
-    // stream: true,
-    // metadata: {}
+	// top_p: number,
+	// n_choices: number,
+	// stop_sequence: [],
+	// token_upper_limit: number,
+	// max_generation_token: number,
+	// presence_penalty:number,
+	// frequency_penalty: number,
+	// logit_bias: number,
+	// user_identifier: string,
+	// stream: true,
+	// metadata: {}
 }
 
 const chat_msg = ref<historyChat>()
 
-chat_msg.value= {
+chat_msg.value = {
 	system: 'You are a helpful assistant.',
 	history: [
 		{
@@ -386,22 +423,78 @@ chat_msg.value= {
 			content: 'python怎么使用vue前端项目'
 		},
 		{
-            role: "assistant",
-            content: "Python 可以与 Vue 前端项目集成的常见方式包括：\n\n1. 后端 API：使用 Flask 或 Django 等 Python 框架来创建 RESTful API，以提供数据给 Vue 应用程序。\n2. 服务端渲染 (SSR)：使用 Node.js 和 Express.js 作为服务端渲染层，使用 Python 作为数据处理层。\n3. Web 服务：使用 Python 的 Web 框架例如 Tornado 或 Pyramid 来提供一个 Web 服务，从而为 Vue 应用程序提供数据。\n\n下面是一个使用 Flask 和 Vue.js 的简单示例\n\n### Flask 后端 API\n\n创建一个名为 `app.py` 的文件，内容如下：\n```python\nfrom flask import Flask, jsonify\n\napp = Flask(__name__)\n\n# 模拟数据\ndata = [\n    {\"id\": 1, \"name\": \"John\"},\n    {\"id\": 2, \"name\": \"Jane\"},\n]\n\n@app.route(\"/api/data\")\ndef get_data():\n    return jsonify(data)\n\nif __name__ == \"__main__\":\n    app.run(debug=True)\n```\n运行该应用程序，打开浏览器，访问 `http://localhost:5000/api/data`，即可看到返回的 JSON 数据。\n\n### Vue.js 前端\n\n创建一个新的 Vue.js 项目，使用以下命令：\n```bash\nnpm install -g @vue/cli\nvue create vue-app\n```\n在 `src` 目录下创建一个名为 `api.js` 的文件，内容如下：\n```javascript\nimport axios from 'axios';\n\nconst api = axios.create({\n  baseURL: 'http://localhost:5000/api',\n});\n\nexport default api;\n```\n"
-        }
-		
+			role: "assistant",
+			content: "Python 可以与 Vue 前端项目集成的常见方式包括：\n\n1. 后端 API：使用 Flask 或 Django 等 Python 框架来创建 RESTful API，以提供数据给 Vue 应用程序。\n2. 服务端渲染 (SSR)：使用 Node.js 和 Express.js 作为服务端渲染层，使用 Python 作为数据处理层。\n3. Web 服务：使用 Python 的 Web 框架例如 Tornado 或 Pyramid 来提供一个 Web 服务，从而为 Vue 应用程序提供数据。\n\n下面是一个使用 Flask 和 Vue.js 的简单示例\n\n### Flask 后端 API\n\n创建一个名为 `app.py` 的文件，内容如下：\n```python\nfrom flask import Flask, jsonify\n\napp = Flask(__name__)\n\n# 模拟数据\ndata = [\n    {\"id\": 1, \"name\": \"John\"},\n    {\"id\": 2, \"name\": \"Jane\"},\n]\n\n@app.route(\"/api/data\")\ndef get_data():\n    return jsonify(data)\n\nif __name__ == \"__main__\":\n    app.run(debug=True)\n```\n运行该应用程序，打开浏览器，访问 `http://localhost:5000/api/data`，即可看到返回的 JSON 数据。\n\n### Vue.js 前端\n\n创建一个新的 Vue.js 项目，使用以下命令：\n```bash\nnpm install -g @vue/cli\nvue create vue-app\n```\n在 `src` 目录下创建一个名为 `api.js` 的文件，内容如下：\n```javascript\nimport axios from 'axios';\n\nconst api = axios.create({\n  baseURL: 'http://localhost:5000/api',\n});\n\nexport default api;\n```\n"
+		}
+
 	],
 	model_name: 'llama-3.2-90b-vision-preview'
 }
 
-
-
-
-
-
 // 问题头像
 const questionEdit = ref(false)
 
+//正在对话
+interface chatBot {
+	// 用户输入
+	userCt: string,
+	// 机器人回复
+	assistantCt: string,
+	// 是否正在回复
+	isLoading: boolean
+}
+// 正在进行的对话数据
+const chatBotDatas = ref<[chatBot]>([])
+
+// 对话输入框的数据
+const chatBotMst = ref('')
+
+// 发送按钮
+const sendBotMsgClick = () => {
+	let msg = chatBotMst.value
+	if (!msg) {
+		ElNotification({
+			title: '提示',
+			message: '请输入要咨询的问题',
+			type: 'warning'
+		})
+	}
+	const curMsg = {
+		userCt:msg,
+		assistantCt:'',
+		isLoading:true
+	}
+	chatBotDatas.value.push(curMsg)
+	// 对话
+	useChatApi({input_text:msg}).then(res => {
+		debugger
+		chatBotDatas.value[chatBotDatas.value.length-1].assistantCt = res
+		chatBotDatas.value[chatBotDatas.value.length-1].isLoading = false
+	}).catch(err => {
+		console.log(err)
+		chatBotDatas.value[chatBotDatas.value.length-1].isLoading = false
+	})
+}
+
+// 对话框滚动条滚动到底部
+const scrollbarRef = ref<InstanceType<typeof ElScrollbar>>()
+const scrollbarToBotom= async () =>{
+	await nextTick();
+	const { scrollTop, clientHeight, scrollHeight } = scrollbarRef.value.wrapRef;
+	const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+	if(isAtBottom){
+		return
+	}else{	
+		scrollbarRef?.value.setScrollTop(scrollHeight)
+	}
+	
+}
+
+watch([scrollbarRef,chatBotDatas.value],([newScrollVal, newChatVal],[oldScrollVal, oldChatVal]) =>{
+	if(newScrollVal || newChatVal){
+		scrollbarToBotom()
+	}
+})
 </script>
 
 

@@ -1,0 +1,36 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "70cdf33ae14c370b5aa01fbade3061ec20b3c122c83f5abbbb7b20fd1606a8c1"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.11"
+        },
+        "sources": [
+            {
+                "name": "pip_conf_index_global",
+                "url": "https://mirrors.aliyun.com/pypi/simple/",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "mysqlclient": {
+            "hashes": [
+                "sha256:3da70a07753ba6be881f7d75e795e254f6a0c12795778034acc69769b0649d37",
+                "sha256:43c5b30be0675080b9c815f457d73397f0442173e7be83d089b126835e2617ae",
+                "sha256:794857bce4f9a1903a99786dd29ad7887f45a870b3d11585b8c51c4a753c4174",
+                "sha256:b0a5cddf1d3488b254605041070086cac743401d876a659a72d706a0d89c8ebb",
+                "sha256:c0b46d9b78b461dbb62482089ca8040fa916595b1b30f831ebbd1b0a82b43d53",
+                "sha256:e940b41d85dfd7b190fa47d52f525f878cfa203d4653bf6a35b271b3c3be125b",
+                "sha256:e94a92858203d97fd584bdb6d7ee8c56f2590db8d77fd44215c0dcf5e739bc37",
+                "sha256:f3efb849d6f7ef4b9788a0eda2e896b975e0ebf1d6bf3dcabea63fd698e5b0b5"
+            ],
+            "index": "pip_conf_index_global",
+            "markers": "python_version >= '3.8'",
+            "version": "==2.2.6"
+        }
+    },
+    "develop": {}
+}

@@ -28,3 +28,6 @@ coverage
 *.sln
 *.sw?
 /.vscode
+/server/.venv
+/server/.vscode
+/server/*.log

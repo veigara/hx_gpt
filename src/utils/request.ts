@@ -34,15 +34,13 @@ service.interceptors.response.use(
 		if (response.status !== 200) {
 			return Promise.reject(new Error(response.statusText || 'Error'))
 		}
-
+		debugger
 		const res = response.data
 		// 响应成功
-		if (res.code === 0) {
-			return res
-		}
+		return res;
 
 		// 错误提示
-		ElMessage.error(res.msg)
+		//ElMessage.error(res.msg)
 
 		return Promise.reject(new Error(res.msg || 'Error'))
 	},
