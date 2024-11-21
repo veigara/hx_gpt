@@ -151,7 +151,8 @@
 									</div>
 									<!--回答内容-->
 									<div class="ans_item_content">
-										<TextComponent ref="textRef" :text="data.assistantCt" :loading="data.isLoading" />											
+										<TextComponent ref="textRef" :text="data.assistantCt"
+											:loading="data.isLoading" />
 									</div>
 								</div>
 							</div>
@@ -198,17 +199,21 @@
 							<div class="chat_textarea">
 								<el-input v-model="chatBotMst" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"
 									input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
-									placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令">
+									placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令"
+									@keyup.enter="sendBotMsgClick">
 								</el-input>
 							</div>
 						</el-scrollbar>
 						<div class="chat_input_send">
-							<el-button color="#626aef" @click="sendBotMsgClick">
+							<el-button color="#ff0000" disabled
+								v-if="chatBotDatas?.[chatBotDatas.length - 1]?.isLoading">加载中</el-button>
+							<el-button color="#626aef" @click="sendBotMsgClick" v-else>
 								<div style="margin-right: 5px;">
 									<svg-icon icon="icon-send_right" />
 								</div>
 								发送
 							</el-button>
+
 						</div>
 
 					</div>
@@ -220,8 +225,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted, onUnmounted, watch,onUpdated, nextTick } from 'vue'
-import { ElNotification,ElScrollbar  } from 'element-plus'
+import { reactive, ref, computed, onMounted, onUnmounted, watch, onUpdated, nextTick } from 'vue'
+import { ElNotification, ElScrollbar, ElMessage } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
 import { useChatApi } from '@/api/chat'
 // 其他syspromt
@@ -460,39 +465,60 @@ const sendBotMsgClick = () => {
 		})
 	}
 	const curMsg = {
-		userCt:msg,
-		assistantCt:'',
-		isLoading:true
+		userCt: msg,
+		assistantCt: '',
+		isLoading: true
 	}
 	chatBotDatas.value.push(curMsg)
 	// 对话
-	useChatApi({input_text:msg}).then(res => {
-		debugger
-		chatBotDatas.value[chatBotDatas.value.length-1].assistantCt = res
-		chatBotDatas.value[chatBotDatas.value.length-1].isLoading = false
+	useChatApi({ input_text: msg }).then(res => {
+		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
+		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
 	}).catch(err => {
-		console.log(err)
-		chatBotDatas.value[chatBotDatas.value.length-1].isLoading = false
+		ElNotification({
+			title: '错误',
+			message: err.message,
+			type: 'error'
+		})
+		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
 	})
+	// 清空发送的消息
+	chatBotMst.value = ''
 }
 
 // 对话框滚动条滚动到底部
 const scrollbarRef = ref<InstanceType<typeof ElScrollbar>>()
-const scrollbarToBotom= async () =>{
+const scrollbarToBotom = async (smooth: boolean) => {
 	await nextTick();
 	const { scrollTop, clientHeight, scrollHeight } = scrollbarRef.value.wrapRef;
 	const isAtBottom = scrollTop + clientHeight >= scrollHeight;
-	if(isAtBottom){
+	if (isAtBottom) {
 		return
-	}else{	
-		scrollbarRef?.value.setScrollTop(scrollHeight)
+	} else {
+		if (smooth) {
+			// 缓慢滚动
+			let baseHeight = 20; // 每次滚动的距离
+			const height = scrollTop + clientHeight
+			const intervalId = setInterval(() => {
+				baseHeight += 50;
+				debugger
+				const newScrollTop = height+baseHeight;
+				scrollbarRef?.value?.setScrollTop(newScrollTop);
+				if (newScrollTop >=scrollHeight) {
+					clearInterval(intervalId);
+				}
+			}, 1000); 
+		} else {
+			scrollbarRef?.value?.setScrollTop(scrollHeight);
+		}
 	}
-	
+
 }
 
-watch([scrollbarRef,chatBotDatas.value],([newScrollVal, newChatVal],[oldScrollVal, oldChatVal]) =>{
-	if(newScrollVal || newChatVal){
-		scrollbarToBotom()
+
+watch([scrollbarRef, chatBotDatas.value], ([newScrollVal, newChatVal], [oldScrollVal, oldChatVal]) => {
+	if (newScrollVal || newChatVal.length>0) {
+		scrollbarToBotom(newChatVal.length>0?true:false)
 	}
 })
 </script>

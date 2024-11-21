@@ -38,14 +38,9 @@ service.interceptors.response.use(
 		const res = response.data
 		// 响应成功
 		return res;
-
-		// 错误提示
-		//ElMessage.error(res.msg)
-
-		return Promise.reject(new Error(res.msg || 'Error'))
 	},
 	error => {
-		ElMessage.error(error.message)
+		//ElMessage.error(error.message)
 		return Promise.reject(error)
 	}
 )

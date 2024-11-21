@@ -105,20 +105,13 @@ class BaseLLMModel:
 
     def stream_next_chatbot(self, inputs) ->str:
         """发送一个回答"""
-        logging.info(
-                "用户"
-                + f"{self.user_name}"
-                + "的输入为：{inputs}"
-            )
+        logger.info(f"用户输入为：{inputs}")
         user_token_count = self.count_token(inputs)
         self.all_token_counts.append(user_token_count)
         logger.debug(f"输入token计数: {user_token_count}")
         self.history.append(construct_user(inputs))
         stream_iter = self.get_answer_stream_iter()
-        logging.info(
-                "回答为："
-                + f"{stream_iter}"
-            )
+        logger.info(f"模型输出为：{stream_iter}")
         self.history.append(construct_assistant(stream_iter))
         
         return stream_iter

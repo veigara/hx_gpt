@@ -140,6 +140,9 @@ onUnmounted(() => {
             <svg-icon className="load-icon" icon="icon-loading"></svg-icon>
           </div>
         </div>
+        <div v-show="!text && !props.loading">
+            <el-empty description="数据为空" />
+        </div>  
       </div>
     </div>
   </div>
