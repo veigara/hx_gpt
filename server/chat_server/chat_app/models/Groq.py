@@ -28,7 +28,7 @@ class Groq_Client(BaseLLMModel):
         )
 
     def _get_groq_style_input(self):
-        messages = [construct_system(self.system_prompt), *self.history]
+        messages = [construct_system(self.system_prompt), *self.get_history()]
         return messages
 
     def get_answer_at_once(self):

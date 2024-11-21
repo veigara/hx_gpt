@@ -50,8 +50,12 @@
 				<div style="height: 40px;border-bottom: 1px solid #ebeef5;">
 					<el-row style="padding: 0px 20px;">
 						<el-col :span="16">
+						 模型名称: <span style="color: #00BFFF;">{{curModel}}</span>	
 						</el-col>
-						<el-col :span="8">
+					</el-row>
+					<el-row style="padding: 0px 20px;">
+						<el-col :span="16">
+						 智能体	
 						</el-col>
 					</el-row>
 				</div>
@@ -168,7 +172,7 @@
 						<div class="chat_main_plane_space">
 							<el-popover placement="top" trigger="hover" :show-arrow="false">
 								<template #reference>
-									<el-button title="上传" @click="uploadIcon = !uploadIcon" round>
+									<el-button title="上传"  round>
 										<template #icon>
 											<svg-icon icon="icon-upload"></svg-icon>
 										</template>
@@ -191,7 +195,24 @@
 								</div>
 							</el-popover>
 						</div>
-						<!--对话设置-->
+						<!--模型-->
+						<div class="chat_main_plane_space">
+							<el-popover placement="top" trigger="hover" :show-arrow="false">
+								<template #reference>
+									<el-button title="大模型"  round>
+										<template #icon>
+											<svg-icon icon="icon-Checkpoint"></svg-icon>
+										</template>
+									</el-button>
+								</template>
+								<el-select :teleported="false" v-model="curModel" placeholder="请选择模型" style="width: 120px;">
+									<el-option v-for="item in modelList" :key="item.label" :label="item.label"
+										:value="item.label">
+									</el-option>
+								</el-select>
+							</el-popover>
+
+						</div>
 					</div>
 
 					<div class="chat_main_plane_label">
@@ -228,7 +249,7 @@
 import { reactive, ref, computed, onMounted, onUnmounted, watch, onUpdated, nextTick } from 'vue'
 import { ElNotification, ElScrollbar, ElMessage } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
-import { useChatApi } from '@/api/chat'
+import { useChatApi,useModelsApi } from '@/api/chat'
 // 其他syspromt
 const syspromts = ref([
 	{
@@ -369,9 +390,19 @@ const closeHistoryMenu = () => {
 	historys.value.filter(item => item.show == true).find(item => item.show = false)
 }
 
-// 点击空白关闭历史记录菜单
-const closeHistoryMounted = onMounted(() => {
+
+const ElNotificationErr = (err: any) => {
+	ElNotification({
+		title: err.message,
+		message: err?.response?.data,
+		type: 'error'
+	})
+}
+const mounted = onMounted(() => {
+	// 点击空白关闭历史记录菜单
 	document.addEventListener('click', handleClickOutside);
+	// 获取所有的模型
+	getModelList();
 });
 
 const closeHistoryUnmounted = onUnmounted(() => {
@@ -389,8 +420,6 @@ const handleClickOutside = (event: any) => {
 // 关闭历史记录siber
 const chatHistoryDisplay = ref(true)
 
-// 上传图标显示
-const uploadIcon = ref(false)
 
 // 对话
 // 定义 HistoryItem 接口
@@ -471,15 +500,11 @@ const sendBotMsgClick = () => {
 	}
 	chatBotDatas.value.push(curMsg)
 	// 对话
-	useChatApi({ input_text: msg }).then(res => {
+	useChatApi({ input_text: msg,model_name:curModel.value }).then(res => {
 		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
 		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
 	}).catch(err => {
-		ElNotification({
-			title: '错误',
-			message: err.message,
-			type: 'error'
-		})
+		ElNotificationErr(err)
 		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
 	})
 	// 清空发送的消息
@@ -501,13 +526,12 @@ const scrollbarToBotom = async (smooth: boolean) => {
 			const height = scrollTop + clientHeight
 			const intervalId = setInterval(() => {
 				baseHeight += 50;
-				debugger
-				const newScrollTop = height+baseHeight;
+				const newScrollTop = height + baseHeight;
 				scrollbarRef?.value?.setScrollTop(newScrollTop);
-				if (newScrollTop >=scrollHeight) {
+				if (newScrollTop >= scrollHeight) {
 					clearInterval(intervalId);
 				}
-			}, 1000); 
+			}, 1000);
 		} else {
 			scrollbarRef?.value?.setScrollTop(scrollHeight);
 		}
@@ -517,10 +541,29 @@ const scrollbarToBotom = async (smooth: boolean) => {
 
 
 watch([scrollbarRef, chatBotDatas.value], ([newScrollVal, newChatVal], [oldScrollVal, oldChatVal]) => {
-	if (newScrollVal || newChatVal.length>0) {
-		scrollbarToBotom(newChatVal.length>0?true:false)
+	if (newScrollVal || newChatVal.length > 0) {
+		scrollbarToBotom(newChatVal.length > 0 ? true : false)
 	}
 })
+
+// 模型列表
+const modelList = ref([])
+// 当前模型
+const curModel = ref()
+
+// 获取所有的模型
+const getModelList = () => {
+	useModelsApi().then(res => {
+		modelList.value = res
+		modelList.value.filter(item => item.default == true).forEach(item => {
+			curModel.value = item.label
+		})
+	}).catch(err => {
+		ElNotificationErr(err)
+	})
+}
+
+
 </script>
 
 

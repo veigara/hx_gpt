@@ -34,7 +34,7 @@ service.interceptors.response.use(
 		if (response.status !== 200) {
 			return Promise.reject(new Error(response.statusText || 'Error'))
 		}
-		debugger
+		
 		const res = response.data
 		// 响应成功
 		return res;

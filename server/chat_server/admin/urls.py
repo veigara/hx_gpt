@@ -21,5 +21,7 @@ from chat_app.service import chat
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello', views.hello, name='hello'),
-    path('chat', chat.chat_with_model, name='chat_with_model') 
+    path('chat', chat.chat_with_model, name='chat_with_model'),
+    # 获取所有的大模型
+    path('models', chat.get_all_models, name='get_all_models') 
 ]

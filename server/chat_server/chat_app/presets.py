@@ -45,8 +45,8 @@ INDEX_QUERY_TEMPRATURE = 1.0
 
 
 ONLINE_MODELS = [
-    "Groq 3.2 90B_vision",
-    "Groq 3.2 90B"
+    "llama-3.2-90b-vision",
+    "llama-3.2-90b-text"
 ]
 
 LOCAL_MODELS = [
@@ -83,14 +83,14 @@ DEFAULT_METADATA = {
 
 # Additional metadata for online and local models
 MODEL_METADATA = {
-    "Groq 3.2 90B_vision": {
+    "llama-3.2-90b-vision": {
         "model_name": "llama-3.2-90b-vision-preview",
         "description": "groq_llama-3.2-90b-vision-preview_description",
         "token_limit": 8192,
         "multimodal": True,
         "model_type": "Groq"
     },
-    "Groq 3.2 90B": {
+    "llama-3.2-90b-text": {
         "model_name": "llama-3.2-90b-text-preview",
         "description": "groq_lama-3.2-90b-text-preview_description",
         "token_limit": 8192,

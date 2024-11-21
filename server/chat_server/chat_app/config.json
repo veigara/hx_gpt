@@ -3,5 +3,5 @@
     "lmstudio_host": "192.168.56.1:9000", // 你的 LMStudio Host，用于 LMStudio 对话模型
     "lmstudio_api_key":"not-needed",// 你的 LMStudio API key ,用于访问有限制的模型
      //== 基础配置 ==
-    "default_model": "Groq 3.2 90B_vision" // 默认模型
+    "default_model": "llama-3.2-90b-vision" // 默认模型
 }

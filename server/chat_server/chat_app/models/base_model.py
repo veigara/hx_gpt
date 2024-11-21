@@ -6,6 +6,8 @@ from ..config import set_default_model_params,get_default_model_params
 
 logger = logging.getLogger('chat_app')
 
+# 全局变量历史记录
+_history =[]
 
 class BaseLLMModel:
     def __init__(
@@ -109,10 +111,10 @@ class BaseLLMModel:
         user_token_count = self.count_token(inputs)
         self.all_token_counts.append(user_token_count)
         logger.debug(f"输入token计数: {user_token_count}")
-        self.history.append(construct_user(inputs))
+        self.set_history(construct_user(inputs))
         stream_iter = self.get_answer_stream_iter()
         logger.info(f"模型输出为：{stream_iter}")
-        self.history.append(construct_assistant(stream_iter))
+        self.set_history(construct_assistant(stream_iter))
         
         return stream_iter
 
@@ -137,6 +139,13 @@ class BaseLLMModel:
             self.all_token_counts[-1] = total_token_count - sum(self.all_token_counts)
         status_text = self.token_message()
         return chatbot, status_text
+    
+    def set_history(self, history):
+        global _history
+        _history.append(history)
+    
+    def get_history(self):
+        return _history    
     
 
 class ModelType(Enum):
