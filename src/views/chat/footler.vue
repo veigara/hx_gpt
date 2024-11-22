@@ -1,0 +1,220 @@
+<template>
+	<div class="chat_main_plane">
+		<div class="chat_main_plane_icon">
+			<!--上传-->
+			<div class="chat_main_plane_space">
+				<el-popover placement="top" trigger="hover" :show-arrow="false">
+					<template #reference>
+						<el-button title="上传" round>
+							<template #icon>
+								<svg-icon icon="icon-upload"></svg-icon>
+							</template>
+						</el-button>
+					</template>
+					<div class="history-menu">
+						<el-tooltip effect="light" content="支持PDF、World、Execl,最大100M" placement="right" :offset="-5">
+							<div class="history-menu-item">
+								<span><svg-icon icon="icon-upload-flie" /></span>上传文档
+							</div>
+						</el-tooltip>
+						<el-tooltip effect="light" content="上传1张不超过10M的PNG/JPG的图片" placement="right" :offset="-5">
+							<div class="history-menu-item" style="color: #181818 !important; border-top: none ;">
+								<span><svg-icon icon="icon-upload-image" /></span>上传图片
+							</div>
+						</el-tooltip>
+					</div>
+				</el-popover>
+			</div>
+			<!--模型-->
+			<div class="chat_main_plane_space">
+				<el-popover placement="top" trigger="hover" :show-arrow="false">
+					<template #reference>
+						<el-button title="大模型" round>
+							<template #icon>
+								<svg-icon icon="icon-Checkpoint"></svg-icon>
+							</template>
+						</el-button>
+					</template>
+					<el-select :teleported="false" v-model="curModel" placeholder="请选择模型" style="width: 120px;">
+						<el-option v-for="item in modelList" :key="item.label" :label="item.label" :value="item.label">
+						</el-option>
+					</el-select>
+				</el-popover>
+
+			</div>
+		</div>
+
+		<div class="chat_main_plane_label">
+			<el-scrollbar :max-height="100" style="width: 100%;">
+				<div class="chat_textarea">
+					<el-input v-model="chatBotMst" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"
+						input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
+						placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令" @keyup.enter="sendBotMsgClick">
+					</el-input>
+				</div>
+			</el-scrollbar>
+			<div class="chat_input_send">
+				<el-button color="#ff0000" disabled
+					v-if="chatBotDatas?.[chatBotDatas.length - 1]?.isLoading">加载中</el-button>
+				<el-button color="#626aef" @click="sendBotMsgClick" v-else>
+					<div style="margin-right: 5px;">
+						<svg-icon icon="icon-send_right" />
+					</div>
+					发送
+				</el-button>
+
+			</div>
+
+		</div>
+
+	</div>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref, onMounted, onUpdated, computed, watch } from 'vue'
+import { ElNotification } from 'element-plus/es'
+import { useModelsApi, useChatApi } from '@/api/chat'
+
+interface Props {
+	// 错误弹框
+	ElNotificationErr: Function
+}
+
+//正在对话
+interface chatBot {
+	// 用户输入
+	userCt: string,
+	// 机器人回复
+	assistantCt: string,
+	// 是否正在回复
+	isLoading: boolean
+}
+
+const props = defineProps<Props>()
+// 当前模型
+const curModel = ref()
+// 正在进行的对话数据
+const chatBotDatas = ref<[chatBot]>([])
+// 对话输入框的数据
+const chatBotMst = ref('')
+
+const mounted = onMounted(() => {
+	// 获取所有的模型
+	getModelList();
+});
+
+// 模型列表
+const modelList = ref([])
+
+// 定义事件，方便传值
+const emit = defineEmits(['update:chatBotDatas', 'update:curModel'])
+
+// 监听 chatBotMst 的变化
+watch(curModel, (newVal, oldVal) => {
+	emit('update:curModel', newVal)
+})
+
+// 获取所有的模型
+const getModelList = () => {
+	useModelsApi().then(res => {
+		modelList.value = res
+		modelList.value.filter(item => item.default == true).forEach(item => {
+			curModel.value = item.label
+		})
+	}).catch(err => {
+		props.ElNotificationErr(err)
+	})
+}
+
+// 发送按钮
+const sendBotMsgClick = () => {
+	let msg = chatBotMst.value
+	if (!msg) {
+		ElNotification({
+			title: '提示',
+			message: '请输入要咨询的问题',
+			type: 'warning'
+		})
+		return
+	}
+	const curMsg = {
+		userCt: msg,
+		assistantCt: '',
+		isLoading: true
+	}
+	chatBotDatas.value.push(curMsg)
+	// 对话
+	useChatApi({ input_text: msg, model_name: curModel.value }).then(res => {
+		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
+		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
+		// 将更新后的数据传递给父组件
+		emit('update:chatBotDatas', chatBotDatas.value)
+	}).catch(err => {
+		props.ElNotificationErr(err)
+		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
+		emit('update:chatBotDatas', chatBotDatas.value)
+	})
+	// 清空发送的消息
+	chatBotMst.value = ''
+}
+
+</script>
+<style lang="scss">
+.chat_main_plane {
+	height: 115px;
+	border-top: 1px solid #ebeef5;
+	padding: 10px;
+	padding-top: 10px;
+	max-width: 1150px;
+	margin: 16px auto;
+}
+
+.chat_main_plane_icon {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: row;
+
+	.chat_main_plane_space {
+		margin-right: 10px;
+	}
+}
+
+.chat_main_plane_label {
+	margin-top: 10px !important;
+	cursor: text;
+	border-radius: 15px;
+	border: 1.2px solid #ebeef5;
+	align-items: flex-end;
+	display: flex;
+	flex: 1;
+	margin: 0 auto;
+	overflow: auto;
+	position: relative;
+	width: 100%;
+	z-index: 2;
+	background-color: white;
+}
+
+
+.chat_main_plane_label:has(.el-textarea__inner:focus) {
+	border: 1px solid #626aef;
+}
+
+.chat_textarea {
+	height: 100%;
+	position: relative;
+	width: calc(100% - 50px)
+}
+
+.chat_input_send {
+	align-items: center;
+	bottom: 7px;
+	color: #fff;
+	cursor: pointer;
+	display: flex;
+	flex-shrink: 0;
+	justify-content: center;
+	position: absolute;
+	right: 7px;
+}
+</style>

@@ -2,43 +2,7 @@
 	<el-card class="chat_card" body-style="padding: 0px;">
 		<el-container>
 			<el-aside width="260px" class="chat_card_aside" v-if="chatHistoryDisplay">
-				<el-row>
-					<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;">
-						<template #prefix>
-							<svg-icon icon="icon-search"></svg-icon>
-						</template>
-					</el-input>
-				</el-row>
-				<div style="overflow: hidden;margin-top:20px">
-					<el-scrollbar :max-height="computedHistoryMaxHeight">
-						<ul>
-							<li class="history_listItem"
-								:class="{ 'history_listItem_active': selectedHistory === item.id }"
-								v-for="item in historys" :key="item.id" @click="selectHistoryItem(item.id)">
-								<span class="history_listItem_content">{{ item.content }}</span>
-								<el-popover :visible="item.show == true" placement="right-start" :show-arrow="false"
-									style="padding: 0px;">
-									<div class="history-menu">
-										<div class="history-menu-item">
-
-											<span><svg-icon icon="icon-edit" /></span>重命名
-										</div>
-										<div class="history-menu-item">
-											<span><svg-icon icon="icon-totop" /></span>置顶此对话
-										</div>
-										<div class="history-menu-item">
-											<span><svg-icon icon="icon-delete" /></span>删除此对话
-										</div>
-									</div>
-									<template #reference>
-										<svg-icon class="history_listItem_icon" icon="icon-ellipsis"
-											@click.stop="openHistoryMenu(item)"></svg-icon>
-									</template>
-								</el-popover>
-							</li>
-						</ul>
-					</el-scrollbar>
-				</div>
+				<HistoryAside :searchTxt="searchTxt" :historys="historys" :selectedHistory="selectedHistory" />
 			</el-aside>
 
 			<el-main class="chat_card_main">
@@ -50,12 +14,12 @@
 				<div style="height: 40px;border-bottom: 1px solid #ebeef5;">
 					<el-row style="padding: 0px 20px;">
 						<el-col :span="16">
-						 模型名称: <span style="color: #00BFFF;">{{curModel}}</span>	
+							模型名称: <span style="color: #00BFFF;">{{ curModel }}</span>
 						</el-col>
 					</el-row>
 					<el-row style="padding: 0px 20px;">
 						<el-col :span="16">
-						 智能体	
+							智能体
 						</el-col>
 					</el-row>
 				</div>
@@ -72,16 +36,15 @@
 											<template #icon>
 												<svg-icon icon="icon-user"></svg-icon>
 											</template>
-										</el-button>
-									</div>
-								</div>
-								回答内容
-								<div class="ans_item_content">
-									<TextComponent ref="textRef" :text="chat_msg.system" :loading="false"
-										:asRawText="false" />
-								</div>
-							</div>
-						-->
+</el-button>
+</div>
+</div>
+回答内容
+<div class="ans_item_content">
+	<TextComponent ref="textRef" :text="chat_msg.system" :loading="false" :asRawText="false" />
+</div>
+</div>
+-->
 							<div v-for="historyItem in chat_msg.history">
 								<!---问题--->
 								<div class="question_item" v-if="historyItem.role == 'user'">
@@ -166,80 +129,8 @@
 				</div>
 
 				<!--尾部-->
-				<div class="chat_main_plane">
-					<div class="chat_main_plane_icon">
-						<!--上传-->
-						<div class="chat_main_plane_space">
-							<el-popover placement="top" trigger="hover" :show-arrow="false">
-								<template #reference>
-									<el-button title="上传"  round>
-										<template #icon>
-											<svg-icon icon="icon-upload"></svg-icon>
-										</template>
-									</el-button>
-								</template>
-								<div class="history-menu">
-									<el-tooltip effect="light" content="支持PDF、World、Execl,最大100M" placement="right"
-										:offset="-5">
-										<div class="history-menu-item">
-											<span><svg-icon icon="icon-upload-flie" /></span>上传文档
-										</div>
-									</el-tooltip>
-									<el-tooltip effect="light" content="上传1张不超过10M的PNG/JPG的图片" placement="right"
-										:offset="-5">
-										<div class="history-menu-item"
-											style="color: #181818 !important; border-top: none ;">
-											<span><svg-icon icon="icon-upload-image" /></span>上传图片
-										</div>
-									</el-tooltip>
-								</div>
-							</el-popover>
-						</div>
-						<!--模型-->
-						<div class="chat_main_plane_space">
-							<el-popover placement="top" trigger="hover" :show-arrow="false">
-								<template #reference>
-									<el-button title="大模型"  round>
-										<template #icon>
-											<svg-icon icon="icon-Checkpoint"></svg-icon>
-										</template>
-									</el-button>
-								</template>
-								<el-select :teleported="false" v-model="curModel" placeholder="请选择模型" style="width: 120px;">
-									<el-option v-for="item in modelList" :key="item.label" :label="item.label"
-										:value="item.label">
-									</el-option>
-								</el-select>
-							</el-popover>
-
-						</div>
-					</div>
-
-					<div class="chat_main_plane_label">
-						<el-scrollbar :max-height="100" style="width: 100%;">
-							<div class="chat_textarea">
-								<el-input v-model="chatBotMst" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"
-									input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
-									placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令"
-									@keyup.enter="sendBotMsgClick">
-								</el-input>
-							</div>
-						</el-scrollbar>
-						<div class="chat_input_send">
-							<el-button color="#ff0000" disabled
-								v-if="chatBotDatas?.[chatBotDatas.length - 1]?.isLoading">加载中</el-button>
-							<el-button color="#626aef" @click="sendBotMsgClick" v-else>
-								<div style="margin-right: 5px;">
-									<svg-icon icon="icon-send_right" />
-								</div>
-								发送
-							</el-button>
-
-						</div>
-
-					</div>
-
-				</div>
+				<Footler :ElNotificationErr="ElNotificationErr" @update:cur-model="item => curModel = item"
+					@update:chat-bot-datas="item => chatBotDatas = item" />
 			</el-main>
 		</el-container>
 	</el-card>
@@ -249,7 +140,9 @@
 import { reactive, ref, computed, onMounted, onUnmounted, watch, onUpdated, nextTick } from 'vue'
 import { ElNotification, ElScrollbar, ElMessage } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
-import { useChatApi,useModelsApi } from '@/api/chat'
+import HistoryAside from '@/views/chat/historyAside.vue'
+import Footler from '@/views/chat/footler.vue'
+import { useChatApi, useModelsApi } from '@/api/chat'
 // 其他syspromt
 const syspromts = ref([
 	{
@@ -328,68 +221,6 @@ const historys = ref([
 	},
 
 ])
-// 保存点击的记录
-const selectedHistory = ref('')
-// 模型
-const modes = ref([
-	{
-		label: 'lamam3',
-		detailsInfo: 'lamam3描述,你是由哪个大模型训练的2'
-	},
-	{
-		label: 'lamam3.1',
-		detailsInfo: 'lamam3.1描述,你是由哪个大模型训练的2'
-	},
-	{
-		label: 'lamam3.2',
-		detailsInfo: 'lamam3.2描述'
-	},
-	{
-		label: 'lamam3.3',
-		detailsInfo: 'lamam3.3描述'
-	},
-
-])
-// 选中模型
-//const selectMode = ref({})
-
-//const visible = ref(false)
-
-
-// 点击历史记录 
-const selectHistoryItem = (item: string) => {
-	selectedHistory.value = item
-}
-
-// 右边其他参数
-const themeHeaderHeight = ref(window.getComputedStyle(document.documentElement).getPropertyValue('--theme-header-height'));
-
-// 计算最大高度
-const computedMaxHeight = computed(() => {
-	const headerHeight = parseFloat(themeHeaderHeight.value);
-	return `calc(100vh - 19px - 130px - ${headerHeight}px)`;
-});
-
-// 左边历史记录
-// 计算最大高度
-const computedHistoryMaxHeight = computed(() => {
-	const headerHeight = parseFloat(themeHeaderHeight.value);
-	return `calc(100vh - 19px - 90px - ${headerHeight}px)`;
-});
-
-
-// 打开历史记录的菜单
-const openHistoryMenu = (item: any) => {
-	// 其他菜单隐藏
-	closeHistoryMenu()
-	item.show = true;
-}
-
-// 关闭菜单
-const closeHistoryMenu = () => {
-	historys.value.filter(item => item.show == true).find(item => item.show = false)
-}
-
 
 const ElNotificationErr = (err: any) => {
 	ElNotification({
@@ -398,28 +229,12 @@ const ElNotificationErr = (err: any) => {
 		type: 'error'
 	})
 }
-const mounted = onMounted(() => {
-	// 点击空白关闭历史记录菜单
-	document.addEventListener('click', handleClickOutside);
-	// 获取所有的模型
-	getModelList();
-});
-
-const closeHistoryUnmounted = onUnmounted(() => {
-	document.removeEventListener('click', handleClickOutside);
-});
-
-const handleClickOutside = (event: any) => {
-	modes.value.forEach(item => {
-		if (!event.target.closest('.el-popover')) {
-			closeHistoryMenu()
-		}
-	});
-};
 
 // 关闭历史记录siber
 const chatHistoryDisplay = ref(true)
 
+// 点击的历史记录
+const selectedHistory = ref('')
 
 // 对话
 // 定义 HistoryItem 接口
@@ -468,48 +283,10 @@ chat_msg.value = {
 // 问题头像
 const questionEdit = ref(false)
 
-//正在对话
-interface chatBot {
-	// 用户输入
-	userCt: string,
-	// 机器人回复
-	assistantCt: string,
-	// 是否正在回复
-	isLoading: boolean
-}
+// 当前模型
+const curModel = ref('')
 // 正在进行的对话数据
 const chatBotDatas = ref<[chatBot]>([])
-
-// 对话输入框的数据
-const chatBotMst = ref('')
-
-// 发送按钮
-const sendBotMsgClick = () => {
-	let msg = chatBotMst.value
-	if (!msg) {
-		ElNotification({
-			title: '提示',
-			message: '请输入要咨询的问题',
-			type: 'warning'
-		})
-	}
-	const curMsg = {
-		userCt: msg,
-		assistantCt: '',
-		isLoading: true
-	}
-	chatBotDatas.value.push(curMsg)
-	// 对话
-	useChatApi({ input_text: msg,model_name:curModel.value }).then(res => {
-		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
-		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
-	}).catch(err => {
-		ElNotificationErr(err)
-		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
-	})
-	// 清空发送的消息
-	chatBotMst.value = ''
-}
 
 // 对话框滚动条滚动到底部
 const scrollbarRef = ref<InstanceType<typeof ElScrollbar>>()
@@ -531,7 +308,7 @@ const scrollbarToBotom = async (smooth: boolean) => {
 				if (newScrollTop >= scrollHeight) {
 					clearInterval(intervalId);
 				}
-			}, 1000);
+			}, 200);
 		} else {
 			scrollbarRef?.value?.setScrollTop(scrollHeight);
 		}
@@ -539,30 +316,11 @@ const scrollbarToBotom = async (smooth: boolean) => {
 
 }
 
-
 watch([scrollbarRef, chatBotDatas.value], ([newScrollVal, newChatVal], [oldScrollVal, oldChatVal]) => {
 	if (newScrollVal || newChatVal.length > 0) {
 		scrollbarToBotom(newChatVal.length > 0 ? true : false)
 	}
 })
-
-// 模型列表
-const modelList = ref([])
-// 当前模型
-const curModel = ref()
-
-// 获取所有的模型
-const getModelList = () => {
-	useModelsApi().then(res => {
-		modelList.value = res
-		modelList.value.filter(item => item.default == true).forEach(item => {
-			curModel.value = item.label
-		})
-	}).catch(err => {
-		ElNotificationErr(err)
-	})
-}
-
 
 </script>
 
@@ -706,48 +464,6 @@ const getModelList = () => {
 	max-width: 266px;
 }
 
-.history_listItem {
-	align-items: center;
-	border-radius: 12px;
-	box-sizing: border-box;
-	color: #26244c;
-	cursor: pointer;
-	display: flex;
-	flex-shrink: 0;
-	font-size: 14px;
-	height: 36px;
-	justify-content: space-between;
-	margin-bottom: 12px;
-	padding: 6px 16px;
-	position: relative;
-}
-
-.history_listItem:hover {
-	background: #f3f2ff;
-	color: #615ced;
-}
-
-.history_listItem_active {
-	background: #f3f2ff;
-	color: #615ced;
-}
-
-.history_listItem_content {
-	display: inline-block;
-	max-width: 180px;
-	overflow: hidden;
-	position: relative;
-	text-overflow: clip;
-	white-space: nowrap
-}
-
-.history_listItem_icon {
-	display: inline-block;
-	height: 22px;
-	line-height: 26px;
-	margin-left: 2px
-}
-
 .model-option-container {
 	display: flex;
 	justify-content: space-between;
@@ -755,62 +471,22 @@ const getModelList = () => {
 	width: 100%;
 }
 
-.model-label {
-	float: left;
-	font-size: 14px;
-	color: var(--el-text-color-primary);
-}
+// .model-label {
+// 	float: left;
+// 	font-size: 14px;
+// 	color: var(--el-text-color-primary);
+// }
 
-.model-details-info {
-	display: inline-block;
-	font-size: 13px;
-	color: var(--el-text-color-secondary);
-	max-width: 100px;
-	width: 100px;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	overflow: hidden;
-}
-
-.history-menu {
-	align-items: center;
-	background: #fff;
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	overflow: hidden;
-	padding: 4px 0;
-
-	.history-menu-item {
-		align-items: center;
-		border-radius: 4px;
-		color: #181818;
-		cursor: pointer;
-		display: flex;
-		flex-direction: row;
-		font-size: 14px;
-		// height: 36px;
-		margin-bottom: 2px;
-		padding: 4px 12px;
-		width: 140px
-	}
-
-	.history-menu-item>span {
-		font-size: 20px;
-		margin-right: 8px;
-		margin-left: 8px;
-	}
-}
-
-.history-menu-item:hover {
-	background: #f7f8fc
-}
-
-.history-menu>div:last-of-type {
-	border-top: 1px solid #e8eaf2;
-	color: #e63224;
-}
+// .model-details-info {
+// 	display: inline-block;
+// 	font-size: 13px;
+// 	color: var(--el-text-color-secondary);
+// 	max-width: 100px;
+// 	width: 100px;
+// 	text-overflow: ellipsis;
+// 	white-space: nowrap;
+// 	overflow: hidden;
+// }
 
 .chat_history_expend {
 	position: absolute;
@@ -826,63 +502,7 @@ const getModelList = () => {
 	z-index: 999;
 }
 
-.chat_main_plane {
-	height: 115px;
-	border-top: 1px solid #ebeef5;
-	padding: 10px;
-	padding-top: 10px;
-	max-width: 1150px;
-	margin: 16px auto;
-}
 
-.chat_main_plane_icon {
-	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
-
-	.chat_main_plane_space {
-		margin-right: 10px;
-	}
-}
-
-.chat_main_plane_label {
-	margin-top: 10px !important;
-	cursor: text;
-	border-radius: 15px;
-	border: 1.2px solid #ebeef5;
-	align-items: flex-end;
-	display: flex;
-	flex: 1;
-	margin: 0 auto;
-	overflow: auto;
-	position: relative;
-	width: 100%;
-	z-index: 2;
-	background-color: white;
-}
-
-
-.chat_main_plane_label:has(.el-textarea__inner:focus) {
-	border: 1px solid #626aef;
-}
-
-.chat_textarea {
-	height: 100%;
-	position: relative;
-	width: calc(100% - 50px)
-}
-
-.chat_input_send {
-	align-items: center;
-	bottom: 7px;
-	color: #fff;
-	cursor: pointer;
-	display: flex;
-	flex-shrink: 0;
-	justify-content: center;
-	position: absolute;
-	right: 7px;
-}
 
 :deep .el-textarea__inner {
 	resize: none !important;
@@ -960,17 +580,16 @@ const getModelList = () => {
 	transition: all ease 0.3s;
 }
 
-.markdown-body {
-	box-sizing: border-box;
-	min-width: 200px;
-	max-width: 980px;
-	margin: 0 auto;
-	padding: 45px;
-}
+// .markdown-body {
+// 	box-sizing: border-box;
+// 	min-width: 200px;
+// 	max-width: 980px;
+// 	margin: 0 auto;
+// 	padding: 45px;
+// }
 
-@media (max-width: 767px) {
-	.markdown-body {
-		padding: 15px;
-	}
-}
-</style>
+// @media (max-width: 767px) {
+// 	.markdown-body {
+// 		padding: 15px;
+// 	}
+// }</style>
