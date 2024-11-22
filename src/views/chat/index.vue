@@ -316,7 +316,8 @@ const scrollbarToBotom = async (smooth: boolean) => {
 
 }
 
-watch([scrollbarRef, chatBotDatas.value], ([newScrollVal, newChatVal], [oldScrollVal, oldChatVal]) => {
+watch([scrollbarRef, chatBotDatas], ([newScrollVal, newChatVal], [oldScrollVal, oldChatVal]) => {
+	debugger
 	if (newScrollVal || newChatVal.length > 0) {
 		scrollbarToBotom(newChatVal.length > 0 ? true : false)
 	}
