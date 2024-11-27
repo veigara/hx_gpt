@@ -23,3 +23,10 @@ def count_token(input_str):
     encoding = tiktoken.get_encoding("cl100k_base")
     length = len(encoding.encode(input_str))
     return length
+
+# 从请求头中中获取用户名
+def get_user_name(request) -> str:
+    user_name = request.headers.get('authorization')
+    return user_name or ""
+        
+    

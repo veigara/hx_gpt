@@ -5,6 +5,9 @@ from ..presets import *
 
 _model_instance = None
 
+# 用户存放的模型实例 <p>{1222:{model_name:LALM_11,model_instance:23445}}</p>
+_user_model_instance={}
+
 logger = logging.getLogger('chat_app')
 
 def get_default_model() -> BaseLLMModel:
@@ -19,13 +22,45 @@ def get_default_model() -> BaseLLMModel:
     """
     return _model_instance
 
-def set_model(new_model):
+def set_model(user_name,cur_model_name,new_model):
     """设置全局模型"""
-    global _model_instance
-    _model_instance = new_model
+    global _user_model_instance
+    _user_model_instance[user_name] = {"model_name":cur_model_name,"model_instance":new_model}
+    
+    
+def get_user_model(user_name, model_name) -> BaseLLMModel:
+    """
+    根据用户名称和模型名称获取用户模型实例。
+    
+    参数:
+    - user_name: 用户名称，用于查找用户的模型实例。
+    - model_name: 模型名称，用于指定用户当前使用的模型。
+    
+    返回:
+    - BaseLLMModel: 返回一个基础LLM模型实例，如果找不到或需要更新模型实例，则返回新的模型实例。
+    """
+    if user_name is None:
+        return None
 
+    model_data = _user_model_instance.get(user_name, {})
+    cur_model_name = model_data.get("model_name")
+    model_instance = model_data.get("model_instance")
+
+    if model_instance is None or (model_name is not None and model_name != cur_model_name):
+        """重新加载 模型"""
+        new_model = get_model(model_name)
+        set_model(user_name, model_name, new_model)
+        return new_model
+
+    return model_instance   
+
+#设置用户模型
+def set_user_model(user_name,model):
+    global _user_model_instance
+    _user_model_instance[user_name] = model
+    
 def get_model(
-    model_name,
+     model_name,
     access_key=None,
     user_name="",
 ) -> BaseLLMModel:
@@ -36,13 +71,12 @@ def get_model(
         if model_type == ModelType.Groq:
             logger.info(f"正在加载Groq模型: {model_name}")
             from .Groq import Groq_Client
-            model = Groq_Client(model_name, access_key, user_name=user_name)
+            model = Groq_Client(model_name, access_key)
         elif model_type == ModelType.LMStudio:
             logger.info(f"正在加载LMStudio本地模型: {model_name}")
             from .LMStudio import LMStudio_Client
             model = LMStudio_Client(model_name, None, user_name=user_name)
             
-        _model_instance = model
         return model    
     except Exception as e:
         import traceback

@@ -16,7 +16,8 @@ service.interceptors.request.use(
 		if (config.method?.toUpperCase() === 'GET') {
 			config.params = { ...config.params, t: new Date().getTime() }
 		}
-
+		// 添加请求参数
+		config.headers["authorization"]= "zhouhx"
 		if (Object.values(config.headers).includes('application/x-www-form-urlencoded')) {
 			config.data = qs.stringify(config.data)
 		}

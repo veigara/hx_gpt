@@ -187,9 +187,33 @@ LOGGING = {
     }
 }
 
-CORS_ORIGIN_ALLOW_ALL = True  # 允许所有源，生产环境中建议指定具体的源
+# 允许所有源，生产环境中建议指定具体的源
+CORS_ORIGIN_ALLOW_ALL = True  
 # 或者指定允许的源
 # CORS_ORIGIN_WHITELIST = [
 #     'http://localhost:3000',
 #     'https://yourdomain.com'
 # ]
+
+#允许特定的HTTP方法
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+#允许特定的HTTP头：
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]

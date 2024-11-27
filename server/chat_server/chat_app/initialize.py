@@ -5,6 +5,7 @@ from .models.model import get_model
 from .config import get_default_model_name
 
 logger = logging.getLogger('chat_app')
+
 def initialize_model():
     """初始化模型"""
     pass

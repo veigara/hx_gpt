@@ -15,7 +15,7 @@ from chat_app.initialize import initialize_model
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chat_server.settings')
 
 # 初始化服务
-initialize_model()
+#initialize_model()
 
 
 application = get_wsgi_application()

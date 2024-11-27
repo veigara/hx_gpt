@@ -42,8 +42,17 @@
 				</el-popover>
 
 			</div>
-		</div>
+			<!--智能体-->
+			<div class="chat_main_plane_space">
+				<el-button title="智能体" round>
+					<template #icon>
+						<svg-icon icon="icon-agent"></svg-icon>
+					</template>
+				</el-button>
 
+			</div>
+		</div>
+		<!--发送框-->
 		<div class="chat_main_plane_label">
 			<el-scrollbar :max-height="100" style="width: 100%;">
 				<div class="chat_textarea">

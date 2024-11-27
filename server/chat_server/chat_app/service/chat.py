@@ -1,5 +1,5 @@
 
-from ..models.model import get_default_model,get_model
+from ..models.model import get_default_model,get_user_model
 from ..config import get_default_model_name
 from ..utils import *
 from ..config import get_default_model_params
@@ -23,15 +23,17 @@ def chat_with_model(request):
             payload = json.loads(request.body.decode('utf-8'))
             input_text = payload.get('input_text')
             model_name = payload.get('model_name')
-        
-            if input_text:
-                if model_name is None:
-                    model = get_default_model()
-                else:    
-                    model = get_model(model_name)
-                return HttpResponse(model.stream_next_chatbot(input_text))
+            user_name = get_user_name(request)
+            if input_text is None:
+                return HttpResponse("input_text text is required", status=500)
+            if model_name is None:
+                return HttpResponse("model_name text is required", status=500)
+            
+            model = get_user_model(user_name,model_name)
+            if model is None:
+                return HttpResponse(f"{model_name} load error", status=500)
             else:
-                return HttpResponse("Input text is required", status=500)
+                return HttpResponse(model.stream_next_chatbot(input_text))
         except Exception as e:
             logger.error(f"Server error occurred: {e}")
             return HttpResponse(f"Server error occurred:{e}", status=500)
