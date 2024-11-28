@@ -44,12 +44,11 @@
 			</div>
 			<!--智能体-->
 			<div class="chat_main_plane_space">
-				<el-button title="智能体" round>
+				<el-button title="智能体" round @click="showAgentVisible">
 					<template #icon>
 						<svg-icon icon="icon-agent"></svg-icon>
 					</template>
 				</el-button>
-
 			</div>
 		</div>
 		<!--发送框-->
@@ -75,7 +74,7 @@
 			</div>
 
 		</div>
-
+		<Agent ref="agentRef"/>
 	</div>
 </template>
 
@@ -83,6 +82,7 @@
 import { reactive, ref, onMounted, onUpdated, computed, watch } from 'vue'
 import { ElNotification } from 'element-plus/es'
 import { useModelsApi, useChatApi } from '@/api/chat'
+import Agent from '@/views/chat/agent.vue'
 
 interface Props {
 	// 错误弹框
@@ -106,6 +106,9 @@ const curModel = ref()
 const chatBotDatas = ref<[chatBot]>([])
 // 对话输入框的数据
 const chatBotMst = ref('')
+// 智能体显示弹窗
+const agentVisible = ref(false)
+const agentRef = ref()
 
 const mounted = onMounted(() => {
 	// 获取所有的模型
@@ -152,6 +155,8 @@ const sendBotMsgClick = () => {
 		isLoading: true
 	}
 	chatBotDatas.value.push(curMsg)
+	// 传输数据
+	emit('update:chatBotDatas', chatBotDatas.value)
 	// 对话
 	useChatApi({ input_text: msg, model_name: curModel.value }).then(res => {
 		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
@@ -167,6 +172,10 @@ const sendBotMsgClick = () => {
 	chatBotMst.value = ''
 }
 
+// 展示智能体弹窗
+const showAgentVisible = () => {
+	agentRef.value.init()
+}
 </script>
 <style lang="scss">
 .chat_main_plane {
