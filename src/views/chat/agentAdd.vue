@@ -3,27 +3,30 @@
 		<el-form ref="dataFormRef" :model="dataForm" label-width="40%" label-position="left" :rules="rules">
 			<el-row type="flex" justify="center">
 				<el-col :span="24">
-					<el-button plain type="primary" icon="el-icon-plus" style="width: 100%;"
-						@click="addAgentContent()">新增一条对话</el-button>
+					<el-button plain type="primary" icon="el-icon-plus" style="width: 100%" @click="addAgentContent()">新增一条对话</el-button>
 				</el-col>
 			</el-row>
 			<div v-for="(agentContent, index) in dataForm.content" :key="index">
 				<el-row class="margin-top-20" :gutter="20">
 					<el-col :span="4">
 						<el-select v-model="agentContent.role" placeholder="请选择">
-							<el-option v-for="item in role" :key="item" :label="item" :value="item">
-							</el-option>
+							<el-option v-for="item in role" :key="item" :label="item" :value="item"> </el-option>
 						</el-select>
 					</el-col>
 					<el-col :span="20">
-						<el-input type="textarea" :rows="1" placeholder="请输入内容" v-model="agentContent.chatText">
-						</el-input>
+						<el-input v-model="agentContent.chatText" type="textarea" :rows="1" placeholder="请输入内容"> </el-input>
 					</el-col>
 				</el-row>
 				<el-row class="margin-top-5" :gutter="20" type="flex" justify="center">
 					<el-col :span="6">
-						<el-button type="primary" :icon="CirclePlus" circle title="添加" @click="addAgentContent()"
-							v-if="index === dataForm.content.length - 1" />
+						<el-button
+							v-if="index === dataForm.content.length - 1"
+							type="primary"
+							:icon="CirclePlus"
+							circle
+							title="添加"
+							@click="addAgentContent()"
+						/>
 						<el-button type="danger" :icon="Delete" circle title="删除" @click="removeAgentContent(index)" />
 					</el-col>
 				</el-row>
@@ -33,73 +36,66 @@
 					<el-input v-model="dataForm.title" placeholder="智能体名称"></el-input>
 				</el-form-item>
 				<el-form-item label="模型(model)" prop="modelName">
-					<el-select :teleported="false" v-model="dataForm.modelName" placeholder="请选择模型"
-						style="width: 100%;">
-						<el-option v-for="item in modelList" :key="item.label" :label="item.label" :value="item.label">
-						</el-option>
+					<el-select v-model="dataForm.modelName" :teleported="false" placeholder="请选择模型" style="width: 100%">
+						<el-option v-for="item in modelList" :key="item.label" :label="item.label" :value="item.label"> </el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item prop="temperature">
 					<template #label>
-						<div style="display: flex;flex-direction: column;">
+						<div style="display: flex; flex-direction: column">
 							<div>随机性(temperature)</div>
 							<div class="agent-label-small">值越大，回复越随机</div>
 						</div>
 					</template>
-					<div style="width: 100%;">
+					<div style="width: 100%">
 						<el-slider v-model="dataForm.temperature" show-input show-stops :max="1" :min="0" :step="0.1" />
 					</div>
 				</el-form-item>
 				<el-form-item prop="top_p">
 					<template #label>
-						<div style="display: flex;flex-direction: column;">
+						<div style="display: flex; flex-direction: column">
 							<div>核采样(top_p)</div>
 							<div class="agent-label-small">与随机性类似，但不要和随机性一起更改</div>
 						</div>
 					</template>
-					<div style="width: 100%;">
+					<div style="width: 100%">
 						<el-slider v-model="dataForm.top_p" show-input show-stops :max="1.0" :min="0" :step="0.1" />
 					</div>
 				</el-form-item>
 				<el-form-item prop="max_tokens">
 					<template #label>
-						<div style="display: flex;flex-direction: column;">
+						<div style="display: flex; flex-direction: column">
 							<div>单次回复限制(max_tokens)</div>
 							<div class="agent-label-small">单次交互所用的最大Token数</div>
 						</div>
 					</template>
-					<div style="width: 100%;">
+					<div style="width: 100%">
 						<el-slider v-model="dataForm.max_tokens" show-input :max="100000" :min="0" :step="1" />
 					</div>
 				</el-form-item>
 				<el-form-item prop="presence_penalty">
 					<template #label>
-						<div style="display: flex;flex-direction: column;">
+						<div style="display: flex; flex-direction: column">
 							<div>话题新鲜度(presence_penalty)</div>
 							<div class="agent-label-small">值越大，越有可能扩展到新话题</div>
 						</div>
 					</template>
-					<div style="width: 100%;">
-						<el-slider v-model="dataForm.presence_penalty" show-input show-stops :max="2.0" :min="0"
-							:step="0.1" />
+					<div style="width: 100%">
+						<el-slider v-model="dataForm.presence_penalty" show-input show-stops :max="2.0" :min="0" :step="0.1" />
 					</div>
 				</el-form-item>
 				<el-form-item prop="frequency_penalty">
 					<template #label>
-						<div style="display: flex;flex-direction: column;">
+						<div style="display: flex; flex-direction: column">
 							<div>频率惩罚度(frequency_penalty)</div>
 							<div class="agent-label-small">值越大，越有可能降低重复字词</div>
 						</div>
 					</template>
-					<div style="width: 100%;">
-						<el-slider v-model="dataForm.frequency_penalty" show-input show-stops :max="2.0" :min="0"
-							:step="0.1" />
+					<div style="width: 100%">
+						<el-slider v-model="dataForm.frequency_penalty" show-input show-stops :max="2.0" :min="0" :step="0.1" />
 					</div>
 				</el-form-item>
 			</div>
-
-
-
 		</el-form>
 		<template #footer>
 			<el-button @click="visible = false">取消</el-button>
@@ -113,11 +109,7 @@ import { reactive, ref, watch, onMounted } from 'vue'
 import { ElNotification } from 'element-plus'
 import { id } from 'element-plus/es/locale'
 import { useModelsApi, useSaveAgentFileApi } from '@/api/chat'
-import {
-	CirclePlus,
-	Delete,
-
-} from '@element-plus/icons-vue'
+import { CirclePlus, Delete } from '@element-plus/icons-vue'
 
 const visible = ref(false)
 
@@ -126,20 +118,19 @@ const dataFormRef = ref()
 const emit = defineEmits(['submit'])
 
 interface agentContent {
-	role: string,
+	role: string
 	chatText: string
 }
 
-
 interface agentModel {
-	id: string,
-	title: string,
-	content: agentContent[],
-	modelName: string,
-	temperature: number,
-	top_p: number,
-	max_tokens: number,
-	presence_penalty: number,
+	id: string
+	title: string
+	content: agentContent[]
+	modelName: string
+	temperature: number
+	top_p: number
+	max_tokens: number
+	presence_penalty: number
 	frequency_penalty: number
 }
 
@@ -161,16 +152,16 @@ const role = ref(['user', 'system', 'assistant'])
 const init = () => {
 	visible.value = true
 	Object.assign(dataForm, {
-        id: '',
-        title: '',
-        content: [],
-        modelName: '',
-        temperature: 0,
-        top_p: 0,
-        max_tokens: 0,
-        presence_penalty: 0,
-        frequency_penalty: 0
-    });
+		id: '',
+		title: '',
+		content: [],
+		modelName: '',
+		temperature: 0,
+		top_p: 0,
+		max_tokens: 0,
+		presence_penalty: 0,
+		frequency_penalty: 0
+	})
 }
 
 const removeAgentContent = (index: number) => {
@@ -194,15 +185,13 @@ const getModelList = () => {
 }
 
 const rules = reactive({
-	title: [
-		{ required: true, message: '智能体名称不能为空', trigger: 'blur' }
-	],
+	title: [{ required: true, message: '智能体名称不能为空', trigger: 'blur' }],
 	modelName: [
 		{
 			required: true,
 			message: '请选择模型',
-			trigger: 'change',
-		},
+			trigger: 'change'
+		}
 	]
 })
 
@@ -210,7 +199,7 @@ const rules = reactive({
 const saveAgent = () => {
 	dataFormRef.value.validate(valid => {
 		if (valid) {
-			useSaveAgentFileApi({ "agent_data": JSON.stringify(dataForm) }).then(res => {
+			useSaveAgentFileApi({ agent_data: JSON.stringify(dataForm) }).then(res => {
 				ElNotification({
 					title: '温馨提示',
 					message: '保存智能体成功',
@@ -226,13 +215,12 @@ const saveAgent = () => {
 
 const mounted = onMounted(() => {
 	// 获取所有的模型
-	getModelList();
-});
+	getModelList()
+})
 
 defineExpose({
 	init
 })
-
 </script>
 
 <style lang="scss" scoped>
