@@ -1,6 +1,6 @@
 import axios from 'axios'
 import qs from 'qs'
-import { ElMessage } from 'element-plus'
+import { ElNotification } from 'element-plus'
 
 // axios实例
 const service = axios.create({
@@ -41,7 +41,12 @@ service.interceptors.response.use(
 		return res;
 	},
 	error => {
-		//ElMessage.error(error.message)
+		ElNotification({
+			title: '错误',
+			message: error.response.data,
+			type: 'error',
+			duration: 9500
+		})
 		return Promise.reject(error)
 	}
 )

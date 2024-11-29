@@ -17,25 +17,30 @@
 				</el-button>
 			</el-col>
 		</el-row>
+		<el-row>
+			<ul  class="infinite-list" style="overflow: auto">
+				<li v-for="item in agentList" :key="item.id" class="infinite-list-item">{{ item.title }}</li>
+			</ul>
+		</el-row>
 		<agent-add ref="agentAddRef"></agent-add>
 	</el-dialog>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref, watch, onMounted } from 'vue'
 import { ElMessage } from 'element-plus/es'
 import AgentAdd from '@/views/chat/agentAdd.vue'
-
+import { useUserAgentApi } from '@/api/chat'
 
 const visible = ref(false)
-const agentAddRef =ref()
+const agentAddRef = ref()
 
 interface agentContent {
 	role: string,
 	chatText: string
 }
 
-interface modelConfig{
+interface modelConfig {
 	modelName: string,
 	temperature: number,
 	top_p: number,
@@ -47,21 +52,34 @@ interface modelConfig{
 interface agentModel {
 	title: string,
 	content: [agentContent],
-	modelConfig:modelConfig
+	modelConfig: modelConfig
 }
 
 const search = ref('')
 
-const init=()=>{
+const agentList = ref([])
+
+// 获取当前用户所有智能体
+const getAllAgent = () => {
+	useUserAgentApi().then(res => {
+		agentList.value = res
+	})
+}
+
+const init = () => {
 	visible.value = true
 }
 
-const handleAdd=()=>{
+const handleAdd = () => {
 	agentAddRef.value.init()
 }
 
 defineExpose({
 	init
+})
+
+onMounted(() => {
+	getAllAgent()
 })
 </script>
 

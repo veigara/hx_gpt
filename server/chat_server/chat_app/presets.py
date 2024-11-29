@@ -20,7 +20,7 @@ BALANCE_API_URL="https://api.openai.com/dashboard/billing/credit_grants"
 USAGE_API_URL="https://api.openai.com/dashboard/billing/usage"
 HISTORY_DIR = Path("history")
 HISTORY_DIR = "history"
-TEMPLATES_DIR = "templates"
+AGENT_DIR = "agentmodels"
 
 # 错误信息
 STANDARD_ERROR_MSG = "☹️发生了错误："  # 错误信息的标准前缀

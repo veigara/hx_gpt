@@ -133,8 +133,6 @@ const getModelList = () => {
 		modelList.value.filter(item => item.default == true).forEach(item => {
 			curModel.value = item.label
 		})
-	}).catch(err => {
-		props.ElNotificationErr(err)
 	})
 }
 
@@ -164,7 +162,6 @@ const sendBotMsgClick = () => {
 		// 将更新后的数据传递给父组件
 		emit('update:chatBotDatas', chatBotDatas.value)
 	}).catch(err => {
-		props.ElNotificationErr(err)
 		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
 		emit('update:chatBotDatas', chatBotDatas.value)
 	})

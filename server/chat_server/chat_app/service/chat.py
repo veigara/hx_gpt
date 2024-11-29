@@ -8,7 +8,7 @@ from django.shortcuts import render,HttpResponse
 import logging
 from django.views.decorators.csrf import csrf_exempt
 import json
-
+from .agent import *
 logger = logging.getLogger('chat_app')
 
 
@@ -68,9 +68,52 @@ def get_all_models(request):
     else:
         return HttpResponse("Invalid request method", status=405)
 
+# 保存智能体文件
+@csrf_exempt
+def save_agent_file(request):
+    if request.method == 'POST':
+        payload = json.loads(request.body.decode('utf-8'))
+        agent_data = payload.get('agent_data')
+        user_name = get_user_name(request)
+        try:
+            save_agent(user_name,agent_data)
+            return HttpResponse("Agent file saved successfully")
+        except Exception as e:
+            logger.error(f"Server error occurred: {e}")
+            return HttpResponse(f"Server error occurred: {e}", status=500)     
+    else:
+        return HttpResponse("Invalid request method", status=405)    
 
+# 获取所有的模型
+def get_user_agent(request):
+    if request.method == 'GET':
+        try:
+            user_name = get_user_name(request)
+            keyword = request.GET.get('keyword')
+            agnets = get_user_all_agents(user_name,keyword)
+            return HttpResponse(json.dumps(agnets), content_type='application/json')               
+        except Exception as e:
+            logger.error(f"Server error occurred: {e}")
+            return HttpResponse(f"Server error occurred: {e}", status=500) 
+    else:
+        return HttpResponse("Invalid request method", status=405)
 
-
+# 获取智能体详情
+def get_agent_detail(request):
+    if request.method == 'GET':
+        try:
+            user_name = get_user_name(request)
+            id = request.GET.get('id')
+            if id is None: 
+                return HttpResponse("id is required", status=500)
+            
+            detail = load_agent(user_name,id)
+            return HttpResponse(json.dumps(detail), content_type='application/json')               
+        except Exception as e:
+            logger.error(f"Server error occurred: {e}")
+            return HttpResponse(f"Server error occurred: {e}", status=500) 
+    else:
+        return HttpResponse("Invalid request method", status=405)
 class ModelData:
     def __init__(self,label,model_name,description):
         self.label = label

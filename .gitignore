@@ -32,3 +32,4 @@ coverage
 /server/.vscode
 /server/*.log
 /server/chat_server/chat_app/models/__pycache__
+/server/chat_server/chat_app/service/__pycache__

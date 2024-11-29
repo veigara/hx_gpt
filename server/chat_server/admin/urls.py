@@ -23,5 +23,11 @@ urlpatterns = [
     path('hello', views.hello, name='hello'),
     path('chat', chat.chat_with_model, name='chat_with_model'),
     # 获取所有的大模型
-    path('models', chat.get_all_models, name='get_all_models') 
+    path('models', chat.get_all_models, name='get_all_models'),
+    # 保存智能体文件
+    path('save_agent_file', chat.save_agent_file, name='save_agent_file'),
+    # 查询当前用户所有智能体文件
+    path('get_user_agent', chat.get_user_agent, name='get_user_agent'),
+    # 查询当前用户的智能体文件详情
+    path('get_agent_detail', chat.get_agent_detail, name='get_agent_detail')
 ]
