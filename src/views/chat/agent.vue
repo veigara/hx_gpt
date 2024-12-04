@@ -2,11 +2,11 @@
 	<el-dialog v-model="visible" title="智能体" :close-on-click-modal="false">
 		<template #title>
 			<div class="header-title">智能体</div>
-			<div>32个预设角色定义</div>
+			<div>{{ agentList.length }}个预设定义</div>
 		</template>
 		<el-row :gutter="20">
 			<el-col :span="16">
-				<el-input v-model="search" placeholder="搜索智能体"></el-input>
+				<el-input v-model="search" placeholder="搜索智能体" @input="debouncedSearchTitle"></el-input>
 			</el-col>
 			<el-col :span="8">
 				<el-button title="新建" color="#567bff" @click="handleAdd">
@@ -23,34 +23,39 @@
 					<div class="agent_icon"></div>
 					<div>
 						<div class="agent_title">{{ item.title }}</div>
-						<div class="agent_info">{{ item.title }}</div>
+						<div class="agent_info">包含{{ item.count }}预设对话 / {{ item.model_name }}</div>
 					</div>
 				</div>
 				<div class="agent_action">
-					<el-button title="选择" color="#E6A23C" text>
+					<el-button title="选择" type="success" text>
 						<template #icon>
 							<svg-icon icon="icon-select"></svg-icon>
 						</template>
 						选择
 					</el-button>
-					<el-button title="查看" color="#E6A23C" text @click="handview(item)">
+					<el-button title="查看" type="info" text @click="handview(item)">
 						<template #icon>
 							<svg-icon icon="icon-view"></svg-icon>
 						</template>
 						查看
 					</el-button>
+					<el-button title="删除" :icon="Delete" type="danger" text @click="delview(item)" v-if="item.edit">
+						删除
+					</el-button>
 				</div>
 			</div>
 		</div>
-		<agent-add ref="agentAddRef"></agent-add>
+		<agent-add ref="agentAddRef" @submit="getAllAgent(undefined)"></agent-add>
 	</el-dialog>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
-import { ElMessage } from 'element-plus/es'
+import { ElMessage,ElMessageBox } from 'element-plus/es'
+import { Delete } from '@element-plus/icons-vue'
 import AgentAdd from '@/views/chat/agentAdd.vue'
-import { useUserAgentApi } from '@/api/chat'
+import { useUserAgentApi, useAgentDetailApi,useDelAgentApi } from '@/api/chat'
+import { debounce } from 'lodash';
 
 const visible = ref(false)
 const agentAddRef = ref()
@@ -61,7 +66,7 @@ interface agentContent {
 }
 
 interface modelConfig {
-	modelName: string
+	model_name: string
 	temperature: number
 	top_p: number
 	max_tokens: number
@@ -70,9 +75,13 @@ interface modelConfig {
 }
 
 interface agentModel {
+	id: string,
 	title: string
 	content: [agentContent]
-	modelConfig: modelConfig
+	modelConfig: modelConfig,
+	edit:boolean
+	user_name:string,
+	model_name:string
 }
 
 const search = ref('')
@@ -80,10 +89,12 @@ const search = ref('')
 const agentList = ref([])
 
 // 获取当前用户所有智能体
-const getAllAgent = () => {
-	useUserAgentApi().then(res => {
+const getAllAgent = (title) => {
+	const params = title ? { keyword: title } : {};
+	useUserAgentApi(params).then(res => {
 		agentList.value = res
 	})
+
 }
 
 const init = () => {
@@ -91,16 +102,55 @@ const init = () => {
 }
 
 const handleAdd = () => {
-	agentAddRef.value.init()
+	agentAddRef.value.init({},true)
 }
 
-const handview = (item: agentModel) => {}
+/**
+ * 查看智能体详情
+ * @param item 
+ */
+const handview = (item: agentModel) => {
+	useAgentDetailApi({ "id": item.id,"fileUserName":item.user_name }).then(res => {
+		agentAddRef.value.init(res,item.edit)
+	})
+}
+
+/**
+ * 搜索智能体
+ */
+const searchTitle = () => {
+	getAllAgent(search.value)
+}
+
+// 300ms 的防抖时间
+const debouncedSearchTitle = debounce(searchTitle, 300); 
+
+// 删除
+const delview = (item: agentModel) => {
+	ElMessageBox.confirm(
+    '是否确认删除该智能体？',
+    '警告',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+		useDelAgentApi({ "id": item.id }).then(res => {
+		ElMessage.success('删除成功')
+		// 刷新列表
+		getAllAgent(undefined)
+	})
+    })
+}
+	
 defineExpose({
 	init
 })
 
 onMounted(() => {
-	getAllAgent()
+	getAllAgent(undefined)
 })
 </script>
 
@@ -114,15 +164,18 @@ onMounted(() => {
 	overflow: hidden;
 	white-space: nowrap;
 }
+
 .agent {
 	padding: 20px 0px;
 }
+
 .agent_item {
 	display: flex;
 	justify-content: space-between;
 	padding: 20px;
 	border: 1px solid #dedede;
 }
+
 .agent_item:not(:last-child) {
 	border-bottom: 0px;
 }
@@ -140,16 +193,19 @@ onMounted(() => {
 .agent_header {
 	display: flex;
 	align-items: center;
+
 	.agent_icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		margin-right: 10px;
 	}
+
 	.agent_title {
 		font-size: 14px;
 		font-weight: 700;
 	}
+
 	.agent_info {
 		font-size: 12px;
 		white-space: nowrap;
@@ -157,6 +213,7 @@ onMounted(() => {
 		text-overflow: ellipsis;
 	}
 }
+
 .agent_action {
 	display: flex;
 	flex-wrap: nowrap;

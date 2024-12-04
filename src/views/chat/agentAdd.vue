@@ -1,32 +1,30 @@
 <template>
-	<el-dialog v-model="visible" :title="!dataForm.id ? '新增智能体' : '修改智能体'" :close-on-click-modal="false" append-to-body>
-		<el-form ref="dataFormRef" :model="dataForm" label-width="40%" label-position="left" :rules="rules">
+	<el-dialog v-model="visible" :title="!dataForm.id ? '新增智能体' : editFlag ? '修改智能体' : '查看智能体'" :close-on-click-modal="false"
+		append-to-body>
+		<el-form ref="dataFormRef" :model="dataForm" label-width="40%" label-position="left" :rules="rules"
+			:disabled="!editFlag">
 			<el-row type="flex" justify="center">
 				<el-col :span="24">
-					<el-button plain type="primary" icon="el-icon-plus" style="width: 100%" @click="addAgentContent()">新增一条对话</el-button>
+					<el-button plain type="primary" icon="el-icon-plus" style="width: 100%" @click="addAgentContent()"
+						v-if="editFlag">新增一条对话</el-button>
 				</el-col>
 			</el-row>
 			<div v-for="(agentContent, index) in dataForm.content" :key="index">
 				<el-row class="margin-top-20" :gutter="20">
 					<el-col :span="4">
-						<el-select v-model="agentContent.role" placeholder="请选择">
+						<el-select v-model="agentContent.role" placeholder="请选择" :disabled="!editFlag">
 							<el-option v-for="item in role" :key="item" :label="item" :value="item"> </el-option>
 						</el-select>
 					</el-col>
 					<el-col :span="20">
-						<el-input v-model="agentContent.chatText" type="textarea" :rows="1" placeholder="请输入内容"> </el-input>
+						<el-input v-model="agentContent.chatText" type="textarea" :rows="1" placeholder="请输入内容"
+							:disabled="!editFlag" :autosize="{ minRows: 1, maxRows: 4 }"> </el-input>
 					</el-col>
 				</el-row>
-				<el-row class="margin-top-5" :gutter="20" type="flex" justify="center">
+				<el-row class="margin-top-5" :gutter="20" type="flex" justify="center" v-if="editFlag">
 					<el-col :span="6">
-						<el-button
-							v-if="index === dataForm.content.length - 1"
-							type="primary"
-							:icon="CirclePlus"
-							circle
-							title="添加"
-							@click="addAgentContent()"
-						/>
+						<el-button v-if="index === dataForm.content.length - 1" type="primary" :icon="CirclePlus" circle
+							title="添加" @click="addAgentContent()" />
 						<el-button type="danger" :icon="Delete" circle title="删除" @click="removeAgentContent(index)" />
 					</el-col>
 				</el-row>
@@ -35,9 +33,11 @@
 				<el-form-item label="智能体名称" prop="title">
 					<el-input v-model="dataForm.title" placeholder="智能体名称"></el-input>
 				</el-form-item>
-				<el-form-item label="模型(model)" prop="modelName">
-					<el-select v-model="dataForm.modelName" :teleported="false" placeholder="请选择模型" style="width: 100%">
-						<el-option v-for="item in modelList" :key="item.label" :label="item.label" :value="item.label"> </el-option>
+				<el-form-item label="模型(model)" prop="model_name">
+					<el-select v-model="dataForm.model_name" :teleported="false" placeholder="请选择模型"
+						style="width: 100%">
+						<el-option v-for="item in modelList" :key="item.label" :label="item.label" :value="item.label">
+						</el-option>
 					</el-select>
 				</el-form-item>
 				<el-form-item prop="temperature">
@@ -81,7 +81,8 @@
 						</div>
 					</template>
 					<div style="width: 100%">
-						<el-slider v-model="dataForm.presence_penalty" show-input show-stops :max="2.0" :min="0" :step="0.1" />
+						<el-slider v-model="dataForm.presence_penalty" show-input show-stops :max="2.0" :min="0"
+							:step="0.1" />
 					</div>
 				</el-form-item>
 				<el-form-item prop="frequency_penalty">
@@ -92,12 +93,13 @@
 						</div>
 					</template>
 					<div style="width: 100%">
-						<el-slider v-model="dataForm.frequency_penalty" show-input show-stops :max="2.0" :min="0" :step="0.1" />
+						<el-slider v-model="dataForm.frequency_penalty" show-input show-stops :max="2.0" :min="0"
+							:step="0.1" />
 					</div>
 				</el-form-item>
 			</div>
 		</el-form>
-		<template #footer>
+		<template #footer v-if="editFlag">
 			<el-button @click="visible = false">取消</el-button>
 			<el-button type="primary" @click="saveAgent">确定</el-button>
 		</template>
@@ -126,7 +128,7 @@ interface agentModel {
 	id: string
 	title: string
 	content: agentContent[]
-	modelName: string
+	model_name: string
 	temperature: number
 	top_p: number
 	max_tokens: number
@@ -138,7 +140,7 @@ const dataForm = reactive<agentModel>({
 	id: '',
 	title: '',
 	content: [],
-	modelName: '',
+	model_name: '',
 	temperature: 0,
 	top_p: 0,
 	max_tokens: 0,
@@ -148,14 +150,25 @@ const dataForm = reactive<agentModel>({
 
 const role = ref(['user', 'system', 'assistant'])
 
+const editFlag = ref(false)
 // 初始化
-const init = () => {
+const init = (data: agentModel, edit: boolean) => {
 	visible.value = true
+	if (data) {
+		Object.assign(dataForm, data)
+		editFlag.value = edit
+	} else {
+		clearForm()
+	}
+}
+
+// 清空表单
+const clearForm = () => {
 	Object.assign(dataForm, {
 		id: '',
 		title: '',
 		content: [],
-		modelName: '',
+		model_name: '',
 		temperature: 0,
 		top_p: 0,
 		max_tokens: 0,
@@ -186,7 +199,7 @@ const getModelList = () => {
 
 const rules = reactive({
 	title: [{ required: true, message: '智能体名称不能为空', trigger: 'blur' }],
-	modelName: [
+	model_name: [
 		{
 			required: true,
 			message: '请选择模型',
@@ -205,10 +218,13 @@ const saveAgent = () => {
 					message: '保存智能体成功',
 					type: 'success'
 				})
+				// 关闭弹窗
+				visible.value = false
+				emit('submit')
+				// 清空表单
+				clearForm()
 			})
-			// 关闭弹窗
-			visible.value = false
-			emit('submit')
+
 		}
 	})
 }

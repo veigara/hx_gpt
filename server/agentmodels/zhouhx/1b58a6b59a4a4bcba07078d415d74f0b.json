@@ -1,1 +1,0 @@
-{"id": "1b58a6b59a4a4bcba07078d415d74f0b", "title": "文言文翻译", "content": [{"role": "assistant", "chatText": "用文言文表达输入的内容"}, {"role": "user", "chatText": "示例：我很开心，因为今天出去玩了"}], "modelName": "llama-3.2-90b-vision", "temperature": 0.8, "top_p": 0.3, "max_tokens": 84492, "presence_penalty": 1.5, "frequency_penalty": 1.7}

@@ -21,6 +21,9 @@ USAGE_API_URL="https://api.openai.com/dashboard/billing/usage"
 HISTORY_DIR = Path("history")
 HISTORY_DIR = "history"
 AGENT_DIR = "agentmodels"
+DEFALUE_AGENT_DIR= "chat_server/chat_app/agentmodels"
+# 系统默认用户
+SYS_USER_NAME = "system"
 
 # 错误信息
 STANDARD_ERROR_MSG = "☹️发生了错误："  # 错误信息的标准前缀

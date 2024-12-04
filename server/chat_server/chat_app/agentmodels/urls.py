@@ -31,5 +31,5 @@ urlpatterns = [
     # 查询当前用户的智能体文件详情
     path('get_agent_detail', chat.get_agent_detail, name='get_agent_detail'),
     # 删除智能体
-    path('del_agent', chat.get_del_agent, name='get_del_agent')
+    path('del_agent', chat.del_agent, name='del_agent')
 ]

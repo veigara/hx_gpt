@@ -41,9 +41,11 @@ service.interceptors.response.use(
 		return res;
 	},
 	error => {
+		console.log(error)
+		const msg = error.response.data?error.response.data:error.message
 		ElNotification({
 			title: '错误',
-			message: error.response.data,
+			message: msg,
 			type: 'error',
 			duration: 9500
 		})
