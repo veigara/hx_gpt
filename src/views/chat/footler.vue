@@ -74,7 +74,7 @@
 			</div>
 
 		</div>
-		<Agent ref="agentRef"/>
+		<Agent ref="agentRef" @submit="useSelectAgentApi" />
 	</div>
 </template>
 
@@ -86,7 +86,9 @@ import Agent from '@/views/chat/agent.vue'
 
 interface Props {
 	// 错误弹框
-	ElNotificationErr: Function
+	ElNotificationErr: Function,
+	historyId: string,
+	agentId: string
 }
 
 //正在对话
@@ -119,7 +121,7 @@ const mounted = onMounted(() => {
 const modelList = ref([])
 
 // 定义事件，方便传值
-const emit = defineEmits(['update:chatBotDatas', 'update:curModel'])
+const emit = defineEmits(['update:chatBotDatas', 'update:curModel', "update:selectAgent"])
 
 // 监听 chatBotMst 的变化
 watch(curModel, (newVal, oldVal) => {
@@ -156,7 +158,7 @@ const sendBotMsgClick = () => {
 	// 传输数据
 	emit('update:chatBotDatas', chatBotDatas.value)
 	// 对话
-	useChatApi({ input_text: msg, model_name: curModel.value }).then(res => {
+	useChatApi({ input_text: msg, model_name: curModel.value, history_id: props.historyId, agent_id: props.agentId }).then(res => {
 		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
 		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
 		// 将更新后的数据传递给父组件
@@ -173,6 +175,24 @@ const sendBotMsgClick = () => {
 const showAgentVisible = () => {
 	agentRef.value.init()
 }
+
+// 向父组件传递选择的智能体
+const useSelectAgentApi = (historyId: string) => {
+	emit('update:selectAgent', historyId)
+}
+
+// 初始化发送框
+const init = () => {
+	chatBotDatas.value = []
+	// 对话输入框的数据
+	chatBotMst.value = ''
+	// 智能体显示弹窗
+	agentVisible.value = false
+}
+
+defineExpose({
+	init
+})	
 </script>
 <style lang="scss">
 .chat_main_plane {

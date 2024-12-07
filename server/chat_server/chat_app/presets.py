@@ -18,7 +18,6 @@ IMAGES_COMPLETION_URL = "https://api.openai.com/v1/images/generations"
 COMPLETION_URL = "https://api.openai.com/v1/completions"
 BALANCE_API_URL="https://api.openai.com/dashboard/billing/credit_grants"
 USAGE_API_URL="https://api.openai.com/dashboard/billing/usage"
-HISTORY_DIR = Path("history")
 HISTORY_DIR = "history"
 AGENT_DIR = "agentmodels"
 DEFALUE_AGENT_DIR= "chat_server/chat_app/agentmodels"

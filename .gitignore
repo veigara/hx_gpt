@@ -33,3 +33,5 @@ coverage
 /server/*.log
 /server/chat_server/chat_app/models/__pycache__
 /server/chat_server/chat_app/service/__pycache__
+/server/history
+/server/agentmodels

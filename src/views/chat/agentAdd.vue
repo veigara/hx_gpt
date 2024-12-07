@@ -17,7 +17,7 @@
 						</el-select>
 					</el-col>
 					<el-col :span="20">
-						<el-input v-model="agentContent.chatText" type="textarea" :rows="1" placeholder="请输入内容"
+						<el-input v-model="agentContent.content" type="textarea" :rows="1" placeholder="请输入内容"
 							:disabled="!editFlag" :autosize="{ minRows: 1, maxRows: 4 }"> </el-input>
 					</el-col>
 				</el-row>
@@ -121,7 +121,7 @@ const emit = defineEmits(['submit'])
 
 interface agentContent {
 	role: string
-	chatText: string
+	content: string
 }
 
 interface agentModel {
@@ -184,7 +184,7 @@ const removeAgentContent = (index: number) => {
 const addAgentContent = () => {
 	const agentContent = {
 		role: '',
-		chatText: ''
+		content: ''
 	}
 	dataForm.content.push(agentContent)
 }

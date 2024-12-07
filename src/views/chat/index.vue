@@ -2,7 +2,7 @@
 	<el-card class="chat_card" body-style="padding: 0px;">
 		<el-container>
 			<el-aside width="260px" class="chat_card_aside" v-if="chatHistoryDisplay">
-				<HistoryAside :searchTxt="searchTxt" :historys="historys" :selectedHistory="selectedHistory" />
+				<HistoryAside ref="historyRef" @click:history="item => selectHistoryItem(item)" />
 			</el-aside>
 
 			<el-main class="chat_card_main">
@@ -19,7 +19,7 @@
 					</el-row>
 					<el-row style="padding: 0px 20px;">
 						<el-col :span="16">
-							智能体
+							智能体: <span style="color: #00BFFF;">{{ curAgent.agent_title }}</span>
 						</el-col>
 					</el-row>
 				</div>
@@ -66,7 +66,8 @@
 									</div>
 								</div>
 								<!---回答--->
-								<div class="ans_item" v-if="historyItem.role == 'assistant'">
+								<div class="ans_item"
+									v-if="historyItem.role == 'assistant' || historyItem.role == 'system'">
 									<div class="ans_item_avatar">
 										<!--回答头像-->
 										<div>
@@ -84,7 +85,7 @@
 									</div>
 								</div>
 							</div>
-							<div v-for="data in chatBotDatas">
+							<div v-for="data in chat_msg.chatBotDatas">
 								<!---问题--->
 								<div class="question_item">
 									<div class="question_item_container">
@@ -129,8 +130,9 @@
 				</div>
 
 				<!--尾部-->
-				<Footler :ElNotificationErr="ElNotificationErr" @update:cur-model="item => curModel = item"
-					@update:chat-bot-datas="item => chatBotDatas = item" />
+				<Footler ref="footlerRef" :ElNotificationErr="ElNotificationErr" :historyId="curHistoryId" :agentId="curAgent.agent_id"
+					@update:cur-model="item => curModel = item" @update:chat-bot-datas="updateChatBotDatas"
+					@update:selectAgent="selectAgent" />
 			</el-main>
 		</el-container>
 	</el-card>
@@ -142,85 +144,12 @@ import { ElNotification, ElScrollbar, ElMessage } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
 import HistoryAside from '@/views/chat/historyAside.vue'
 import Footler from '@/views/chat/footler.vue'
-import { useChatApi, useModelsApi } from '@/api/chat'
-// 其他syspromt
-const syspromts = ref([
-	{
-		title: '面试技巧',
-		content: '作为一名资深HR，请结合面试岗位，用通俗易懂的言语提供实用可行的面试指南，面试岗位：会计'
-	},
-	{
-		title: '账号涨粉助手',
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆'
-	}
-	,
-	{
-		title: '账号涨粉助手',
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆'
-	}
-	,
-	{
-		title: '账号涨粉助手',
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆'
-	}
-	,
-	{
-		title: '账号涨粉助手',
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆'
-	}
-	,
-	{
-		title: '账号涨粉助手',
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆'
-	}
-	,
-	{
-		title: '账号涨粉助手',
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆'
-	}
+import { useGetHistoryDetailApi } from '@/api/chat'
 
-])
-// 搜索
-const searchTxt = ref('')
-// 历史记录
-const historys = ref([
-	{
-		id: 1,
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆',
-		show: false
-	},
-	{
-		id: 2,
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆',
-		show: false
-	},
-	{
-		id: 3,
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆',
-		show: false
-	},
-	{
-		id: 4,
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆',
-		show: false
-	},
-	{
-		id: 5,
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆',
-		show: false
-	},
-	{
-		id: 6,
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆',
-		show: false
-	},
-	{
-		id: 7,
-		content: '输入您的行业类别，我会给您一些快速涨粉的建议。我的行业是：美妆',
-		show: false
-	},
 
-])
+
+const curHistoryId = ref('')
+const historyRef = ref()
 
 const ElNotificationErr = (err: any) => {
 	ElNotification({
@@ -233,8 +162,6 @@ const ElNotificationErr = (err: any) => {
 // 关闭历史记录siber
 const chatHistoryDisplay = ref(true)
 
-// 点击的历史记录
-const selectedHistory = ref('')
 
 // 对话
 // 定义 HistoryItem 接口
@@ -262,31 +189,25 @@ interface historyChat {
 	// metadata: {}
 }
 
-const chat_msg = ref<historyChat>()
+const chat_msg = reactive({
+	history: [],
+	chatBotDatas: []
+})
 
-chat_msg.value = {
-	system: 'You are a helpful assistant.',
-	history: [
-		{
-			role: 'user',
-			content: 'python怎么使用vue前端项目'
-		},
-		{
-			role: "assistant",
-			content: "Python 可以与 Vue 前端项目集成的常见方式包括：\n\n1. 后端 API：使用 Flask 或 Django 等 Python 框架来创建 RESTful API，以提供数据给 Vue 应用程序。\n2. 服务端渲染 (SSR)：使用 Node.js 和 Express.js 作为服务端渲染层，使用 Python 作为数据处理层。\n3. Web 服务：使用 Python 的 Web 框架例如 Tornado 或 Pyramid 来提供一个 Web 服务，从而为 Vue 应用程序提供数据。\n\n下面是一个使用 Flask 和 Vue.js 的简单示例\n\n### Flask 后端 API\n\n创建一个名为 `app.py` 的文件，内容如下：\n```python\nfrom flask import Flask, jsonify\n\napp = Flask(__name__)\n\n# 模拟数据\ndata = [\n    {\"id\": 1, \"name\": \"John\"},\n    {\"id\": 2, \"name\": \"Jane\"},\n]\n\n@app.route(\"/api/data\")\ndef get_data():\n    return jsonify(data)\n\nif __name__ == \"__main__\":\n    app.run(debug=True)\n```\n运行该应用程序，打开浏览器，访问 `http://localhost:5000/api/data`，即可看到返回的 JSON 数据。\n\n### Vue.js 前端\n\n创建一个新的 Vue.js 项目，使用以下命令：\n```bash\nnpm install -g @vue/cli\nvue create vue-app\n```\n在 `src` 目录下创建一个名为 `api.js` 的文件，内容如下：\n```javascript\nimport axios from 'axios';\n\nconst api = axios.create({\n  baseURL: 'http://localhost:5000/api',\n});\n\nexport default api;\n```\n"
-		}
-
-	],
-	model_name: 'llama-3.2-90b-vision-preview'
-}
 
 // 问题头像
 const questionEdit = ref(false)
 
 // 当前模型
 const curModel = ref('')
-// 正在进行的对话数据
-const chatBotDatas = ref<[chatBot]>([])
+
+// 当前智能体
+const curAgent = reactive({
+	agent_id: '',
+	agent_title: ''
+})
+
+const footlerRef = ref()
 
 // 对话框滚动条滚动到底部
 const scrollbarRef = ref<InstanceType<typeof ElScrollbar>>()
@@ -316,12 +237,63 @@ const scrollbarToBotom = async (smooth: boolean) => {
 
 }
 
-watch([scrollbarRef, chatBotDatas], ([newScrollVal, newChatVal], [oldScrollVal, oldChatVal]) => {
+watch([scrollbarRef, chat_msg], ([newScrollVal, newChatVal], [oldScrollVal, oldChatVal]) => {
 	if (newScrollVal || newChatVal.length > 0) {
 		scrollbarToBotom(newChatVal.length > 0 ? true : false)
 	}
 })
 
+// 选择智能体
+const selectAgent = (historyId: any) => {
+	// 刷新历史记录
+	curHistoryId.value = historyId
+	// 模拟点击
+	historyRef.value.activeHistoryItem(historyId)
+	//选择的历史记录
+	selectHistoryItem(historyId)
+}
+
+// 选择的历史记录
+const selectHistoryItem = (data:any) => {
+	//chat_msg.chatBotDatas = []
+	// 清空数据
+	const historyId = data.historyId
+	const isClearChat = data.isClearChat
+	curHistoryId.value = historyId
+	footlerRef.value.init()
+	// 获取历史记录详情
+	useGetHistoryDetailApi({ "id": historyId }).then(res => {
+		// 填充数据
+		curModel.value = res.model_name
+		curAgent.agent_id = res.agent_id
+		curAgent.agent_title = res.agent_title
+		if(isClearChat){
+			//表明是直接点击的历史记录
+			chat_msg.chatBotDatas = []
+			chat_msg.history = res.content
+		}else{
+			//表明是发送的消息，不是点击的历史记录
+			// 填充数据
+			chat_msg.history = []
+		}
+		
+	})
+}
+
+// 发送按钮事件
+const updateChatBotDatas = (data: any) => {
+	chat_msg.chatBotDatas = data
+	if (curHistoryId.value == '') {
+		// 刷新历史列表,不清空chat
+		historyRef.value.refreshAndSelectFirstHistory(false)
+	}
+}
+
+onMounted(() => {
+	// 初始化数据
+	chat_msg.chatBotDatas = []
+	chat_msg.history = []
+})
 </script>
 
 

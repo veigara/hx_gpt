@@ -27,7 +27,7 @@
 					</div>
 				</div>
 				<div class="agent_action">
-					<el-button title="选择" type="success" text>
+					<el-button title="选择" type="success" text @click="selectview(item)">
 						<template #icon>
 							<svg-icon icon="icon-select"></svg-icon>
 						</template>
@@ -51,10 +51,10 @@
 
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
-import { ElMessage,ElMessageBox } from 'element-plus/es'
+import { ElMessage, ElMessageBox } from 'element-plus/es'
 import { Delete } from '@element-plus/icons-vue'
 import AgentAdd from '@/views/chat/agentAdd.vue'
-import { useUserAgentApi, useAgentDetailApi,useDelAgentApi } from '@/api/chat'
+import { useUserAgentApi, useAgentDetailApi, useDelAgentApi, useSelectAgentApi } from '@/api/chat'
 import { debounce } from 'lodash';
 
 const visible = ref(false)
@@ -79,14 +79,16 @@ interface agentModel {
 	title: string
 	content: [agentContent]
 	modelConfig: modelConfig,
-	edit:boolean
-	user_name:string,
-	model_name:string
+	edit: boolean
+	user_name: string,
+	model_name: string
 }
 
 const search = ref('')
 
 const agentList = ref([])
+
+const emit = defineEmits(['submit'])
 
 // 获取当前用户所有智能体
 const getAllAgent = (title) => {
@@ -102,7 +104,7 @@ const init = () => {
 }
 
 const handleAdd = () => {
-	agentAddRef.value.init({},true)
+	agentAddRef.value.init({}, true)
 }
 
 /**
@@ -110,8 +112,8 @@ const handleAdd = () => {
  * @param item 
  */
 const handview = (item: agentModel) => {
-	useAgentDetailApi({ "id": item.id,"fileUserName":item.user_name }).then(res => {
-		agentAddRef.value.init(res,item.edit)
+	useAgentDetailApi({ "id": item.id}).then(res => {
+		agentAddRef.value.init(res, item.edit)
 	})
 }
 
@@ -123,28 +125,40 @@ const searchTitle = () => {
 }
 
 // 300ms 的防抖时间
-const debouncedSearchTitle = debounce(searchTitle, 300); 
+const debouncedSearchTitle = debounce(searchTitle, 300);
 
 // 删除
 const delview = (item: agentModel) => {
 	ElMessageBox.confirm(
-    '是否确认删除该智能体？',
-    '警告',
-    {
-      confirmButtonText: 'OK',
-      cancelButtonText: 'Cancel',
-      type: 'warning',
-    }
-  )
-    .then(() => {
-		useDelAgentApi({ "id": item.id }).then(res => {
-		ElMessage.success('删除成功')
-		// 刷新列表
-		getAllAgent(undefined)
-	})
-    })
+		'是否确认删除该智能体？',
+		'警告',
+		{
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning',
+		}
+	)
+		.then(() => {
+			useDelAgentApi({ "id": item.id }).then(res => {
+				ElMessage.success('删除成功')
+				// 刷新列表
+				getAllAgent(undefined)
+			})
+		})
 }
-	
+
+// 选择智能体
+const selectview = (item: agentModel) => {
+	useSelectAgentApi({ "id": item.id, "fileUserName": item.user_name }).then(res => {
+		const historyId = res
+		// 关闭智能体
+		visible.value = false
+		// 提交选择
+		emit('submit', historyId)
+	})
+
+}
+
 defineExpose({
 	init
 })

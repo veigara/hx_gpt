@@ -23,3 +23,15 @@ export const useAgentDetailApi = (params: any) => {
 export const useDelAgentApi = (params: any) => {
 	return service.delete('/del_agent',{params})
 }
+
+export const useSelectAgentApi = (params: any) => {
+	return service.get('/select_agent',{params})
+}
+
+export const useGetHistorysApi = (params: any) => {
+	return service.get('/get_historys',{params})
+}
+
+export const useGetHistoryDetailApi = (params: any) => {
+	return service.get('/get_history_detail',{params})
+}

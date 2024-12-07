@@ -1,6 +1,6 @@
 <template>
 	<el-row>
-		<el-input v-model="props.searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;">
+		<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;">
 			<template #prefix>
 				<svg-icon icon="icon-search"></svg-icon>
 			</template>
@@ -9,9 +9,9 @@
 	<div style="overflow: hidden;margin-top:20px">
 		<el-scrollbar :max-height="computedHistoryMaxHeight">
 			<ul>
-				<li  :class="{'history_listItem':true, 'history_listItem_active':item.active ==true }"
-					v-for="item in props.historys" :key="item.id" @click="selectHistoryItem(item)">
-					<span class="history_listItem_content">{{ item.content }}</span>
+				<li :class="{ 'history_listItem': true, 'history_listItem_active': item.active == true }"
+					v-for="item in historys" :key="item.id" @click="selectHistoryItem(item)">
+					<span class="history_listItem_content">{{ item.title }}</span>
 					<el-popover :visible="item.show == true" placement="right-start" :show-arrow="false"
 						style="padding: 0px;">
 						<div class="history-menu">
@@ -38,27 +38,57 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive, ref,computed,onMounted,onUnmounted } from 'vue'
+import { nextTick, reactive, ref, computed, onMounted, onUnmounted } from 'vue'
+import { useGetHistorysApi } from '@/api/chat'
 
 
-interface Props {
-  // 搜索文本
-  searchTxt?: string
-  // 计算历史记录最大高度
-  historys:any
-  // 保存点击的记录
-  selectedHistory:string
+const historys = ref<any>([])
+// 搜索历史记录
+const searchTxt = ref()
+
+const emits = defineEmits(['click:history'])
+// 获取用户历史记录
+const getUserHistory = () => {
+	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
+		historys.value = res
+	})
 }
 
-const props = defineProps<Props>()
+// 设置记录为激活状态
+const activeHistoryItem = (historyId: String) => {
+	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
+		historys.value = res
+		historys.value.find(item => item.id == historyId).active = true
+	})
+}
+
+// 新建后刷新列表后点击第一个数据
+const refreshAndSelectFirstHistory = (isClearChat: boolean) => {
+	// 刷新历史记录
+	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
+		historys.value = res
+		if (res && res.length > 0) {
+			// 激活第一个
+			historys.value[0].active = true
+			emits('click:history', {historyId:historys.value[0].id,isClearChat:isClearChat})
+		}
+	})
+}
+
+defineExpose({
+	getUserHistory,
+	activeHistoryItem,
+	refreshAndSelectFirstHistory
+})
 
 // 点击历史记录 
 const selectHistoryItem = (item: any) => {
 	// 其他取消
-	props.historys.filter(item => item.active ==true).find(item => item.active = false)	
+	historys.value.filter(item => item.active == true).find(item => item.active = false)
 	// 指定当前
 	item.active = true
-	props.selectedHistory = item
+	// 将历史记录id给父组件
+	emits('click:history', {historyId:item.id,isClearChat:true})
 }
 
 // 左边历史记录
@@ -79,12 +109,13 @@ const openHistoryMenu = (item: any) => {
 
 // 关闭菜单
 const closeHistoryMenu = () => {
-	props.historys.filter(item => item.show == true).find(item => item.show = false)
+	historys.value.filter(item => item.show == true).find(item => item.show = false)
 }
 
 const mounted = onMounted(() => {
 	// 点击空白关闭历史记录菜单
 	document.addEventListener('click', handleClickOutside);
+	getUserHistory()
 });
 
 const closeHistoryUnmounted = onUnmounted(() => {
@@ -92,7 +123,7 @@ const closeHistoryUnmounted = onUnmounted(() => {
 });
 
 const handleClickOutside = (event: any) => {
-	props.historys.forEach(item => {
+	historys.value.forEach(item => {
 		if (!event.target.closest('.el-popover')) {
 			closeHistoryMenu()
 		}
@@ -101,7 +132,7 @@ const handleClickOutside = (event: any) => {
 </script>
 
 <style lang="scss">
-	.history_listItem {
+.history_listItem {
 	align-items: center;
 	border-radius: 12px;
 	box-sizing: border-box;
