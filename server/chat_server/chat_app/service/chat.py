@@ -65,7 +65,10 @@ def get_all_models(request):
             for key, value in MODEL_METADATA.items():
                 model_name = value["model_name"]
                 model_data = ModelData(
-                    label=key, model_name=model_name, description=value["description"]
+                    label=key,
+                    model_name=model_name,
+                    description=value["description"],
+                    model_type=value["model_type"],
                 ).to_dict()
                 if key == default_model_name:
                     model_data["default"] = True
@@ -268,7 +271,7 @@ def top_user_history(request):
 
 
 class ModelData:
-    def __init__(self, label, model_name, description):
+    def __init__(self, label, model_name, description, model_type):
         self.label = label
         # 模型名称
         self.model_name = model_name
@@ -276,12 +279,14 @@ class ModelData:
         self.description = description
         # 默认模型
         self.default = False
+        self.model_type = model_type
 
     def to_dict(self):
         return {
             "label": self.label,
             "model_name": self.model_name,
             "description": self.description,
+            "model_type": self.model_type,
         }
 
     def set_default(self, isDefault):

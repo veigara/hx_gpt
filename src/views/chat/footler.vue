@@ -36,8 +36,13 @@
 						</el-button>
 					</template>
 					<el-select :teleported="false" v-model="curModel" placeholder="请选择模型" style="width: 120px;">
-						<el-option v-for="item in modelList" :key="item.label" :label="item.label" :value="item.label">
-						</el-option>
+						<el-option-group v-for="item in modelList" :key="item.group" :label="item.group">
+							<el-tooltip v-for="model in item.options" :content="model.description" placement="right">
+								<el-option  :key="model.label" :label="model.label"
+								:value="model.label" >
+							</el-option>
+							</el-tooltip>
+						</el-option-group>
 					</el-select>
 				</el-popover>
 
@@ -62,8 +67,7 @@
 				</div>
 			</el-scrollbar>
 			<div class="chat_input_send">
-				<el-button color="#ff0000" disabled
-					v-if="chatBotData?.isLoading">加载中</el-button>
+				<el-button color="#ff0000" disabled v-if="chatBotData?.isLoading">加载中</el-button>
 				<el-button color="#626aef" @click="sendBotMsgClick" v-else>
 					<div style="margin-right: 5px;">
 						<svg-icon icon="icon-send_right" />
@@ -125,7 +129,7 @@ const mounted = onMounted(() => {
 const modelList = ref([])
 
 // 定义事件，方便传值
-const emit = defineEmits(['update:chatBotDataUser','update:chatBotDatAssert', 'update:curModel', "update:selectAgent"])
+const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModel', "update:selectAgent"])
 
 // 监听 chatBotMst 的变化
 watch(curModel, (newVal, oldVal) => {
@@ -135,17 +139,33 @@ watch(curModel, (newVal, oldVal) => {
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		modelList.value = res
-		modelList.value.filter(item => item.default == true).forEach(item => {
-			curModel.value = item.label
-		})
+		modelList.value = groupedModels(res)
+
+		modelList.value.filter(group => group.options.filter(item => item.default == true).forEach(model  =>{
+			curModel.value = model.label
+		}))
 	})
 }
 
+// 模型按照类别分类
+const groupedModels = (dataList: any[]) => {
+	return dataList.reduce((acc, model) => {
+		const existingGroup = acc.find(g => g.group === model.model_type);
+		if (existingGroup) {
+			existingGroup.options.push({ label: model.label, description: model.description,default: model.default });
+		} else {
+			acc.push({
+				group: model.model_type,
+				options: [{ label: model.label, description: model.description,default: model.default }]
+			});
+		}
+		return acc;
+	}, []);	
+}
 // 发送按钮
 const sendBotMsgClick = () => {
 	// 获取输入框的内容并去除换行符
-    const message = chatBotMst.value.trim();
+	const message = chatBotMst.value.trim();
 	if (!message) {
 		ElNotification({
 			title: '提示',
@@ -159,8 +179,8 @@ const sendBotMsgClick = () => {
 		assistantCt: '',
 		isLoading: true
 	}
-	chatBotData.userCt=message
-	chatBotData.isLoading=true
+	chatBotData.userCt = message
+	chatBotData.isLoading = true
 	// 传输数据
 	emit('update:chatBotDataUser', curMsg)
 	// 对话
@@ -189,9 +209,9 @@ const useSelectAgentApi = (historyId: string) => {
 
 // 初始化发送框
 const init = () => {
-	chatBotData.assistantCt=''
-	chatBotData.userCt=''
-	chatBotData.isLoading=false
+	chatBotData.assistantCt = ''
+	chatBotData.userCt = ''
+	chatBotData.isLoading = false
 	// 对话输入框的数据
 	chatBotMst.value = ''
 	// 智能体显示弹窗
