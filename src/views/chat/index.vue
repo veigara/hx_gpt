@@ -1,7 +1,7 @@
 <template>
 	<el-card class="chat_card" body-style="padding: 0px;">
 		<el-container>
-			<el-aside width="260px" class="chat_card_aside" v-if="chatHistoryDisplay">
+			<el-aside width="300px" class="chat_card_aside" v-if="chatHistoryDisplay">
 				<HistoryAside ref="historyRef" @click:history="item => selectHistoryItem(item)" @refresh:history="refreshHistory"/>
 			</el-aside>
 

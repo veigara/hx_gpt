@@ -21,7 +21,13 @@
 			<ul>
 				<li :class="{ 'history_listItem': true, 'history_listItem_active': item.active == true }"
 					v-for="item in historys" :key="item.id" @click="selectHistoryItem(item)">
-					<span class="history_listItem_content">{{ item.title }}</span>
+					<div style="width: 100%;padding: 0px 10px 0px 0px;">
+						<div><span class="history_listItem_content">{{ item.title }}</span></div>
+						<div style="display: flex;justify-content: space-between;font-size: 12px;color: #a6a6a6;">
+							<div class="history_listItem_time">共{{ item.count }}条对话</div>
+							<div class="history_listItem_time">{{ item.create_time }}</div>
+						</div>
+					</div>
 					<el-popover :visible="item.show == true" placement="right-start" :show-arrow="false"
 						style="padding: 0px;">
 						<div class="history-menu">
@@ -30,18 +36,19 @@
 							</div>
 							<div class="history-menu-item" @click="topHistory(item)">
 								<span><svg-icon icon="icon-add-top" /></span>置顶此对话
+							</div>
+							<div class="history-menu-item" @click="delHistory(item)">
+								<span><svg-icon icon="icon-delete" /></span>删除此对话
+							</div>
 						</div>
-						<div class="history-menu-item" @click="delHistory(item)">
-							<span><svg-icon icon="icon-delete" /></span>删除此对话
-						</div>
-	</div>
-	<template #reference>
-		<svg-icon class="history_listItem_icon" icon="icon-ellipsis" @click.stop="openHistoryMenu(item)"></svg-icon>
-	</template>
-	</el-popover>
-	</li>
-	</ul>
-	</el-scrollbar>
+						<template #reference>
+							<svg-icon class="history_listItem_icon" icon="icon-ellipsis"
+								@click.stop="openHistoryMenu(item)"></svg-icon>
+						</template>
+					</el-popover>
+				</li>
+			</ul>
+		</el-scrollbar>
 	</div>
 </template>
 
@@ -110,11 +117,12 @@ const selectHistoryItem = (item: any) => {
 
 // 左边历史记录
 // 右边其他参数
-const themeHeaderHeight = ref(window.getComputedStyle(document.documentElement).getPropertyValue('--theme-header-height'));
+//const themeHeaderHeight = ref(window.getComputedStyle(document.documentElement).getPropertyValue('--theme-header-height'));
 // 计算最大高度
 const computedHistoryMaxHeight = computed(() => {
-	const headerHeight = parseFloat(themeHeaderHeight.value);
-	return `calc(100vh - 19px - 90px - ${headerHeight}px)`;
+	//const headerHeight = parseFloat(themeHeaderHeight.value);
+	//return `calc(100vh - 19px - 90px - ${headerHeight}px)`;
+	return `calc(100vh - 19px - 90px )`;
 });
 
 // 打开历史记录的菜单
@@ -215,7 +223,7 @@ const topHistory = (item: any) => {
 	display: flex;
 	flex-shrink: 0;
 	font-size: 14px;
-	height: 36px;
+	//height: 36px;
 	justify-content: space-between;
 	margin-bottom: 12px;
 	padding: 6px 16px;
@@ -238,7 +246,9 @@ const topHistory = (item: any) => {
 	overflow: hidden;
 	position: relative;
 	text-overflow: clip;
-	white-space: nowrap
+	white-space: nowrap;
+	font-size: 14px;
+	font-weight: bolder;
 }
 
 .history_listItem_icon {
