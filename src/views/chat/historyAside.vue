@@ -1,10 +1,19 @@
 <template>
-	<el-row>
-		<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;">
-			<template #prefix>
-				<svg-icon icon="icon-search"></svg-icon>
-			</template>
-		</el-input>
+	<el-row gutter="2">
+		<el-col :span="20">
+			<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;">
+				<template #prefix>
+					<svg-icon icon="icon-search"></svg-icon>
+				</template>
+			</el-input>
+		</el-col>
+		<el-col :span="3">
+			<div class="add-chat" title="新建对话" @click="addChat">
+				<el-icon :size="20">
+					<Plus />
+				</el-icon>
+			</div>
+		</el-col>
 	</el-row>
 	<div style="overflow: hidden;margin-top:20px">
 		<el-scrollbar :max-height="computedHistoryMaxHeight">
@@ -16,7 +25,7 @@
 						style="padding: 0px;">
 						<div class="history-menu">
 							<div class="history-menu-item" @click="showRenameInput(item)">
-								<span><svg-icon icon="icon-edit"/></span>重命名
+								<span><svg-icon icon="icon-edit" /></span>重命名
 							</div>
 							<div class="history-menu-item">
 								<span><svg-icon icon="icon-totop" /></span>置顶此对话
@@ -38,14 +47,15 @@
 
 <script setup lang="ts">
 import { nextTick, reactive, ref, computed, onMounted, onUnmounted } from 'vue'
-import { useGetHistorysApi,useRenameHistoryApi } from '@/api/chat'
+import { useGetHistorysApi, useRenameHistoryApi } from '@/api/chat'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 
 const historys = ref<any>([])
 // 搜索历史记录
 const searchTxt = ref()
 
-const emits = defineEmits(['click:history'])
+const emits = defineEmits(['click:history','refresh:history'])
 // 获取用户历史记录
 const getUserHistory = () => {
 	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
@@ -69,15 +79,21 @@ const refreshAndSelectFirstHistory = (isClearChat: boolean) => {
 		if (res && res.length > 0) {
 			// 激活第一个
 			historys.value[0].active = true
-			emits('click:history', {historyId:historys.value[0].id,isClearChat:isClearChat})
+			emits('click:history', { historyId: historys.value[0].id, isClearChat: isClearChat })
 		}
 	})
+}
+
+// 取消所有选中
+const clearActive=() => {
+	historys.value.find(item => item.active == true).active = false
 }
 
 defineExpose({
 	getUserHistory,
 	activeHistoryItem,
-	refreshAndSelectFirstHistory
+	refreshAndSelectFirstHistory,
+	clearActive
 })
 
 // 点击历史记录 
@@ -87,7 +103,7 @@ const selectHistoryItem = (item: any) => {
 	// 指定当前
 	item.active = true
 	// 将历史记录id给父组件
-	emits('click:history', {historyId:item.id,isClearChat:true})
+	emits('click:history', { historyId: item.id, isClearChat: true })
 }
 
 // 左边历史记录
@@ -130,22 +146,26 @@ const handleClickOutside = (event: any) => {
 };
 
 // 重命名
-const showRenameInput =(item:any) => {
+const showRenameInput = (item: any) => {
 	ElMessageBox.prompt('请输入历史记录的标题', '重命名', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-	inputPattern: /.+?/,
-    inputErrorMessage: '标题不能为空',
-  })
-    .then(({ value }) => {
-		useRenameHistoryApi({id:item.id,new_title:value}).then(res =>{
-			// 刷新
-			getUserHistory()
-			ElMessage.success('重命名成功')
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		inputPattern: /.+?/,
+		inputErrorMessage: '标题不能为空',
+	})
+		.then(({ value }) => {
+			useRenameHistoryApi({ id: item.id, new_title: value }).then(res => {
+				// 刷新
+				getUserHistory()
+				ElMessage.success('重命名成功')
+			})
 		})
-    })
-    
+}
 
+// 新建对话
+const addChat=() => {
+	// 页面上全部初始化
+	emits('refresh:history')
 }
 </script>
 
@@ -230,5 +250,13 @@ const showRenameInput =(item:any) => {
 .history-menu>div:last-of-type {
 	border-top: 1px solid #e8eaf2;
 	color: #e63224;
+}
+
+.add-chat {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
 }
 </style>

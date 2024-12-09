@@ -63,7 +63,7 @@
 			</el-scrollbar>
 			<div class="chat_input_send">
 				<el-button color="#ff0000" disabled
-					v-if="chatBotDatas?.[chatBotDatas.length - 1]?.isLoading">加载中</el-button>
+					v-if="chatBotData?.isLoading">加载中</el-button>
 				<el-button color="#626aef" @click="sendBotMsgClick" v-else>
 					<div style="margin-right: 5px;">
 						<svg-icon icon="icon-send_right" />
@@ -105,7 +105,11 @@ const props = defineProps<Props>()
 // 当前模型
 const curModel = ref()
 // 正在进行的对话数据
-const chatBotDatas = ref<[chatBot]>([])
+const chatBotData = reactive({
+	userCt: '',
+	assistantCt: '',
+	isLoading: false
+})
 // 对话输入框的数据
 const chatBotMst = ref('')
 // 智能体显示弹窗
@@ -121,7 +125,7 @@ const mounted = onMounted(() => {
 const modelList = ref([])
 
 // 定义事件，方便传值
-const emit = defineEmits(['update:chatBotDatas', 'update:curModel', "update:selectAgent"])
+const emit = defineEmits(['update:chatBotDataUser','update:chatBotDatAssert', 'update:curModel', "update:selectAgent"])
 
 // 监听 chatBotMst 的变化
 watch(curModel, (newVal, oldVal) => {
@@ -155,18 +159,19 @@ const sendBotMsgClick = () => {
 		assistantCt: '',
 		isLoading: true
 	}
-	chatBotDatas.value.push(curMsg)
+	chatBotData.userCt=message
+	chatBotData.isLoading=true
 	// 传输数据
-	emit('update:chatBotDatas', chatBotDatas.value)
+	emit('update:chatBotDataUser', curMsg)
 	// 对话
 	useChatApi({ input_text: message, model_name: curModel.value, history_id: props.historyId, agent_id: props.agentId }).then(res => {
-		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
-		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
+		chatBotData.assistantCt = res
+		chatBotData.isLoading = false
 		// 将更新后的数据传递给父组件
-		emit('update:chatBotDatas', chatBotDatas.value)
+		emit('update:chatBotDatAssert', chatBotData)
 	}).catch(err => {
-		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
-		emit('update:chatBotDatas', chatBotDatas.value)
+		chatBotData.isLoading = false
+		emit('update:chatBotDatAssert', chatBotData)
 	})
 	// 清空发送的消息
 	chatBotMst.value = ''
@@ -184,7 +189,9 @@ const useSelectAgentApi = (historyId: string) => {
 
 // 初始化发送框
 const init = () => {
-	chatBotDatas.value = []
+	chatBotData.assistantCt=''
+	chatBotData.userCt=''
+	chatBotData.isLoading=false
 	// 对话输入框的数据
 	chatBotMst.value = ''
 	// 智能体显示弹窗

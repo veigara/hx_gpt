@@ -2,7 +2,7 @@
 	<el-card class="chat_card" body-style="padding: 0px;">
 		<el-container>
 			<el-aside width="260px" class="chat_card_aside" v-if="chatHistoryDisplay">
-				<HistoryAside ref="historyRef" @click:history="item => selectHistoryItem(item)" />
+				<HistoryAside ref="historyRef" @click:history="item => selectHistoryItem(item)" @refresh:history="refreshHistory"/>
 			</el-aside>
 
 			<el-main class="chat_card_main">
@@ -27,24 +27,6 @@
 				<div style="height: calc(100vh - 270px - var(--theme-header-height));">
 					<el-scrollbar max-height="100%" style="width: 100%;" ref="scrollbarRef">
 						<div style="max-width: 1150px;margin: 16px auto;">
-							<!--
-							<div class="ans_item">
-								<div class="ans_item_avatar">
-									回答头像
-									<div>
-										<el-button>
-											<template #icon>
-												<svg-icon icon="icon-user"></svg-icon>
-											</template>
-</el-button>
-</div>
-</div>
-回答内容
-<div class="ans_item_content">
-	<TextComponent ref="textRef" :text="chat_msg.system" :loading="false" :asRawText="false" />
-</div>
-</div>
--->
 							<div v-for="historyItem in chat_msg.history">
 								<!---问题--->
 								<div class="question_item" v-if="historyItem.role == 'user'">
@@ -131,7 +113,7 @@
 
 				<!--尾部-->
 				<Footler ref="footlerRef" :ElNotificationErr="ElNotificationErr" :historyId="curHistoryId" :agentId="curAgent.agent_id"
-					@update:cur-model="item => curModel = item" @update:chat-bot-datas="updateChatBotDatas"
+					@update:cur-model="item => curModel = item" @update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
 					@update:selectAgent="selectAgent" />
 			</el-main>
 		</el-container>
@@ -252,7 +234,6 @@ const selectAgent = (historyId: any) => {
 
 // 选择的历史记录
 const selectHistoryItem = (data:any) => {
-	//chat_msg.chatBotDatas = []
 	// 清空数据
 	const historyId = data.historyId
 	const isClearChat = data.isClearChat
@@ -278,19 +259,44 @@ const selectHistoryItem = (data:any) => {
 	})
 }
 
-// 发送按钮事件
+// 发送按钮事件,返回回答
 const updateChatBotDatas = (data: any) => {
-	chat_msg.chatBotDatas = data
+	chat_msg.chatBotDatas[chat_msg.chatBotDatas.length - 1] = data
 	if (curHistoryId.value == '') {
 		// 刷新历史列表,不清空chat
 		historyRef.value.refreshAndSelectFirstHistory(false)
 	}
 }
 
-onMounted(() => {
+// 首先发送
+const updateChatBotDatasUser = (data: any) => {
+	chat_msg.chatBotDatas.push(data)
+}
+
+// 初始化所有页面
+const refreshHistory =()=>{
+	if(curHistoryId.value == ''){
+		ElMessage.success('已经是最新对话')
+	}
+	// 历史记录
+	historyRef.value.clearActive()
+	// 对话部分
+	init()
+	// 尾部
+	footlerRef.value.init()
+}
+
+const init=() => {
 	// 初始化数据
 	chat_msg.chatBotDatas = []
 	chat_msg.history = []
+	curHistoryId.value=''
+	curAgent.agent_id=''
+	curAgent.agent_title=''
+}
+
+onMounted(() => {
+	init()
 })
 </script>
 
