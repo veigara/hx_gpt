@@ -255,7 +255,8 @@ def update_history(user_name, history_id, contents) -> None:
         )
         content_data.extend(contents)
 
-        save_history_file(user_name, history_data)
+        # 保存并修改缓存
+        save_history(user_name, json.dumps(history_data))
 
     except Exception as e:
         raise Exception(f"修改历史记录失败,id={history_id},错误信息:{e}")
