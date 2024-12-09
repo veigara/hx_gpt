@@ -92,7 +92,7 @@ def rename_history(user_name, id, new_title) -> None:
             data = load_history(user_name, id)
             data["title"] = new_title
             # 保存到文件
-            save_history(user_name, data)
+            save_history(user_name, json.dumps(data))
 
 
 def del_history(user_name, id) -> None:
@@ -161,9 +161,9 @@ def save_history_agent(user_name, agentData) -> str:
         agent_title = agentData.get("title", "新的聊天")
         history_title = agentData.get("history_title")
         title = (
-            history_title
-            if history_title is not None or history_title != ""
-            else agent_title
+            agent_title
+            if history_title is None or history_title == ""
+            else history_title
         )
         history = agentData.get("content", [])
         model_name = agentData.get("model_name")

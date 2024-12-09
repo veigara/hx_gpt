@@ -1,4 +1,4 @@
-from ..models.model import get_default_model, get_user_model
+from ..models.model import get_model
 from ..config import get_default_model_name
 from ..utils import *
 from ..config import get_default_model_params
@@ -36,7 +36,13 @@ def chat_with_model(request):
             history_id = cretate_new_history(user_name, model_name, input_text)
             agent_data = get_default_agent_data(user_name)
             agent_id = agent_data.get("id")
-        model = get_user_model(user_name, model_name, history_id, agent_id)
+        model = get_model(
+            model_name=model_name,
+            user_name=user_name,
+            history_id=history_id,
+            agent_id=agent_id,
+        )
+
         if model is None:
             return HttpResponse(f"{model_name} load error", status=500)
         else:
@@ -44,7 +50,7 @@ def chat_with_model(request):
                 model.stream_next_chatbot(input_text, history_id, agent_id)
             )
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred:{e}", status=500)
 
 
@@ -71,7 +77,7 @@ def get_all_models(request):
                 json.dumps(model_data_list), content_type="application/json"
             )
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -86,7 +92,7 @@ def save_agent_file(request):
         save_agent(user_name, agent_data)
         return HttpResponse("Agent file saved successfully")
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -99,7 +105,7 @@ def get_user_agent(request):
         agnets = get_user_all_agents(user_name, keyword)
         return HttpResponse(json.dumps(agnets), content_type="application/json")
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -115,7 +121,7 @@ def get_agent_detail(request):
         detail = load_agent(user_name, id)
         return HttpResponse(json.dumps(detail), content_type="application/json")
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -131,7 +137,7 @@ def get_del_agent(request):
         del_agent(user_name, id)
         return HttpResponse(True)
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -156,7 +162,7 @@ def select_agent(request) -> str:
         return HttpResponse(history_id)
 
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -174,7 +180,7 @@ def get_historys(request):
             content_type="application/json",
         )
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -195,7 +201,7 @@ def get_history_detail(request):
         set_history_global(user_name, detail.get("content", []))
         return HttpResponse(json.dumps(detail), content_type="application/json")
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
@@ -214,7 +220,7 @@ def del_user_history(request):
         del_history(user_name, id)
         return HttpResponse(True)
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
 
 
 @csrf_exempt
@@ -237,7 +243,7 @@ def rename_user_history(request):
         rename_history(user_name, id, new_title)
         return HttpResponse(True)
     except Exception as e:
-        logger.error(f"Server error occurred: {e}")
+        logger.error(print_err(e))
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 

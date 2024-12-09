@@ -140,8 +140,9 @@ const getModelList = () => {
 
 // 发送按钮
 const sendBotMsgClick = () => {
-	let msg = chatBotMst.value
-	if (!msg) {
+	// 获取输入框的内容并去除换行符
+    const message = chatBotMst.value.trim();
+	if (!message) {
 		ElNotification({
 			title: '提示',
 			message: '请输入要咨询的问题',
@@ -150,7 +151,7 @@ const sendBotMsgClick = () => {
 		return
 	}
 	const curMsg = {
-		userCt: msg,
+		userCt: message,
 		assistantCt: '',
 		isLoading: true
 	}
@@ -158,7 +159,7 @@ const sendBotMsgClick = () => {
 	// 传输数据
 	emit('update:chatBotDatas', chatBotDatas.value)
 	// 对话
-	useChatApi({ input_text: msg, model_name: curModel.value, history_id: props.historyId, agent_id: props.agentId }).then(res => {
+	useChatApi({ input_text: message, model_name: curModel.value, history_id: props.historyId, agent_id: props.agentId }).then(res => {
 		chatBotDatas.value[chatBotDatas.value.length - 1].assistantCt = res
 		chatBotDatas.value[chatBotDatas.value.length - 1].isLoading = false
 		// 将更新后的数据传递给父组件

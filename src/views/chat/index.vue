@@ -247,11 +247,8 @@ watch([scrollbarRef, chat_msg], ([newScrollVal, newChatVal], [oldScrollVal, oldC
 const selectAgent = (historyId: any) => {
 	// 刷新历史记录
 	curHistoryId.value = historyId
-	// 模拟点击
-	historyRef.value.activeHistoryItem(historyId)
-	//选择的历史记录
-	selectHistoryItem(historyId)
-}
+	historyRef.value.refreshAndSelectFirstHistory(true)
+}                                                                                                                                                                           
 
 // 选择的历史记录
 const selectHistoryItem = (data:any) => {

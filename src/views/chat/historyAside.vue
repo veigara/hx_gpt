@@ -15,9 +15,8 @@
 					<el-popover :visible="item.show == true" placement="right-start" :show-arrow="false"
 						style="padding: 0px;">
 						<div class="history-menu">
-							<div class="history-menu-item">
-
-								<span><svg-icon icon="icon-edit" /></span>重命名
+							<div class="history-menu-item" @click="showRenameInput(item)">
+								<span><svg-icon icon="icon-edit"/></span>重命名
 							</div>
 							<div class="history-menu-item">
 								<span><svg-icon icon="icon-totop" /></span>置顶此对话
@@ -39,8 +38,8 @@
 
 <script setup lang="ts">
 import { nextTick, reactive, ref, computed, onMounted, onUnmounted } from 'vue'
-import { useGetHistorysApi } from '@/api/chat'
-
+import { useGetHistorysApi,useRenameHistoryApi } from '@/api/chat'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const historys = ref<any>([])
 // 搜索历史记录
@@ -129,6 +128,25 @@ const handleClickOutside = (event: any) => {
 		}
 	});
 };
+
+// 重命名
+const showRenameInput =(item:any) => {
+	ElMessageBox.prompt('请输入历史记录的标题', '重命名', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+	inputPattern: /.+?/,
+    inputErrorMessage: '标题不能为空',
+  })
+    .then(({ value }) => {
+		useRenameHistoryApi({id:item.id,new_title:value}).then(res =>{
+			// 刷新
+			getUserHistory()
+			ElMessage.success('重命名成功')
+		})
+    })
+    
+
+}
 </script>
 
 <style lang="scss">

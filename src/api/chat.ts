@@ -35,3 +35,11 @@ export const useGetHistorysApi = (params: any) => {
 export const useGetHistoryDetailApi = (params: any) => {
 	return service.get('/get_history_detail',{params})
 }
+
+export const useDelHistoryApi = (params: any) => {
+	return service.delete('/del_history',{params})
+}
+
+export const useRenameHistoryApi = (params: any) => {
+	return service.post('/rename_history',params)
+}

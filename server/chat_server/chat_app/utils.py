@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import tiktoken
+import traceback
 from django.core.cache import cache
 
 
@@ -40,3 +41,10 @@ def count_token(input_str):
     encoding = tiktoken.get_encoding("cl100k_base")
     tokens = encoding.encode(input_str)
     return len(tokens)
+
+
+def print_err(error: Exception) -> str:
+    # 打印详细的错误信息和堆栈跟踪
+    error_message = f"Server error occurred: {e}"
+    stack_trace = traceback.format_exc()
+    return f"{error_message}\n{stack_trace}"
