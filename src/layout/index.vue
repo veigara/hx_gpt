@@ -2,11 +2,7 @@
 	<el-container class="layout-container">
 		<el-container>
 			<Sidebar/>
-			<el-main class="layout-main">
-				<el-header class="layout-header">
-					
-				</el-header>
-				
+			<el-main class="layout-main">				
 				<el-scrollbar class="layout-scrollbar">
 					<div class="layout-card">
 						<router-view v-slot="{ Component, route }">

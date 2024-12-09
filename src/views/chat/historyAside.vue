@@ -1,7 +1,8 @@
 <template>
 	<el-row gutter="2">
 		<el-col :span="20">
-			<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;">
+			<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;"
+				@input="debouncedSearchTitle">
 				<template #prefix>
 					<svg-icon icon="icon-search"></svg-icon>
 				</template>
@@ -27,35 +28,35 @@
 							<div class="history-menu-item" @click="showRenameInput(item)">
 								<span><svg-icon icon="icon-edit" /></span>重命名
 							</div>
-							<div class="history-menu-item">
-								<span><svg-icon icon="icon-totop" /></span>置顶此对话
-							</div>
-							<div class="history-menu-item">
-								<span><svg-icon icon="icon-delete" /></span>删除此对话
-							</div>
+							<div class="history-menu-item" @click="topHistory(item)">
+								<span><svg-icon icon="icon-add-top" /></span>置顶此对话
 						</div>
-						<template #reference>
-							<svg-icon class="history_listItem_icon" icon="icon-ellipsis"
-								@click.stop="openHistoryMenu(item)"></svg-icon>
-						</template>
-					</el-popover>
-				</li>
-			</ul>
-		</el-scrollbar>
+						<div class="history-menu-item" @click="delHistory(item)">
+							<span><svg-icon icon="icon-delete" /></span>删除此对话
+						</div>
+	</div>
+	<template #reference>
+		<svg-icon class="history_listItem_icon" icon="icon-ellipsis" @click.stop="openHistoryMenu(item)"></svg-icon>
+	</template>
+	</el-popover>
+	</li>
+	</ul>
+	</el-scrollbar>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { nextTick, reactive, ref, computed, onMounted, onUnmounted } from 'vue'
-import { useGetHistorysApi, useRenameHistoryApi } from '@/api/chat'
+import { useGetHistorysApi, useRenameHistoryApi, useDelHistoryApi, useTopHistoryApi } from '@/api/chat'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { debounce } from 'lodash';
 
 const historys = ref<any>([])
 // 搜索历史记录
 const searchTxt = ref()
 
-const emits = defineEmits(['click:history','refresh:history'])
+const emits = defineEmits(['click:history', 'refresh:history'])
 // 获取用户历史记录
 const getUserHistory = () => {
 	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
@@ -85,15 +86,16 @@ const refreshAndSelectFirstHistory = (isClearChat: boolean) => {
 }
 
 // 取消所有选中
-const clearActive=() => {
+const clearAll = () => {
 	historys.value.find(item => item.active == true).active = false
+	searchTxt.value = ''
 }
 
 defineExpose({
 	getUserHistory,
 	activeHistoryItem,
 	refreshAndSelectFirstHistory,
-	clearActive
+	clearAll
 })
 
 // 点击历史记录 
@@ -163,9 +165,43 @@ const showRenameInput = (item: any) => {
 }
 
 // 新建对话
-const addChat=() => {
-	// 页面上全部初始化
-	emits('refresh:history')
+const addChat = () => {
+	// 页面上全部初始化,显示提示信息
+	emits('refresh:history', true)
+}
+
+const delHistory = (item: any) => {
+	ElMessageBox.confirm(
+		'是否确认删除该对话记录？',
+		'警告',
+		{
+			confirmButtonText: 'OK',
+			cancelButtonText: 'Cancel',
+			type: 'warning',
+		}
+	)
+		.then(() => {
+			// 删除历史记录
+			useDelHistoryApi({ id: item.id }).then(res => {
+				// 刷新
+				getUserHistory()
+				ElMessage.success('删除成功')
+				emits('refresh:history', false)
+			})
+		})
+
+}
+
+// 300ms 的防抖时间
+const debouncedSearchTitle = debounce(getUserHistory, 300);
+
+// 置顶对话
+const topHistory = (item: any) => {
+	useTopHistoryApi({ id: item.id }).then(res => {
+		// 刷新
+		getUserHistory()
+		ElMessage.success('置顶成功')
+	})
 }
 </script>
 

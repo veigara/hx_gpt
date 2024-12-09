@@ -247,6 +247,26 @@ def rename_user_history(request):
         return HttpResponse(f"Server error occurred: {e}", status=500)
 
 
+@csrf_exempt
+@require_http_methods(["POST"])
+def top_user_history(request):
+    """置顶历史记录
+    params:id 历史记录id
+    return:置顶结果
+    """
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+        id = payload.get("id")
+        user_name = get_user_name(request)
+        if id is None:
+            return HttpResponse("id is required", status=500)
+        top_history(user_name, id)
+        return HttpResponse(True)
+    except Exception as e:
+        logger.error(print_err(e))
+        return HttpResponse(f"Server error occurred: {e}", status=500)
+
+
 class ModelData:
     def __init__(self, label, model_name, description):
         self.label = label

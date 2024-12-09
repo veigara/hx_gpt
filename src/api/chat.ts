@@ -43,3 +43,7 @@ export const useDelHistoryApi = (params: any) => {
 export const useRenameHistoryApi = (params: any) => {
 	return service.post('/rename_history',params)
 }
+
+export const useTopHistoryApi = (params: any) => {
+	return service.post('/top_history',params)
+}

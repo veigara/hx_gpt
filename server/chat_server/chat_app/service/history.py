@@ -259,3 +259,18 @@ def update_history(user_name, history_id, contents) -> None:
 
     except Exception as e:
         raise Exception(f"修改历史记录失败,id={history_id},错误信息:{e}")
+
+
+def top_history(user_name, history_id) -> None:
+    """置顶历史记录"""
+    try:
+        history_data = load_history(user_name, history_id)
+        if history_data is None:
+            raise Exception(f"历史记录不存在,id={history_id}")
+        history_data["create_time"] = datetime.datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+        save_history(user_name, json.dumps(history_data))
+    except Exception as e:
+        raise Exception(f"置顶历史记录失败,id={history_id},错误信息:{e}")

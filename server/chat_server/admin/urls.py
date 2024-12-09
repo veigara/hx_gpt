@@ -43,4 +43,6 @@ urlpatterns = [
     path("del_history", chat.del_user_history, name="del_user_history"),
     # 重命名历史记录
     path("rename_history", chat.rename_user_history, name="rename_user_history"),
+    # 置顶历史记录
+    path("top_history", chat.top_user_history, name="top_user_history"),
 ]

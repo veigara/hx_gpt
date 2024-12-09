@@ -24,7 +24,7 @@
 					</el-row>
 				</div>
 				<!--内容-->
-				<div style="height: calc(100vh - 270px - var(--theme-header-height));">
+				<div style="height: calc(100vh - 270px);">
 					<el-scrollbar max-height="100%" style="width: 100%;" ref="scrollbarRef">
 						<div style="max-width: 1150px;margin: 16px auto;">
 							<div v-for="historyItem in chat_msg.history">
@@ -145,32 +145,6 @@ const ElNotificationErr = (err: any) => {
 const chatHistoryDisplay = ref(true)
 
 
-// 对话
-// 定义 HistoryItem 接口
-interface HistoryItem {
-	role: string;
-	content: string;
-}
-
-interface historyChat {
-	system: string,
-	history: HistoryItem[],
-	model_name: string,
-	// single_turn: boolean,
-	// temperature: number,
-	// top_p: number,
-	// n_choices: number,
-	// stop_sequence: [],
-	// token_upper_limit: number,
-	// max_generation_token: number,
-	// presence_penalty:number,
-	// frequency_penalty: number,
-	// logit_bias: number,
-	// user_identifier: string,
-	// stream: true,
-	// metadata: {}
-}
-
 const chat_msg = reactive({
 	history: [],
 	chatBotDatas: []
@@ -274,12 +248,14 @@ const updateChatBotDatasUser = (data: any) => {
 }
 
 // 初始化所有页面
-const refreshHistory =()=>{
+const refreshHistory =(isAlert:boolean)=>{
 	if(curHistoryId.value == ''){
-		ElMessage.success('已经是最新对话')
+		if(isAlert){
+			ElMessage.success('已经是最新对话')
+		}
 	}
 	// 历史记录
-	historyRef.value.clearActive()
+	historyRef.value.clearAll()
 	// 对话部分
 	init()
 	// 尾部
@@ -305,13 +281,13 @@ onMounted(() => {
 .chat_card_aside {
 	padding: 24px 10px 8px 10px;
 	border-right: 1px solid rgba(237, 239, 245, .45);
-	min-height: calc(100vh - 19px - var(--theme-header-height));
+	min-height: calc(100vh - 19px);
 	background-color: #fff;
 }
 
 .chat_card_main {
 	background-color: rgb(246, 247, 251);
-	min-height: calc(100vh - 19px - var(--theme-header-height));
+	min-height: calc(100vh - 19px);
 	padding: 20px 0px;
 	top: 0px;
 	position: relative;
