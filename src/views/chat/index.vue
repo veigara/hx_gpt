@@ -260,7 +260,7 @@ const selectHistoryItem = (data:any) => {
 	const historyId = data.historyId
 	const isClearChat = data.isClearChat
 	curHistoryId.value = historyId
-	footlerRef.value.init()
+	
 	// 获取历史记录详情
 	useGetHistoryDetailApi({ "id": historyId }).then(res => {
 		// 填充数据
@@ -271,6 +271,7 @@ const selectHistoryItem = (data:any) => {
 			//表明是直接点击的历史记录
 			chat_msg.chatBotDatas = []
 			chat_msg.history = res.content
+			footlerRef.value.init()
 		}else{
 			//表明是发送的消息，不是点击的历史记录
 			// 填充数据
