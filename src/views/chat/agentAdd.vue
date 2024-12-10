@@ -33,6 +33,9 @@
 				<el-form-item label="智能体名称" prop="title">
 					<el-input v-model="dataForm.title" placeholder="智能体名称"></el-input>
 				</el-form-item>
+				<el-form-item label="用户图标" prop="icon">
+					<icon-select v-model="dataForm.icon" suffx="icon-avatar-"/>
+				</el-form-item>
 				<el-form-item label="模型(model)" prop="model_name">
 					<el-select v-model="dataForm.model_name" :teleported="false" placeholder="请选择模型"
 						style="width: 100%">
@@ -109,9 +112,9 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { ElNotification } from 'element-plus'
-import { id } from 'element-plus/es/locale'
 import { useModelsApi, useSaveAgentFileApi } from '@/api/chat'
 import { CirclePlus, Delete } from '@element-plus/icons-vue'
+import IconSelect from '@/components/icon-select/src/index.vue'
 
 const visible = ref(false)
 
