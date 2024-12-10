@@ -235,15 +235,18 @@ const selectHistoryItem = (data:any) => {
 
 // 发送按钮事件,返回回答
 const updateChatBotDatas = (data: any) => {
+	// 使用深拷贝
+	data = JSON.parse(JSON.stringify(data))
 	chat_msg.chatBotDatas[chat_msg.chatBotDatas.length - 1] = data
 	if (curHistoryId.value == '') {
 		// 刷新历史列表,不清空chat
 		historyRef.value.refreshAndSelectFirstHistory(false)
 	}
 }
-
 // 首先发送
 const updateChatBotDatasUser = (data: any) => {
+	// 使用深拷贝
+	data = JSON.parse(JSON.stringify(data))
 	chat_msg.chatBotDatas.push(data)
 }
 

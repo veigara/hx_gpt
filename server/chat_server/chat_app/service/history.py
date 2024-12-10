@@ -2,10 +2,13 @@ import os
 import json
 import uuid
 import datetime
+import logging
 from ..presets import *
 from ..utils import *
 from .agent import *
 from ..cache_utils import *
+
+logger = logging.getLogger("chat_app")
 
 
 def get_user_all_history(user_name, keyword):
@@ -237,16 +240,20 @@ def set_user_history(user_name, jsonData) -> None:
     set_history_doc_global(user_name, jsonData)
 
 
-def update_history(user_name, history_id, contents) -> None:
-    """修改历史记录
+def update_history(user_name, history_id, contents, agent_data) -> None:
+    """修改历史记录，对话防止超限
     history_id(str):id 历史记录id
     content([]):当前对话
+    agent_data(dict):智能体id
     """
     try:
         history_data = load_history(user_name, history_id)
         if history_data is None:
             raise Exception(f"历史记录不存在,id={history_id}")
+        if agent_data is None:
+            raise Exception(f"智能体数据不存在,历史记录id={history_id}")
         count = history_data.get("count", 0)
+        agent_count = agent_data.get("count", 0)
         all_token_counts = history_data.get("all_token_counts", 0)
         content_data = history_data.get("content", [])
         history_data["count"] = count + len(contents)
@@ -254,6 +261,30 @@ def update_history(user_name, history_id, contents) -> None:
             contents
         )
         content_data.extend(contents)
+        max_tokens = agent_data.get("max_tokens", 0)
+        if (
+            max_tokens is not None
+            and history_data["all_token_counts"] > max_tokens
+            and max_tokens > 0
+        ):
+            logger.warning("历史记录对话超过最大限制，自动截断开始。。。。")
+            agent_content_data = content_data[:agent_count]
+            chat_content_data = content_data[agent_count + 1 :]
+            # 智能体的token
+            cur_token = count_user_history_token(agent_content_data)
+
+            real_chat_data = []
+            for history in chat_content_data[::-1]:
+                token = count_user_history_token([history])
+                if cur_token + token < max_tokens:
+                    # 倒叙添加
+                    real_chat_data.insert(0, history)
+                else:
+                    break
+            content_data = agent_content_data.extend(real_chat_data)
+            history_data["content"] = content_data
+            history_data["count"] = len(content_data)
+            history_data["all_token_counts"] = count_user_history_token(content_data)
 
         # 保存并修改缓存
         save_history(user_name, json.dumps(history_data))

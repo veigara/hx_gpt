@@ -67,7 +67,7 @@
 				</div>
 			</el-scrollbar>
 			<div class="chat_input_send">
-				<el-button color="#ff0000" disabled v-if="chatBotData?.isLoading">加载中</el-button>
+				<el-button color="#ff0000" disabled v-if="chatData?.isLoading">加载中</el-button>
 				<el-button color="#626aef" @click="sendBotMsgClick" v-else>
 					<div style="margin-right: 5px;">
 						<svg-icon icon="icon-send_right" />
@@ -109,7 +109,7 @@ const props = defineProps<Props>()
 // 当前模型
 const curModel = ref()
 // 正在进行的对话数据
-const chatBotData = reactive({
+const chatData = reactive({
 	userCt: '',
 	assistantCt: '',
 	isLoading: false
@@ -179,19 +179,19 @@ const sendBotMsgClick = () => {
 		assistantCt: '',
 		isLoading: true
 	}
-	chatBotData.userCt = message
-	chatBotData.isLoading = true
+	chatData.userCt = message
+	chatData.isLoading = true
 	// 传输数据
 	emit('update:chatBotDataUser', curMsg)
 	// 对话
 	useChatApi({ input_text: message, model_name: curModel.value, history_id: props.historyId, agent_id: props.agentId }).then(res => {
-		chatBotData.assistantCt = res
-		chatBotData.isLoading = false
+		chatData.assistantCt = res
+		chatData.isLoading = false
 		// 将更新后的数据传递给父组件
-		emit('update:chatBotDatAssert', chatBotData)
+		emit('update:chatBotDatAssert', chatData)
 	}).catch(err => {
-		chatBotData.isLoading = false
-		emit('update:chatBotDatAssert', chatBotData)
+		chatData.isLoading = false
+		emit('update:chatBotDatAssert', chatData)
 	})
 	// 清空发送的消息
 	chatBotMst.value = ''
@@ -209,9 +209,9 @@ const useSelectAgentApi = (historyId: string) => {
 
 // 初始化发送框
 const init = () => {
-	chatBotData.assistantCt = ''
-	chatBotData.userCt = ''
-	chatBotData.isLoading = false
+	chatData.assistantCt = ''
+	chatData.userCt = ''
+	chatData.isLoading = false
 	// 对话输入框的数据
 	chatBotMst.value = ''
 	// 智能体显示弹窗

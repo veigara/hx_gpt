@@ -19,6 +19,7 @@ def save_agent(user_name, json_str) -> None:
             # 智能体名称
             title = agent_data.get("title")
             id = agent_data.get("id")
+            content = agent_data.get("content", [])
             if title is None:
                 raise "智能体名称不能为空"
             if id is None or id == "":
@@ -26,7 +27,7 @@ def save_agent(user_name, json_str) -> None:
                 id = str(uuid.uuid4()).replace("-", "")
                 agent_data["id"] = id
                 agent_data["user_name"] = user_name
-                agent_data["count"] = len(agent_data.get("content", []))
+            agent_data["count"] = len(content)
 
             # 创建目录
             os.makedirs(os.path.join(AGENT_DIR, user_name), exist_ok=True)

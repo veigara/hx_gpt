@@ -75,7 +75,12 @@ class BaseLLMModel:
         assistant_content = construct_assistant(stream_iter)
         self.set_history(construct_assistant(stream_iter))
         # 修改文件
-        update_history(self.user_name, history_id, [user_content, assistant_content])
+        update_history(
+            self.user_name,
+            history_id,
+            [user_content, assistant_content],
+            self.get_agent_data(),
+        )
 
         return stream_iter
 
