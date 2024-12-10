@@ -1,0 +1,1 @@
+{"id": "b080a2cfb293484e84dd9ac4f021b65c", "title": "代码放大镜", "content": [{"role": "system", "content": "你擅长代码Debug，你需要指出代码中具体Bug，并对代码进行修改。接下来你需要进行Debug的代码为："}], "model_name": "llama-3.2-90b-vision", "temperature": 0.5, "top_p": 0.2, "max_tokens": 8000, "presence_penalty": 0, "frequency_penalty": 0, "user_name": "zhouhx", "count": 1}

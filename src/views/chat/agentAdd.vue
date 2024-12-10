@@ -141,9 +141,9 @@ const dataForm = reactive<agentModel>({
 	title: '',
 	content: [],
 	model_name: '',
-	temperature: 0,
-	top_p: 0,
-	max_tokens: 0,
+	temperature: 0.5,
+	top_p: 0.2,
+	max_tokens: 8000,
 	presence_penalty: 0,
 	frequency_penalty: 0
 })

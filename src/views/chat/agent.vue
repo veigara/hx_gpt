@@ -104,7 +104,18 @@ const init = () => {
 }
 
 const handleAdd = () => {
-	agentAddRef.value.init({}, true)
+	const data = {
+		id: '',
+		title: '',
+		content: [],
+		model_name: '',
+		temperature: 0.5,
+		top_p: 0.2,
+		max_tokens: 8000,
+		presence_penalty: 0,
+		frequency_penalty: 0
+	}
+	agentAddRef.value.init(data, true)
 }
 
 /**
@@ -112,7 +123,7 @@ const handleAdd = () => {
  * @param item 
  */
 const handview = (item: agentModel) => {
-	useAgentDetailApi({ "id": item.id}).then(res => {
+	useAgentDetailApi({ "id": item.id }).then(res => {
 		agentAddRef.value.init(res, item.edit)
 	})
 }

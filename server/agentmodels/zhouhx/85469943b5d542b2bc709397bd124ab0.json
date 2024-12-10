@@ -1,0 +1,1 @@
+{"id": "85469943b5d542b2bc709397bd124ab0", "title": "C语言编程", "content": [{"role": "system", "content": "你是一位C语言编程专家，请用规范正确的代码进行程序编写，我的第一个输出:"}], "model_name": "llama-3.2-90b-vision", "temperature": 0.5, "top_p": 0.2, "max_tokens": 8000, "presence_penalty": 0, "frequency_penalty": 0, "user_name": "zhouhx", "count": 1}
