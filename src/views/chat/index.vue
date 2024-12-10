@@ -39,7 +39,7 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon icon="icon-edit" v-if="questionEdit"></svg-icon>
+													<svg-icon icon="icon-edit" v-if="questionEdit"  @click="editQuestion(historyItem.content)"></svg-icon>
 													<svg-icon icon="icon-user" v-else></svg-icon>
 												</template>
 											</el-button>
@@ -117,7 +117,7 @@
 				<!--尾部-->
 				<Footler ref="footlerRef" :ElNotificationErr="ElNotificationErr" :historyId="curHistoryId" :agentId="curAgent.agent_id"
 					@update:cur-model="item => curModel = item" @update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
-					@update:selectAgent="selectAgent" />
+					@update:selectAgent="selectAgent" :sendContent="sendContent" />
 			</el-main>
 		</el-container>
 	</el-card>
@@ -125,7 +125,7 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted, onUnmounted, watch, onUpdated, nextTick } from 'vue'
-import { ElNotification, ElScrollbar, ElMessage } from 'element-plus'
+import { ElNotification, ElScrollbar, ElMessage,ElMessageBox } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
 import HistoryAside from '@/views/chat/historyAside.vue'
 import Footler from '@/views/chat/footler.vue'
@@ -166,6 +166,9 @@ const curAgent = reactive({
 	agent_title: '',
 	token_count: 0
 })
+
+// 重新发送的问题
+const sendContent = ref('')
 
 const footlerRef = ref()
 
@@ -278,6 +281,20 @@ const init=() => {
 	curAgent.agent_id=''
 	curAgent.agent_title=''
 	curAgent.token_count = 0
+}
+
+const editQuestion=(data:string) =>{
+	// 重新发送内容
+	ElMessageBox.prompt('请输入发送的内容', '发送', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		inputPattern: /.+?/,
+		inputErrorMessage: '内容不能为空',
+		inputValue: data
+	})
+	.then(({ value }) => {
+		sendContent.value = value
+	})
 }
 
 onMounted(() => {

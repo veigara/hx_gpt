@@ -92,7 +92,9 @@ interface Props {
 	// 错误弹框
 	ElNotificationErr: Function,
 	historyId: string,
-	agentId: string
+	agentId: string,
+	// 重新发送的内容
+	sendContent:string
 }
 
 //正在对话
@@ -217,6 +219,13 @@ const init = () => {
 	// 智能体显示弹窗
 	agentVisible.value = false
 }
+
+watch(() => props.sendContent, (newVal, oldVal) => {
+	if(newVal){
+		chatBotMst.value = newVal
+		sendBotMsgClick()
+	}
+})
 
 defineExpose({
 	init
