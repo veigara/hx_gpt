@@ -1,3 +1,4 @@
+import requests
 from ..models.model import get_model
 from ..config import get_default_model_name
 from ..utils import *
@@ -49,6 +50,12 @@ def chat_with_model(request):
             return HttpResponse(
                 model.stream_next_chatbot(input_text, history_id, agent_id)
             )
+    except requests.exceptions.ConnectTimeout:
+        status_text = STANDARD_ERROR_MSG + CONNECTION_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
+        return HttpResponse(status_text, status=500)
+    except requests.exceptions.ReadTimeout:
+        status_text = STANDARD_ERROR_MSG + READ_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
+        return HttpResponse(status_text, status=500)
     except Exception as e:
         logger.error(print_err(e))
         return HttpResponse(f"Server error occurred:{e}", status=500)

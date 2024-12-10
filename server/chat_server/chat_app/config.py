@@ -47,7 +47,7 @@ def get_default_model_params():
 
 def get_default_model_name() -> str:
     # 设置默认model
-    default_model = config.get("default_model", "GPT-4o-mini")
+    default_model = config.get("default_model")
     try:
         if default_model in MODELS:
             DEFAULT_MODEL = MODELS.index(default_model)
