@@ -16,6 +16,9 @@
 						<el-col :span="16">
 							模型名称: <span style="color: #00BFFF;">{{ curModel }}</span>
 						</el-col>
+						<el-col :span="8" style="display: flex;justify-content: end;">
+							<span style="color: #a6a6a6;">本次对话累计消耗了 {{curAgent.token_count }} tokens</span>	
+						</el-col>
 					</el-row>
 					<el-row style="padding: 0px 20px;">
 						<el-col :span="16">
@@ -160,7 +163,8 @@ const curModel = ref('')
 // 当前智能体
 const curAgent = reactive({
 	agent_id: '',
-	agent_title: ''
+	agent_title: '',
+	token_count: 0
 })
 
 const footlerRef = ref()
@@ -219,6 +223,7 @@ const selectHistoryItem = (data:any) => {
 		curModel.value = res.model_name
 		curAgent.agent_id = res.agent_id
 		curAgent.agent_title = res.agent_title
+		curAgent.token_count = res.all_token_counts
 		if(isClearChat){
 			//表明是直接点击的历史记录
 			chat_msg.chatBotDatas = []
@@ -272,6 +277,7 @@ const init=() => {
 	curHistoryId.value=''
 	curAgent.agent_id=''
 	curAgent.agent_title=''
+	curAgent.token_count = 0
 }
 
 onMounted(() => {
