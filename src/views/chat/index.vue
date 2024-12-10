@@ -29,7 +29,7 @@
 				<!--内容-->
 				<div style="height: calc(100vh - 270px);">
 					<el-scrollbar max-height="100%" style="width: 100%;" ref="scrollbarRef">
-						<div style="max-width: 1150px;margin: 16px auto;">
+						<div style="max-width: 896px;min-width:320px; margin: 16px auto;">
 							<div v-for="historyItem in chat_msg.history">
 								<!---问题--->
 								<div class="question_item" v-if="historyItem.role == 'user'">
