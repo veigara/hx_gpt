@@ -101,6 +101,7 @@ const getAllAgent = (title) => {
 
 const init = () => {
 	visible.value = true
+	search.value = ''
 }
 
 const handleAdd = () => {
