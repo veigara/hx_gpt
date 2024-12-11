@@ -157,7 +157,7 @@ pre {
     padding: 0px !important;
 }
 
-:deep .tongyi-design-highlighter-header {
+:deep(.tongyi-design-highlighter-header) {
     align-items: center;
     background-color: #585a73;
     color: #fafafc;
@@ -167,34 +167,34 @@ pre {
     padding: 0 14px
 }
 
-:deep .tongyi-design-highlighter {
+:deep(.tongyi-design-highlighter) {
   border-radius: 4px
 }
 
-:deep .tongyi-design-highlighter-right-actions {
+:deep(.tongyi-design-highlighter-right-actions) {
     align-items: center;
     display: flex
 }
 
-:deep .tongyi-design-highlighter-lang {
+:deep(.tongyi-design-highlighter-lang) {
     color: #fafafa;
     font-weight: 500;
     margin-right: auto
 }
 
-:deep .tongyi-design-highlighter-lang:first-letter {
+:deep(.tongyi-design-highlighter-lang:first-letter) {
     text-transform: uppercase
 }
 
-:deep .tongyi-design-highlighter-copy-btn {
+:deep(.tongyi-design-highlighter-copy-btn) {
     fill: #fafafa;
 }
 
-:deep .tongyi-design-highlighter-header+div>pre {
+:deep(.tongyi-design-highlighter-header)+div>pre {
     padding: 16px!important;
 }
 
-:deep .markdown-body  pre {
+:deep(.markdown-body)  pre {
     background-color: #f6f8fa;
     border-radius: 6px;
     color: #1f2328;
@@ -207,14 +207,14 @@ pre {
     padding: 0px;
 }
 
-:deep .tongyi-design-highlighter-copy-btn {
+:deep(.tongyi-design-highlighter-copy-btn) {
     fill: #f2f3f7;
     cursor: pointer;
     display: flex;
     align-items: center;
 }
 
-:deep .load-icon {
+:deep(.load-icon) {
   width: 100px !important;
   height: 60px !important;
 }

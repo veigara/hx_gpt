@@ -60,7 +60,7 @@
 		<div class="chat_main_plane_label">
 			<el-scrollbar :max-height="100" style="width: 100%;">
 				<div class="chat_textarea">
-					<el-input v-model="chatBotMst" :autosize="{ minRows: 2, maxRows: 6 }" type="textarea"
+					<el-input v-model="chatBotMst" :autosize="{ minRows: 2 }" type="textarea"
 						input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
 						placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令" @keyup.enter="sendBotMsgClick">
 					</el-input>
