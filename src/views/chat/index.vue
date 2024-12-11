@@ -46,7 +46,7 @@
 										</div>
 										<!--问题内容-->
 										<div class="question_item_content">
-											<div>{{ historyItem.content }}</div>
+											<div class="preserve-format">{{ historyItem.content }}</div>
 										</div>
 									</div>
 								</div>
@@ -86,7 +86,7 @@
 										</div>
 										<!--问题内容-->
 										<div class="question_item_content">
-											<div>{{ data.userCt }}</div>
+											<div class="preserve-format">{{ data.userCt }}</div>
 										</div>
 									</div>
 								</div>
@@ -566,6 +566,10 @@ onMounted(() => {
 	user-select: text;
 	word-break: break-word;
 	transition: all ease 0.3s;
+}
+
+.preserve-format {
+    white-space: pre-wrap; /* 保留空格和换行符 */
 }
 
 // .markdown-body {

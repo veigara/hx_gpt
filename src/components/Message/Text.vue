@@ -152,6 +152,7 @@ onUnmounted(() => {
 .markdown-body {
   background-color: transparent;
   font-size: 14px;
+  white-space: pre-wrap; /* 保留空格和换行符 */
 }  
 pre {
     padding: 0px !important;
