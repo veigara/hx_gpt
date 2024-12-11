@@ -79,7 +79,7 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon :size="20" icon="icon-edit" v-if="questionEdit"></svg-icon>
+													<svg-icon :size="20" icon="icon-edit" v-if="questionEdit" @click="editQuestion(data.content)"></svg-icon>
 													<svg-icon :size="25" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
