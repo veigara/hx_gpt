@@ -62,7 +62,7 @@
 				<div class="chat_textarea">
 					<el-input v-model="chatBotMst" :autosize="{ minRows: 2 }" type="textarea"
 						input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
-						placeholder="Enter 发送，Shift + Enter 换行，/ 触发补全，: 触发命令" @keyup.enter="sendBotMsgClick">
+						placeholder="Enter 发送，Shift + Enter 换行" @keyup.enter="sendBotMsgClick">
 					</el-input>
 				</div>
 			</el-scrollbar>
@@ -165,7 +165,11 @@ const groupedModels = (dataList: any[]) => {
 	}, []);	
 }
 // 发送按钮
-const sendBotMsgClick = () => {
+const sendBotMsgClick = (event: KeyboardEvent) => {
+	if(event.shiftKey){
+		//shift+enter 不触发此事件
+		return
+	}
 	// 获取输入框的内容并去除换行符
 	const message = chatBotMst.value.trim();
 	if (!message) {
