@@ -105,6 +105,10 @@ const init = () => {
 }
 
 const handleAdd = () => {
+	clearAgentAdd()
+}
+
+const clearAgentAdd = () => {
 	const data = {
 		id: '',
 		title: '',
@@ -114,16 +118,19 @@ const handleAdd = () => {
 		top_p: 0.2,
 		max_tokens: 8000,
 		presence_penalty: 0,
-		frequency_penalty: 0
+		frequency_penalty: 0,
+		user_icon:'',
+		assistant_icon:''
 	}
 	agentAddRef.value.init(data, true)
 }
-
 /**
  * 查看智能体详情
  * @param item 
  */
 const handview = (item: agentModel) => {
+	// 先清空
+	clearAgentAdd()
 	useAgentDetailApi({ "id": item.id }).then(res => {
 		agentAddRef.value.init(res, item.edit)
 	})

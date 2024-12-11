@@ -2,7 +2,7 @@
 	<div class="icon-box">
 		<el-input ref="inputRef" v-model="model" v-bind="$attrs" :placeholder="placeholder" :clearable="clearable" @clear="clearIcon" @click="openDialog">
 			<template #append>
-				<ma-icon :icon="model"></ma-icon>
+				<svg-icon  :icon="model"></svg-icon>
 			</template>
 		</el-input>
 		<el-dialog v-model="dialogVisible" :title="placeholder" top="50px" width="66%">

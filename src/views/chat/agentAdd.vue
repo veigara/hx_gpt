@@ -33,8 +33,11 @@
 				<el-form-item label="智能体名称" prop="title">
 					<el-input v-model="dataForm.title" placeholder="智能体名称"></el-input>
 				</el-form-item>
-				<el-form-item label="用户图标" prop="icon">
-					<icon-select v-model="dataForm.icon" suffx="icon-avatar-"/>
+				<el-form-item label="用户图标" prop="user_icon">
+					<icon-select v-model="dataForm.user_icon" suffx="icon-avatar-"/>
+				</el-form-item>
+				<el-form-item label="助理图标" prop="assistant_icon">
+					<icon-select v-model="dataForm.assistant_icon" suffx="icon-avatar-"/>
 				</el-form-item>
 				<el-form-item label="模型(model)" prop="model_name">
 					<el-select v-model="dataForm.model_name" :teleported="false" placeholder="请选择模型"
@@ -136,7 +139,9 @@ interface agentModel {
 	top_p: number
 	max_tokens: number
 	presence_penalty: number
-	frequency_penalty: number
+	frequency_penalty: number,
+	user_icon:string,
+	assistant_icon:string
 }
 
 const dataForm = reactive<agentModel>({
@@ -148,7 +153,9 @@ const dataForm = reactive<agentModel>({
 	top_p: 0.2,
 	max_tokens: 8000,
 	presence_penalty: 0,
-	frequency_penalty: 0
+	frequency_penalty: 0,
+	user_icon:'',
+	assistant_icon:''
 })
 
 const role = ref(['user', 'system', 'assistant'])
@@ -176,7 +183,9 @@ const clearForm = () => {
 		top_p: 0,
 		max_tokens: 0,
 		presence_penalty: 0,
-		frequency_penalty: 0
+		frequency_penalty: 0,
+		user_icon:'',
+		assistant_icon:''
 	})
 }
 

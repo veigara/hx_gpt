@@ -39,8 +39,8 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon icon="icon-edit" v-if="questionEdit"  @click="editQuestion(historyItem.content)"></svg-icon>
-													<svg-icon icon="icon-user" v-else></svg-icon>
+													<svg-icon :size="20" icon="icon-edit" v-if="questionEdit"  @click="editQuestion(historyItem.content)"></svg-icon>
+													<svg-icon :size="25" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -58,7 +58,7 @@
 										<div>
 											<el-button>
 												<template #icon>
-													<svg-icon icon="icon-user"></svg-icon>
+													<svg-icon :size="25" :icon="curAgent.assistant_icon"></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -79,8 +79,8 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon icon="icon-edit" v-if="questionEdit"></svg-icon>
-													<svg-icon icon="icon-user" v-else></svg-icon>
+													<svg-icon :size="20" icon="icon-edit" v-if="questionEdit"></svg-icon>
+													<svg-icon :size="25" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -97,7 +97,7 @@
 										<div>
 											<el-button>
 												<template #icon>
-													<svg-icon icon="icon-user"></svg-icon>
+													<svg-icon :size="25" :icon="curAgent.assistant_icon"></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -161,11 +161,18 @@ const questionEdit = ref(false)
 const curModel = ref('')
 
 // 当前智能体
-const curAgent = reactive({
+const initCurAgent ={
 	agent_id: '',
 	agent_title: '',
-	token_count: 0
-})
+	token_count: 0,
+	user_icon:'icon-user',
+	assistant_icon:'icon-user'
+}
+const curAgent = reactive({...initCurAgent})
+// 重置
+const resetCurAgent = () => {
+	Object.assign(curAgent, initCurAgent)
+}
 
 // 重新发送的问题
 const sendContent = ref('')
@@ -227,6 +234,8 @@ const selectHistoryItem = (data:any) => {
 		curAgent.agent_id = res.agent_id
 		curAgent.agent_title = res.agent_title
 		curAgent.token_count = res.all_token_counts
+		curAgent.user_icon = res.user_icon? res.user_icon:'icon-user'
+		curAgent.assistant_icon = res.assistant_icon?res.assistant_icon:'icon-user'
 		if(isClearChat){
 			//表明是直接点击的历史记录
 			chat_msg.chatBotDatas = []
@@ -278,9 +287,7 @@ const init=() => {
 	chat_msg.chatBotDatas = []
 	chat_msg.history = []
 	curHistoryId.value=''
-	curAgent.agent_id=''
-	curAgent.agent_title=''
-	curAgent.token_count = 0
+	resetCurAgent()
 }
 
 const editQuestion=(data:string) =>{
@@ -528,10 +535,13 @@ onMounted(() => {
 }
 
 .question_item>.question_item_container {
-	align-items: flex-end;
+	display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
 }
 
 .question_item_avatar {
+	display: flex;
 	flex-direction: row-reverse;
 }
 

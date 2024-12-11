@@ -176,6 +176,8 @@ def save_history_agent(user_name, agentData) -> str:
         presence_penalty = agentData["presence_penalty"]
         frequency_penalty = agentData["frequency_penalty"]
         agent_id = agentData.get("id")
+        user_icon = agentData.get("user_icon")
+        assistant_icon = agentData.get("assistant_icon")
         # 对话条数
         count = len(history)
         create_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -196,6 +198,8 @@ def save_history_agent(user_name, agentData) -> str:
             "agent_id": agent_id,
             "agent_title": agent_title,
             "chatbot": [],
+            "user_icon": user_icon,
+            "assistant_icon": assistant_icon,
         }
         save_history_file(user_name, history_data)
         # 将历史记录的相关参数保存在全局变量
