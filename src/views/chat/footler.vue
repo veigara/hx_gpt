@@ -35,15 +35,7 @@
 							</template>
 						</el-button>
 					</template>
-					<el-select :teleported="false" v-model="curModel" placeholder="请选择模型" style="width: 120px;">
-						<el-option-group v-for="item in modelList" :key="item.group" :label="item.group">
-							<el-tooltip v-for="model in item.options" :content="model.description" placement="right">
-								<el-option  :key="model.label" :label="model.label"
-								:value="model.label" >
-							</el-option>
-							</el-tooltip>
-						</el-option-group>
-					</el-select>
+					<mode-select v-model="curModel"  style="width: 120px;" />
 				</el-popover>
 
 			</div>
@@ -87,6 +79,7 @@ import { reactive, ref, onMounted, onUpdated, computed, watch } from 'vue'
 import { ElNotification } from 'element-plus/es'
 import { useModelsApi, useChatApi } from '@/api/chat'
 import Agent from '@/views/chat/agent.vue'
+import ModeSelect from '@/components/model-select/index.vue'
 
 interface Props {
 	// 错误弹框
@@ -127,9 +120,6 @@ const mounted = onMounted(() => {
 	getModelList();
 });
 
-// 模型列表
-const modelList = ref([])
-
 // 定义事件，方便传值
 const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModel', "update:selectAgent"])
 
@@ -141,29 +131,13 @@ watch(curModel, (newVal, oldVal) => {
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		modelList.value = groupedModels(res)
-
-		modelList.value.filter(group => group.options.filter(item => item.default == true).forEach(model  =>{
+		res.filter(item =>item.default == true).forEach(model  =>{
+			// 获取默认的模型
 			curModel.value = model.label
-		}))
+		})
 	})
 }
 
-// 模型按照类别分类
-const groupedModels = (dataList: any[]) => {
-	return dataList.reduce((acc, model) => {
-		const existingGroup = acc.find(g => g.group === model.model_type);
-		if (existingGroup) {
-			existingGroup.options.push({ label: model.label, description: model.description,default: model.default });
-		} else {
-			acc.push({
-				group: model.model_type,
-				options: [{ label: model.label, description: model.description,default: model.default }]
-			});
-		}
-		return acc;
-	}, []);	
-}
 // 发送按钮
 const sendBotMsgClick = (event: KeyboardEvent) => {
 	if(event.shiftKey){
