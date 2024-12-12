@@ -1,0 +1,25 @@
+{
+    "llama-3.2-90b-vision": {
+        "model_key": "llama-3.2-90b-vision",
+        "model_name": "llama-3.2-90b-vision-preview",
+        "description": "3.2 90b大模型",
+        "model_type": "Groq",
+        "multimodal": false
+    },
+    "Llama-3.1 8B": {
+        "model_key": "Llama-3.1 8B",
+        "model_name": "meta-llama-3.1-8b-instruct",
+        "description": "meta-llama-3.1-8b",
+        "model_type": "LMStudio",
+        "multimodal": true,
+        "max_content_len": 18334
+    },
+    "llama-3.3-70b": {
+        "model_key": "llama-3.3-70b",
+        "model_name": "llama-3.3-70b-versatile",
+        "description": "llama-3.3大模型，支持上下文:128k,输出token:32,768",
+        "model_type": "Groq",
+        "multimodal": false,
+        "max_content_len": 131072
+    }
+}

@@ -8,8 +8,17 @@ export const menuRoutes: RouteRecordRaw[] = [
 		meta: {
 			title: '对话',
 			icon: 'icon-wechat-fill'
+		},
+	},
+	{
+		path: '/model',
+		name: 'Model',
+		component: () => import('../views/model/index.vue'),
+		meta: {
+			title: '模型',
+			icon: 'icon-fire'
 		}
-	}
+	},
 ]
 
 export const constantRoutes: RouteRecordRaw[] = [

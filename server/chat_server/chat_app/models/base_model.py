@@ -2,7 +2,7 @@ from ..presets import *
 from enum import Enum
 import logging
 from ..utils import *
-from ..config import set_default_model_params, get_default_model_params
+from ..config import get_default_model_params
 from ..service.agent import *
 from ..service.history import *
 from ..cache_utils import *
@@ -19,8 +19,6 @@ class BaseLLMModel:
         history_id=None,
         config=None,
     ) -> None:
-        # 设置默认的模型参数
-        set_default_model_params()
         # 使用全局变量 MODEL_METADATA 获取模型参数
         MODEL_METADATA = get_default_model_params()
         if config is not None:
@@ -111,27 +109,27 @@ class BaseLLMModel:
         return get_agent_data_global(self.user_name)
 
 
-class ModelType(Enum):
-    Unknown = -1
-    Groq = 1
-    LMStudio = 2
+# class ModelType(Enum):
+#     Unknown = -1
+#     Groq = 1
+#     LMStudio = 2
 
-    @classmethod
-    def get_type(cls, model_name: str):
-        # 1. get model type from model metadata (if exists)
-        model_type = MODEL_METADATA[model_name]["model_type"]
-        if model_type is not None:
-            for member in cls:
-                if member.name == model_type:
-                    return member
+#     @classmethod
+#     def get_type(cls, model_name: str):
+#         # 1. get model type from model metadata (if exists)
+#         model_type = MODEL_METADATA[model_name]["model_type"]
+#         if model_type is not None:
+#             for member in cls:
+#                 if member.name == model_type:
+#                     return member
 
-        # 2. infer model type from model name
-        model_type = None
-        model_name_lower = model_name.lower()
+#         # 2. infer model type from model name
+#         model_type = None
+#         model_name_lower = model_name.lower()
 
-        if "groq" in model_name_lower:
-            model_type = ModelType.Groq
+#         if "groq" in model_name_lower:
+#             model_type = ModelType.Groq
 
-        else:
-            model_type = ModelType.LMStudio
-        return model_type
+#         else:
+#             model_type = ModelType.LMStudio
+#         return model_type

@@ -10,6 +10,7 @@ from groq import Groq
 from ..utils import construct_system
 from .base_model import BaseLLMModel
 from django.http import StreamingHttpResponse
+from ..config import groq_api_key
 
 logger = logging.getLogger("chat_app")
 
@@ -24,7 +25,7 @@ class Groq_Client(BaseLLMModel):
             config={"api_key": api_key},
         )
         self.client = Groq(
-            api_key=os.environ.get("GROQ_API_KEY") if api_key is None else api_key,
+            api_key=groq_api_key() if api_key is None else api_key,
             base_url=self.api_host,
         )
 

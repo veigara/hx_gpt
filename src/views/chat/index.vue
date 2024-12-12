@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted, onUnmounted, watch, onUpdated, nextTick } from 'vue'
+import { reactive, ref, onMounted, watch, nextTick } from 'vue'
 import { ElNotification, ElScrollbar, ElMessage,ElMessageBox } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
 import HistoryAside from '@/views/chat/historyAside.vue'

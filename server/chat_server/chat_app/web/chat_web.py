@@ -9,8 +9,8 @@ from django.views.decorators.http import require_http_methods
 import logging
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .agent import *
-from .history import *
+from ..service.agent import *
+from ..service.history import *
 from ..cache_utils import *
 
 logger = logging.getLogger("chat_app")
@@ -38,7 +38,7 @@ def chat_with_model(request):
             agent_data = get_default_agent_data(user_name)
             agent_id = agent_data.get("id")
         model = get_model(
-            model_name=model_name,
+            model_key=model_name,
             user_name=user_name,
             history_id=history_id,
             agent_id=agent_id,

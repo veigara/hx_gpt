@@ -11,10 +11,16 @@ IMAGES_COMPLETION_URL = "https://api.openai.com/v1/images/generations"
 COMPLETION_URL = "https://api.openai.com/v1/completions"
 BALANCE_API_URL = "https://api.openai.com/dashboard/billing/credit_grants"
 USAGE_API_URL = "https://api.openai.com/dashboard/billing/usage"
-
+# 历史记录存放地址
 HISTORY_DIR = "history"
+# 用户智能体存放地址
 AGENT_DIR = "agentmodels"
+# 系统默认智能体存放地址
 DEFALUE_AGENT_DIR = "chat_server/chat_app/agentmodels"
+# 模型配置文件存放地址
+MODEL_CONFIG_DIR = "chat_server/chat_app/model_config/model.json"
+# 配置文件存放地址
+CONFIG_DIR = "chat_server/chat_app/config.json"
 # 系统默认用户
 SYS_USER_NAME = "system"
 
@@ -53,41 +59,43 @@ DEFAULT_METADATA = {
 }
 
 # Additional metadata for online and local models
-MODEL_METADATA = {
-    "llama-3.2-90b-vision": {
-        "model_name": "llama-3.2-90b-vision-preview",
-        "description": "groq_llama-3.2-90b-vision-preview_description",
-        "token_limit": 8192,
-        "multimodal": True,
-        "model_type": "Groq",
-    },
-    "llama-3.2-90b-text": {
-        "model_name": "llama-3.2-90b-text-preview",
-        "description": "groq_lama-3.2-90b-text-preview_description",
-        "token_limit": 8192,
-        "model_type": "Groq",
-    },
-    # LMStudio 本地模型
-    "Llama-3.1 8B": {
-        "model_name": "meta-llama-3.1-8b-instruct",
-        "description": "meta-llama-3.1-8b",
-        "token_limit": 8192,
-        "model_type": "LMStudio",
-    },
-    "Qwen2.5-Coder 7B": {
-        "model_name": "qwen2.5-coder-7b-instruct",
-        "description": "qwen2.5 代码编程",
-        "token_limit": 8192,
-        "model_type": "LMStudio",
-    },
-}
+# MODEL_METADATA = {
+#     "llama-3.2-90b-vision": {
+#         "model_name": "llama-3.2-90b-vision-preview",
+#         "description": "groq_llama-3.2-90b-vision-preview_description",
+#         "token_limit": 8192,
+#         "multimodal": True,
+#         "model_type": "Groq",
+#     },
+#     "llama-3.2-90b-text": {
+#         "model_name": "llama-3.2-90b-text-preview",
+#         "description": "groq_lama-3.2-90b-text-preview_description",
+#         "token_limit": 8192,
+#         "model_type": "Groq",
+#     },
+#     # LMStudio 本地模型
+#     "Llama-3.1 8B": {
+#         "model_name": "meta-llama-3.1-8b-instruct",
+#         "description": "meta-llama-3.1-8b",
+#         "token_limit": 8192,
+#         "model_type": "LMStudio",
+#     },
+#     "Qwen2.5-Coder 7B": {
+#         "model_name": "qwen2.5-coder-7b-instruct",
+#         "description": "qwen2.5 代码编程",
+#         "token_limit": 8192,
+#         "model_type": "LMStudio",
+#     },
+# }
 
 
-ONLINE_MODELS = ["llama-3.2-90b-vision", "llama-3.2-90b-text"]
+# ONLINE_MODELS = ["llama-3.2-90b-vision", "llama-3.2-90b-text"]
 
-LOCAL_MODELS = ["Llama-3.1 8B", "Qwen2.5-Coder 7B"]
+# LOCAL_MODELS = ["Llama-3.1 8B", "Qwen2.5-Coder 7B"]
 
 # 所有的模型
-MODELS = ONLINE_MODELS + LOCAL_MODELS
+# MODELS = ONLINE_MODELS + LOCAL_MODELS
 
 DEFAULT_MODEL = 0
+
+# 所有的模型

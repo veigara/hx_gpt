@@ -1,39 +1,40 @@
 import logging
 from ..utils import *
-from .base_model import BaseLLMModel, ModelType
+from .base_model import BaseLLMModel
 from ..presets import *
-
-_model_instance = None
-
-# 用户存放的模型实例 <p>{1222:{model_name:LALM_11,model_instance:23445}}</p>
-_user_model_instance = {}
+from ..service.ai_model import get_model_detail, ModelType
 
 logger = logging.getLogger("chat_app")
 
 
 def get_model(
-    model_name, access_key=None, user_name="", history_id=None, agent_id=None
+    model_key, access_key=None, user_name="", history_id=None, agent_id=None
 ) -> BaseLLMModel:
-    global _model_instance
-    msg = f"模型设置为了：{model_name}"
-    model_type = ModelType.get_type(model_name)
+    msg = f"模型设置为了：{model_key}"
+    model = get_model_detail(model_key)
+    if model is None:
+        raise Exception(f"{STANDARD_ERROR_MSG}: 模型不存在")
+    model_type = model["model_type"]
+
     try:
-        if model_type == ModelType.Groq:
-            logger.info(f"正在加载Groq模型: {model_name}")
+        if model_type == ModelType.GROQ.value:
+            logger.info(f"正在加载Groq模型: {model_key}")
             from .Groq import Groq_Client
 
             model = Groq_Client(
-                model_name,
+                model_key,
                 None,
                 user_name=user_name,
                 history_id=history_id,
                 agent_id=agent_id,
             )
-        elif model_type == ModelType.LMStudio:
-            logger.info(f"正在加载LMStudio本地模型: {model_name}")
+        elif model_type == ModelType.LMSTUDIO.value:
+            logger.info(f"正在加载LMStudio本地模型: {model_key}")
             from .LMStudio import LMStudio_Client
 
-            model = LMStudio_Client(model_name, None, user_name=user_name)
+            model = LMStudio_Client(model_key, None, user_name=user_name)
+        else:
+            raise Exception(f"{STANDARD_ERROR_MSG}: 模型类型【{model_type}】不支持")
 
         return model
     except Exception as e:

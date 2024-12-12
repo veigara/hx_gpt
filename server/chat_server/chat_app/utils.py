@@ -45,6 +45,6 @@ def count_token(input_str):
 
 def print_err(error: Exception) -> str:
     # 打印详细的错误信息和堆栈跟踪
-    error_message = f"Server error occurred: {e}"
+    error_message = f"Server error occurred: {error}"
     stack_trace = traceback.format_exc()
-    return f"{error_message}\n{stack_trace}"
+    return f"{error_message} {stack_trace}"
