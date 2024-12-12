@@ -298,7 +298,8 @@ const editQuestion=(data:string) =>{
 		cancelButtonText: '取消',
 		inputPattern: /.+?/,
 		inputErrorMessage: '内容不能为空',
-		inputValue: data
+		inputValue: data,
+		inputType: 'textarea',
 	})
 	.then(({ value }) => {
 		sendContent.value = value
