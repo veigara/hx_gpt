@@ -35,7 +35,7 @@
 							</template>
 						</el-button>
 					</template>
-					<mode-select v-model="curModel"  style="width: 120px;" />
+					<mode-select v-model="curModel" style="width: 120px;" />
 				</el-popover>
 
 			</div>
@@ -47,6 +47,35 @@
 					</template>
 				</el-button>
 			</div>
+			<!--连续对话-->
+			<div class="chat_main_plane_space">
+				<el-popover placement="top" trigger="hover" :show-arrow="false">
+					<template #reference>
+						<el-button title="连续对话" round>
+							<template #icon>
+								<svg-icon icon="icon-conv" :size="18"></svg-icon>
+							</template>
+						</el-button>
+					</template>
+					连续对话：<el-switch v-model="convOff"
+						style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+				</el-popover>
+			</div>
+			<!--在线搜索-->
+			<div class="chat_main_plane_space">
+				<el-popover placement="top" trigger="hover" :show-arrow="false">
+					<template #reference>
+						<el-button title="在线搜索" round>
+							<template #icon>
+								<svg-icon icon="icon-search-online" :size="15"></svg-icon>
+							</template>
+						</el-button>
+					</template>
+					在线搜索：<el-switch v-model="searchOnline"
+						style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+				</el-popover>
+			</div>
+
 		</div>
 		<!--发送框-->
 		<div class="chat_main_plane_label">
@@ -87,7 +116,7 @@ interface Props {
 	historyId: string,
 	agentId: string,
 	// 重新发送的内容
-	sendContent:string
+	sendContent: string
 }
 
 //正在对话
@@ -115,6 +144,11 @@ const chatBotMst = ref('')
 const agentVisible = ref(false)
 const agentRef = ref()
 
+// 连续对话开关显示
+const convOff = ref(true)
+// 在线搜索显示
+const searchOnline = ref(false)
+
 const mounted = onMounted(() => {
 	// 获取所有的模型
 	getModelList();
@@ -131,7 +165,7 @@ watch(curModel, (newVal, oldVal) => {
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		res.filter(item =>item.default == true).forEach(model  =>{
+		res.filter(item => item.default == true).forEach(model => {
 			// 获取默认的模型
 			curModel.value = model.label
 		})
@@ -140,7 +174,7 @@ const getModelList = () => {
 
 // 发送按钮
 const sendBotMsgClick = (event: any) => {
-	if(event.shiftKey){
+	if (event.shiftKey) {
 		//shift+enter 不触发此事件
 		return
 	}
@@ -164,7 +198,14 @@ const sendBotMsgClick = (event: any) => {
 	// 传输数据
 	emit('update:chatBotDataUser', curMsg)
 	// 对话
-	useChatApi({ input_text: message, model_name: curModel.value, history_id: props.historyId, agent_id: props.agentId }).then(res => {
+	const data = {
+		input_text: message,
+		model_name: curModel.value,
+		history_id: props.historyId,
+		agent_id: props.agentId,
+		conv_off: convOff.value
+	}
+	useChatApi(data).then(res => {
 		chatData.assistantCt = res
 		chatData.isLoading = false
 		// 将更新后的数据传递给父组件
@@ -188,7 +229,7 @@ const useSelectAgentApi = (historyId: string) => {
 }
 
 // 初始化发送框
-const init = (modelName:string) => {
+const init = (modelName: string) => {
 	chatData.assistantCt = ''
 	chatData.userCt = ''
 	chatData.isLoading = false
@@ -200,7 +241,7 @@ const init = (modelName:string) => {
 }
 
 watch(() => props.sendContent, (newVal, oldVal) => {
-	if(newVal){
+	if (newVal) {
 		chatBotMst.value = newVal
 		sendBotMsgClick({})
 	}

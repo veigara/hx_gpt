@@ -265,9 +265,8 @@ def update_history(
         all_token_counts = history_data.get("all_token_counts", 0)
         content_data = history_data.get("content", [])
         history_data["count"] = count + len(contents)
-        history_data["all_token_counts"] = all_token_counts + count_user_history_token(
-            contents
-        )
+        cur_chat_token = count_user_history_token(contents)
+        history_data["all_token_counts"] = all_token_counts + cur_chat_token
         content_data.extend(contents)
         max_tokens = agent_data.get("max_tokens", 0)
         max_limit = max_content_len if max_content_len > 0 else max_tokens
@@ -280,8 +279,8 @@ def update_history(
             logger.warning("历史记录对话超过最大限制，自动截断开始。。。。")
             agent_content_data = content_data[:agent_count]
             chat_content_data = content_data[agent_count + 1 :]
-            # 智能体的token
-            cur_token = count_user_history_token(agent_content_data)
+            # 智能体的token和当前对话token
+            cur_token = count_user_history_token(agent_content_data) + cur_chat_token
 
             real_chat_data = []
             for history in chat_content_data[::-1]:

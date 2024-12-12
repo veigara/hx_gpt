@@ -57,13 +57,15 @@ class BaseLLMModel:
         agent_data = self.get_agent_data()
         if len(agent_data) == 0:
             # 初始化智能体配置
-            agent_list = get_user_all_agents(self.user_name, None)
-            for agent in agent_list:
-                if agent["id"] == agent_id:
-                    self.set_agent_data(agent)
-                    break
+            self.init_agent_data(agent_id)
+        else:
+            # 判断当前智能体数据是否一样
+            if agent_id != agent_data["id"]:
+                agent_data = self.init_agent_data(agent_id)
 
-    def stream_next_chatbot(self, inputs, history_id, agent_id) -> str:
+        self.agent_history_data = [*agent_data.get("content", [])]
+
+    def stream_next_chatbot(self, inputs, history_id) -> str:
         """发送一个回答"""
         logger.info(f"用户输入为：{inputs}")
         user_content = construct_user(inputs)
@@ -84,15 +86,23 @@ class BaseLLMModel:
         return stream_iter
 
     def get_answer_stream_iter(self):
-        """Implement stream prediction.
-        Conversations are stored in self.history, with the most recent question in OpenAI format.
-        Should return a generator that yields the next word (str) in the answer.
-        """
-        logger.warning(
-            "Stream prediction is not implemented. Using at once prediction instead."
-        )
-        response, _ = self.get_answer_at_once()
-        yield response
+        return "未实现功能"
+
+    def get_answer_at_once(self):
+        """没有上下文"""
+        return "未实现功能"
+
+    def get_answer_chatbot_at_once(self, inputs):
+        """没有上下文，只回答一次"""
+        """发送一个回答"""
+        logger.info(f"用户输入为：{inputs}")
+        user_content = construct_user(inputs)
+        # 将当前内容保存
+        self.input_txt = user_content
+        stream_iter = self.get_answer_at_once()
+        logger.info(f"模型输出为：{stream_iter}")
+
+        return stream_iter
 
     def set_history(self, history):
         set_history_global(self.user_name, history)
@@ -108,6 +118,20 @@ class BaseLLMModel:
 
     def get_agent_data(self):
         return get_agent_data_global(self.user_name)
+
+    def init_agent_data(self, agent_id) -> list:
+        """初始化智能体配置"""
+        agent_data = load_agent(self.user_name, agent_id)
+        if agent_data is not None:
+            self.set_agent_data(agent_data)
+        else:
+            agent_data = {}
+        return agent_data
+
+    def get_agent_current_input(self):
+        """上下文只有智能体和当前对话的"""
+        messages = [*self.agent_history_data, self.input_txt]
+        return messages
 
 
 # class ModelType(Enum):

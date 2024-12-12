@@ -27,6 +27,8 @@ def chat_with_model(request):
         model_name = payload.get("model_name")
         history_id = payload.get("history_id")
         agent_id = payload.get("agent_id")
+        # 连续对话
+        convOff = payload.get("conv_off", True)
         user_name = get_user_name(request)
         if input_text is None:
             return HttpResponse("input_text text is required", status=500)
@@ -47,9 +49,11 @@ def chat_with_model(request):
         if model is None:
             return HttpResponse(f"{model_name} load error", status=500)
         else:
-            return HttpResponse(
-                model.stream_next_chatbot(input_text, history_id, agent_id)
-            )
+            if convOff:
+                response = model.stream_next_chatbot(input_text, history_id)
+            else:
+                response = model.get_answer_chatbot_at_once(input_text)
+            return HttpResponse(response)
     except requests.exceptions.ConnectTimeout:
         status_text = STANDARD_ERROR_MSG + CONNECTION_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
         return HttpResponse(status_text, status=500)

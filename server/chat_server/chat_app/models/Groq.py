@@ -51,3 +51,23 @@ class Groq_Client(BaseLLMModel):
             partial_text += chunk.choices[0].delta.content or ""
 
         return partial_text
+
+    def get_answer_at_once(self):
+        """单次对话"""
+        messages = self.get_agent_current_input()
+        completion = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=messages,
+            temperature=self.get_agent_data().get("temperature"),
+            max_tokens=self.get_agent_data().get("max_tokens"),
+            top_p=self.get_agent_data().get("top_p"),
+            stream=True,
+            presence_penalty=self.get_agent_data().get("presence_penalty"),
+            frequency_penalty=self.get_agent_data().get("frequency_penalty"),
+        )
+
+        partial_text = ""
+        for chunk in completion:
+            partial_text += chunk.choices[0].delta.content or ""
+
+        return partial_text

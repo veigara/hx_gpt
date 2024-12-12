@@ -1,5 +1,5 @@
 <template>
-	<el-row gutter="2">
+	<el-row :gutter="2">
 		<el-col :span="20">
 			<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;"
 				@input="debouncedSearchTitle">

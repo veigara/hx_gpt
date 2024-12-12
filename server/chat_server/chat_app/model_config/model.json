@@ -5,7 +5,7 @@
         "description": "3.2 90b大模型",
         "model_type": "Groq",
         "multimodal": false,
-        "max_content_len": 1000
+        "max_content_len": 131072
     },
     "Llama-3.1 8B": {
         "model_key": "Llama-3.1 8B",
@@ -13,7 +13,7 @@
         "description": "meta-llama-3.1-8b",
         "model_type": "LMStudio",
         "multimodal": true,
-        "max_content_len": 18334
+        "max_content_len": 131072
     },
     "llama-3.3-70b": {
         "model_key": "llama-3.3-70b",
