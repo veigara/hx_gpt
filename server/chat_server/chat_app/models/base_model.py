@@ -38,7 +38,7 @@ class BaseLLMModel:
         self.api_host = config["api_host"]
         self.stream = config["stream"]
         self.model_name = config["model_name"]
-
+        self.max_content_len = config["max_content_len"]
         self.user_name = user_name
         self.agent_id = agent_id
         self.history_id = history_id
@@ -78,6 +78,7 @@ class BaseLLMModel:
             history_id,
             [user_content, assistant_content],
             self.get_agent_data(),
+            max_content_len=self.max_content_len,
         )
 
         return stream_iter

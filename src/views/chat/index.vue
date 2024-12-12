@@ -240,7 +240,8 @@ const selectHistoryItem = (data:any) => {
 			//表明是直接点击的历史记录
 			chat_msg.chatBotDatas = []
 			chat_msg.history = res.content
-			footlerRef.value.init()
+			// 把模型名称传过去
+			footlerRef.value.init(res.model_name)
 		}else{
 			//表明是发送的消息，不是点击的历史记录
 			// 填充数据

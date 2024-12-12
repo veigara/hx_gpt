@@ -139,7 +139,7 @@ const getModelList = () => {
 }
 
 // 发送按钮
-const sendBotMsgClick = (event: KeyboardEvent) => {
+const sendBotMsgClick = (event: any) => {
 	if(event.shiftKey){
 		//shift+enter 不触发此事件
 		return
@@ -188,7 +188,7 @@ const useSelectAgentApi = (historyId: string) => {
 }
 
 // 初始化发送框
-const init = () => {
+const init = (modelName:string) => {
 	chatData.assistantCt = ''
 	chatData.userCt = ''
 	chatData.isLoading = false
@@ -196,12 +196,13 @@ const init = () => {
 	chatBotMst.value = ''
 	// 智能体显示弹窗
 	agentVisible.value = false
+	curModel.value = modelName
 }
 
 watch(() => props.sendContent, (newVal, oldVal) => {
 	if(newVal){
 		chatBotMst.value = newVal
-		sendBotMsgClick()
+		sendBotMsgClick({})
 	}
 })
 

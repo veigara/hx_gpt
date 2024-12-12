@@ -4,7 +4,8 @@
         "model_name": "llama-3.2-90b-vision-preview",
         "description": "3.2 90b大模型",
         "model_type": "Groq",
-        "multimodal": false
+        "multimodal": false,
+        "max_content_len": 1000
     },
     "Llama-3.1 8B": {
         "model_key": "Llama-3.1 8B",

@@ -7,6 +7,7 @@ from ..presets import *
 from ..utils import *
 from .agent import *
 from ..cache_utils import *
+from ..config import *
 
 logger = logging.getLogger("chat_app")
 
@@ -244,11 +245,14 @@ def set_user_history(user_name, jsonData) -> None:
     set_history_doc_global(user_name, jsonData)
 
 
-def update_history(user_name, history_id, contents, agent_data) -> None:
+def update_history(
+    user_name, history_id, contents, agent_data, max_content_len
+) -> None:
     """修改历史记录，对话防止超限
     history_id(str):id 历史记录id
     content([]):当前对话
     agent_data(dict):智能体id
+    max_content_len(int) 最大上下文
     """
     try:
         history_data = load_history(user_name, history_id)
@@ -266,10 +270,12 @@ def update_history(user_name, history_id, contents, agent_data) -> None:
         )
         content_data.extend(contents)
         max_tokens = agent_data.get("max_tokens", 0)
+        max_limit = max_content_len if max_content_len > 0 else max_tokens
         if (
             max_tokens is not None
-            and history_data["all_token_counts"] > max_tokens
-            and max_tokens > 0
+            and history_data["all_token_counts"] > max_limit
+            and max_limit > 0
+            and max_limit > max_tokens
         ):
             logger.warning("历史记录对话超过最大限制，自动截断开始。。。。")
             agent_content_data = content_data[:agent_count]
@@ -280,7 +286,7 @@ def update_history(user_name, history_id, contents, agent_data) -> None:
             real_chat_data = []
             for history in chat_content_data[::-1]:
                 token = count_user_history_token([history])
-                if cur_token + token < max_tokens:
+                if cur_token + token < max_limit:
                     # 倒叙添加
                     real_chat_data.insert(0, history)
                 else:
