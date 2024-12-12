@@ -499,6 +499,7 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
+	margin-top: 10px;
 }
 
 .ans_item_avatar :deep(.el-button) {
