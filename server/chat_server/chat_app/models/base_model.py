@@ -1,6 +1,10 @@
 from ..presets import *
 from enum import Enum
+from duckduckgo_search import DDGS
+from itertools import islice
+import urllib3
 import logging
+import json
 from ..utils import *
 from ..config import get_default_model_params
 from ..service.agent import *
@@ -133,7 +137,24 @@ class BaseLLMModel:
         messages = [*self.agent_history_data, self.input_txt]
         return messages
 
-
+    def online_search(self, input):
+        """使用在线搜索"""
+        search_results = []
+        with DDGS(proxies=None) as ddgs:
+                    ddgs_gen = ddgs.text(input, backend="lite")
+                    for r in islice(ddgs_gen, 10):
+                        search_results.append(r)
+        reference_results = []      
+        for idx, result in enumerate(search_results):
+            logger.debug(f"搜索结果{idx + 1}：{result}")
+            reference_results.append([result["body"], result["href"]])
+        reference_results = add_source_numbers(reference_results) 
+        
+        today = datetime.datetime.today().strftime("%Y-%m-%d")
+        real_input =WEBSEARCH_PTOMPT_TEMPLATE.replace("{current_date}", today).replace("{query}", input).replace("{web_results}", "\n\n".join(reference_results))
+                    
+        return real_input
+                   
 # class ModelType(Enum):
 #     Unknown = -1
 #     Groq = 1

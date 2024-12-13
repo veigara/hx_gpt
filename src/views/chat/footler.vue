@@ -18,7 +18,7 @@
 							</div>
 						</el-tooltip>
 						<el-tooltip effect="light" content="上传1张不超过10M的PNG/JPG的图片" placement="right" :offset="-5">
-							<div class="history-menu-item" style="color: #181818 !important; border-top: none ;">
+							<div class="history-menu-item" style="color: #181818 !important; border-top: none">
 								<span><svg-icon icon="icon-upload-image" /></span>上传图片
 							</div>
 						</el-tooltip>
@@ -35,9 +35,8 @@
 							</template>
 						</el-button>
 					</template>
-					<mode-select v-model="curModel" style="width: 120px;" />
+					<mode-select v-model="curModel" style="width: 120px" />
 				</el-popover>
-
 			</div>
 			<!--智能体-->
 			<div class="chat_main_plane_space">
@@ -57,8 +56,7 @@
 							</template>
 						</el-button>
 					</template>
-					连续对话：<el-switch v-model="convOff"
-						style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+					连续对话：<el-switch v-model="convOff" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
 				</el-popover>
 			</div>
 			<!--在线搜索-->
@@ -71,33 +69,34 @@
 							</template>
 						</el-button>
 					</template>
-					在线搜索：<el-switch v-model="searchOnline"
-						style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+					在线搜索：<el-switch v-model="searchOnline" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
 				</el-popover>
 			</div>
-
 		</div>
 		<!--发送框-->
 		<div class="chat_main_plane_label">
-			<el-scrollbar :max-height="100" style="width: 100%;">
+			<el-scrollbar :max-height="100" style="width: 100%">
 				<div class="chat_textarea">
-					<el-input v-model="chatBotMst" :autosize="{ minRows: 2 }" type="textarea"
+					<el-input
+						v-model="chatBotMst"
+						:autosize="{ minRows: 2 }"
+						type="textarea"
 						input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
-						placeholder="Enter 发送，Shift + Enter 换行" @keyup.enter="sendBotMsgClick">
+						placeholder="Enter 发送，Shift + Enter 换行"
+						@keyup.enter="sendBotMsgClick"
+					>
 					</el-input>
 				</div>
 			</el-scrollbar>
 			<div class="chat_input_send">
-				<el-button color="#ff0000" disabled v-if="chatData?.isLoading">加载中</el-button>
-				<el-button color="#626aef" @click="sendBotMsgClick" v-else>
-					<div style="margin-right: 5px;">
+				<el-button v-if="chatData?.isLoading" color="#ff0000" disabled>加载中</el-button>
+				<el-button v-else color="#626aef" @click="sendBotMsgClick">
+					<div style="margin-right: 5px">
 						<svg-icon icon="icon-send_right" />
 					</div>
 					发送
 				</el-button>
-
 			</div>
-
 		</div>
 		<Agent ref="agentRef" @submit="useSelectAgentApi" />
 	</div>
@@ -112,9 +111,9 @@ import ModeSelect from '@/components/model-select/index.vue'
 
 interface Props {
 	// 错误弹框
-	ElNotificationErr: Function,
-	historyId: string,
-	agentId: string,
+	ElNotificationErr: Function
+	historyId: string
+	agentId: string
 	// 重新发送的内容
 	sendContent: string
 }
@@ -122,9 +121,9 @@ interface Props {
 //正在对话
 interface chatBot {
 	// 用户输入
-	userCt: string,
+	userCt: string
 	// 机器人回复
-	assistantCt: string,
+	assistantCt: string
 	// 是否正在回复
 	isLoading: boolean
 }
@@ -151,11 +150,11 @@ const searchOnline = ref(false)
 
 const mounted = onMounted(() => {
 	// 获取所有的模型
-	getModelList();
-});
+	getModelList()
+})
 
 // 定义事件，方便传值
-const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModel', "update:selectAgent"])
+const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModel', 'update:selectAgent'])
 
 // 监听 chatBotMst 的变化
 watch(curModel, (newVal, oldVal) => {
@@ -165,10 +164,12 @@ watch(curModel, (newVal, oldVal) => {
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		res.filter(item => item.default == true).forEach(model => {
-			// 获取默认的模型
-			curModel.value = model.label
-		})
+		res
+			.filter(item => item.default == true)
+			.forEach(model => {
+				// 获取默认的模型
+				curModel.value = model.label
+			})
 	})
 }
 
@@ -179,7 +180,7 @@ const sendBotMsgClick = (event: any) => {
 		return
 	}
 	// 获取输入框的内容并去除换行符
-	const message = chatBotMst.value.trim();
+	const message = chatBotMst.value.trim()
 	if (!message) {
 		ElNotification({
 			title: '提示',
@@ -203,17 +204,20 @@ const sendBotMsgClick = (event: any) => {
 		model_name: curModel.value,
 		history_id: props.historyId,
 		agent_id: props.agentId,
-		conv_off: convOff.value
+		conv_off: convOff.value,
+		online_search: searchOnline.value
 	}
-	useChatApi(data).then(res => {
-		chatData.assistantCt = res
-		chatData.isLoading = false
-		// 将更新后的数据传递给父组件
-		emit('update:chatBotDatAssert', chatData)
-	}).catch(err => {
-		chatData.isLoading = false
-		emit('update:chatBotDatAssert', chatData)
-	})
+	useChatApi(data)
+		.then(res => {
+			chatData.assistantCt = res
+			chatData.isLoading = false
+			// 将更新后的数据传递给父组件
+			emit('update:chatBotDatAssert', chatData)
+		})
+		.catch(err => {
+			chatData.isLoading = false
+			emit('update:chatBotDatAssert', chatData)
+		})
 	// 清空发送的消息
 	chatBotMst.value = ''
 }
@@ -238,18 +242,25 @@ const init = (modelName: string) => {
 	// 智能体显示弹窗
 	agentVisible.value = false
 	curModel.value = modelName
+	if (!modelName) {
+		// 不存在则获取所有的模型
+		getModelList()
+	}
 }
 
-watch(() => props.sendContent, (newVal, oldVal) => {
-	if (newVal) {
-		chatBotMst.value = newVal
-		sendBotMsgClick({})
+watch(
+	() => props.sendContent,
+	(newVal, oldVal) => {
+		if (newVal) {
+			chatBotMst.value = newVal
+			sendBotMsgClick({})
+		}
 	}
-})
+)
 
 defineExpose({
 	init
-})	
+})
 </script>
 <style lang="scss">
 .chat_main_plane {
@@ -287,7 +298,6 @@ defineExpose({
 	background-color: white;
 }
 
-
 .chat_main_plane_label:has(.el-textarea__inner:focus) {
 	border: 1px solid #626aef;
 }
@@ -295,7 +305,7 @@ defineExpose({
 .chat_textarea {
 	height: 100%;
 	position: relative;
-	width: calc(100% - 50px)
+	width: calc(100% - 50px);
 }
 
 .chat_input_send {

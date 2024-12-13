@@ -29,6 +29,8 @@ def chat_with_model(request):
         agent_id = payload.get("agent_id")
         # 连续对话
         convOff = payload.get("conv_off", True)
+        # 在线搜索
+        online_search = payload.get("online_search", False)
         user_name = get_user_name(request)
         if input_text is None:
             return HttpResponse("input_text text is required", status=500)
@@ -49,10 +51,15 @@ def chat_with_model(request):
         if model is None:
             return HttpResponse(f"{model_name} load error", status=500)
         else:
+            if online_search:
+                # 在线搜索
+                input_text = model.online_search(input_text)
+                
             if convOff:
                 response = model.stream_next_chatbot(input_text, history_id)
             else:
                 response = model.get_answer_chatbot_at_once(input_text)
+               
             return HttpResponse(response)
     except requests.exceptions.ConnectTimeout:
         status_text = STANDARD_ERROR_MSG + CONNECTION_TIMEOUT_MSG + ERROR_RETRIEVE_MSG

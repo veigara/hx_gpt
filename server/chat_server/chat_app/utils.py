@@ -48,3 +48,13 @@ def print_err(error: Exception) -> str:
     error_message = f"Server error occurred: {error}"
     stack_trace = traceback.format_exc()
     return f"{error_message} {stack_trace}"
+
+
+def add_source_numbers(lst, source_name="Source", use_source=True):
+    if use_source:
+        return [
+            f'[{idx+1}]\t "{item[0]}"\n{source_name}: {item[1]}'
+            for idx, item in enumerate(lst)
+        ]
+    else:
+        return [f'[{idx+1}]\t "{item}"' for idx, item in enumerate(lst)]
