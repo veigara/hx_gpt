@@ -3,8 +3,8 @@
 		append-to-body>
 		<el-form ref="dataFormRef" :model="dataForm" label-width="auto" label-position="left" :rules="rules">
 			<div class="model-config">
-				<el-form-item label="模型显示名称" prop="model_key" :disabled="editFlag">
-					<el-input v-model="dataForm.model_key" placeholder="请输入模型显示名称"></el-input>
+				<el-form-item label="模型显示名称" prop="model_key">
+					<el-input v-model="dataForm.model_key" placeholder="请输入模型显示名称" :disabled="editFlag"></el-input>
 				</el-form-item>
 				<el-form-item label="模型" prop="model_name">
 					<el-input v-model="dataForm.model_name" placeholder="请输入模型名称"></el-input>
@@ -114,7 +114,15 @@ const rules = reactive({
 			message: '请选择模型类别',
 			trigger: 'change'
 		}
-	]
+	],
+	max_content_len: [
+		{	
+			min: 1000,
+			message: '上下文长度不能小于1000',
+			trigger: 'blur'
+		}
+	],
+	
 })
 
 // 保存模型
