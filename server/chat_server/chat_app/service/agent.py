@@ -3,10 +3,14 @@ import os
 from ..presets import *
 import uuid
 import threading
+import logging
+from ..utils import *
 
 # 用户存放的模型实例 <p>{1222:{model_name:LALM_11,model_instance:23445}}</p>
 _user_agent_instance = {}
 _user_agent_lock = threading.Lock()
+
+logger = logging.getLogger("chat_app")
 
 
 def save_agent(user_name, json_str) -> None:
@@ -39,7 +43,8 @@ def save_agent(user_name, json_str) -> None:
             set_user_agent(user_name, agent_data)
     except Exception as e:
         # 抛出异常
-        raise Exception(f"Error saving agent file: {e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:保存智能体文件失败")
 
 
 def load_agent(user_name, id) -> str:
@@ -58,7 +63,8 @@ def load_agent(user_name, id) -> str:
         return agent_data
     except Exception as e:
         # 抛出异常
-        raise Exception(f"Error loading agent file: {e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:加载智能体文件失败")
 
 
 def get_file_path(user_name, id):
@@ -108,7 +114,8 @@ def get_user_all_agents(user_name, keyword):
         return agent_list
     except Exception as e:
         # 抛出异常
-        raise Exception(f"Error searching agent file: {e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:获取当前用户所有智能体失败")
 
 
 def set_user_agent(user_name, jsonData) -> None:

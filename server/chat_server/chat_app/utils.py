@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import tiktoken
 import traceback
-from django.core.cache import cache
+from .presets import *
 
 
 def construct_text(role, text):
@@ -45,7 +45,7 @@ def count_token(input_str):
 
 def print_err(error: Exception) -> str:
     # 打印详细的错误信息和堆栈跟踪
-    error_message = f"Server error occurred: {error}"
+    error_message = f"{STANDARD_ERROR_MSG}:"
     stack_trace = traceback.format_exc()
     return f"{error_message} {stack_trace}"
 

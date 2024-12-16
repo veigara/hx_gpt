@@ -53,7 +53,8 @@ def get_user_all_history(user_name, keyword):
         return sort_history_list(history_list)
     except Exception as e:
         # 抛出异常
-        raise Exception(f"Error searching history file: {e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:获取当前用户所有历史记录失败")
 
 
 def sort_history_list(history_list):
@@ -82,7 +83,8 @@ def load_history(user_name, id) -> str:
             return json.load(f)
     except Exception as e:
         # 抛出异常
-        raise Exception(f"Error loading history file: {e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:加载历史文件失败")
 
 
 def rename_history(user_name, id, new_title) -> None:
@@ -145,7 +147,8 @@ def save_history(user_name, json_str) -> None:
             set_user_history(user_name, history_data)
     except Exception as e:
         # 抛出异常
-        raise Exception(f"Error saving history file: {e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:保存历史文件失败")
 
 
 def save_history_file(user_name, history_data) -> str:
@@ -209,7 +212,8 @@ def save_history_agent(user_name, agentData) -> str:
         return id
     except Exception as e:
         # 抛出异常
-        raise Exception(f"Error saving history file: {e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:从智能体中创建历史记录失败")
 
 
 def count_user_history_token(contents) -> int:
@@ -299,7 +303,8 @@ def update_history(
         save_history(user_name, json.dumps(history_data))
 
     except Exception as e:
-        raise Exception(f"修改历史记录失败,id={history_id},错误信息:{e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:修改历史记录失败")
 
 
 def top_history(user_name, history_id) -> None:
@@ -314,4 +319,5 @@ def top_history(user_name, history_id) -> None:
 
         save_history(user_name, json.dumps(history_data))
     except Exception as e:
-        raise Exception(f"置顶历史记录失败,id={history_id},错误信息:{e}")
+        logger.error(print_err(e))
+        raise Exception(f"{STANDARD_ERROR_MSG}:置顶历史记录失败")

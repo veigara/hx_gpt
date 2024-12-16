@@ -1,16 +1,9 @@
-import json
 import logging
-import textwrap
-import uuid
-
-import os
 from groq import Groq
 
-
-from ..utils import construct_system
 from .base_model import BaseLLMModel
-from django.http import StreamingHttpResponse
 from ..config import groq_api_key
+from ..presets import *
 
 logger = logging.getLogger("chat_app")
 
@@ -34,16 +27,23 @@ class Groq_Client(BaseLLMModel):
         return messages
 
     def _create_completion(self, messages, stream):
-        return self.client.chat.completions.create(
-            model=self.model_name,
-            messages=messages,
-            temperature=self.get_agent_data().get("temperature"),
-            max_tokens=self.get_agent_data().get("max_tokens", -1),
-            top_p=self.get_agent_data().get("top_p"),
-            stream=stream,
-            presence_penalty=self.get_agent_data().get("presence_penalty"),
-            frequency_penalty=self.get_agent_data().get("frequency_penalty"),
-        )
+        try:
+            return self.client.chat.completions.create(
+                model=self.model_name,
+                messages=messages,
+                temperature=self.get_agent_data().get("temperature"),
+                max_tokens=self.get_agent_data().get("max_tokens", -1),
+                top_p=self.get_agent_data().get("top_p"),
+                stream=stream,
+                presence_penalty=self.get_agent_data().get("presence_penalty"),
+                frequency_penalty=self.get_agent_data().get("frequency_penalty"),
+            )
+        except Exception as e:
+            status_code = e.__getattribute__("status_code")
+            if status_code == 403:
+                raise Exception(ERROR_RETRIEVE_MSG)
+            body = e.__getattribute__("body")
+            raise Exception(f"{STANDARD_ERROR_MSG}:{body}")
 
     def get_answer_stream_iter(self):
         messages = self._get_groq_style_input()
