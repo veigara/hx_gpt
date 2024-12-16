@@ -1,7 +1,7 @@
 <template>
 	<el-row :gutter="2">
 		<el-col :span="20">
-			<el-input v-model="searchTxt" placeholder="搜索历史记录" style="border-radius: 20px;"
+			<el-input v-model="searchTxt" placeholder="搜索聊天记录" style="border-radius: 20px;"
 				@input="debouncedSearchTitle">
 				<template #prefix>
 					<svg-icon icon="icon-search"></svg-icon>
@@ -60,11 +60,11 @@ import { Plus } from '@element-plus/icons-vue'
 import { debounce } from 'lodash';
 
 const historys = ref<any>([])
-// 搜索历史记录
+// 搜索聊天记录
 const searchTxt = ref()
 
 const emits = defineEmits(['click:history', 'refresh:history'])
-// 获取用户历史记录
+// 获取用户聊天记录
 const getUserHistory = () => {
 	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
 		historys.value = res
@@ -81,7 +81,7 @@ const activeHistoryItem = (historyId: String) => {
 
 // 新建后刷新列表后点击第一个数据
 const refreshAndSelectFirstHistory = (isClearChat: boolean) => {
-	// 刷新历史记录
+	// 刷新聊天记录
 	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
 		historys.value = res
 		if (res && res.length > 0) {
@@ -94,28 +94,27 @@ const refreshAndSelectFirstHistory = (isClearChat: boolean) => {
 
 // 取消所有选中
 const clearAll = () => {
-	historys.value.find(item => item.active == true).active = false
 	searchTxt.value = ''
+	getUserHistory()
 }
 
 defineExpose({
-	getUserHistory,
 	activeHistoryItem,
 	refreshAndSelectFirstHistory,
 	clearAll
 })
 
-// 点击历史记录 
+// 点击聊天记录 
 const selectHistoryItem = (item: any) => {
 	// 其他取消
 	historys.value.filter(item => item.active == true).find(item => item.active = false)
 	// 指定当前
 	item.active = true
-	// 将历史记录id给父组件
+	// 将聊天记录id给父组件
 	emits('click:history', { historyId: item.id, isClearChat: true })
 }
 
-// 左边历史记录
+// 左边聊天记录
 // 右边其他参数
 //const themeHeaderHeight = ref(window.getComputedStyle(document.documentElement).getPropertyValue('--theme-header-height'));
 // 计算最大高度
@@ -125,7 +124,7 @@ const computedHistoryMaxHeight = computed(() => {
 	return `calc(100vh - 19px - 90px )`;
 });
 
-// 打开历史记录的菜单
+// 打开聊天记录的菜单
 const openHistoryMenu = (item: any) => {
 	// 其他菜单隐藏
 	closeHistoryMenu()
@@ -138,7 +137,7 @@ const closeHistoryMenu = () => {
 }
 
 const mounted = onMounted(() => {
-	// 点击空白关闭历史记录菜单
+	// 点击空白关闭聊天记录菜单
 	document.addEventListener('click', handleClickOutside);
 	getUserHistory()
 });
@@ -157,7 +156,7 @@ const handleClickOutside = (event: any) => {
 
 // 重命名
 const showRenameInput = (item: any) => {
-	ElMessageBox.prompt('请输入历史记录的标题', '重命名', {
+	ElMessageBox.prompt('请输入聊天记录的标题', '重命名', {
 		confirmButtonText: '确定',
 		cancelButtonText: '取消',
 		inputPattern: /.+?/,
@@ -189,7 +188,7 @@ const delHistory = (item: any) => {
 		}
 	)
 		.then(() => {
-			// 删除历史记录
+			// 删除聊天记录
 			useDelHistoryApi({ id: item.id }).then(res => {
 				// 刷新
 				getUserHistory()

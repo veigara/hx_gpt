@@ -54,12 +54,12 @@ def chat_with_model(request):
             if online_search:
                 # 在线搜索
                 input_text = model.online_search(input_text)
-                
+
             if convOff:
                 response = model.stream_next_chatbot(input_text, history_id)
             else:
                 response = model.get_answer_chatbot_at_once(input_text)
-               
+
             return HttpResponse(response)
     except requests.exceptions.ConnectTimeout:
         status_text = STANDARD_ERROR_MSG + CONNECTION_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
@@ -167,7 +167,7 @@ def select_agent(request) -> str:
     """选择智能体
      params:id 智能体id
      params:fileUserName 智能体文件用户
-    return: 历史记录id
+    return: 聊天记录id
     """
     try:
         id = request.GET.get("id")
@@ -177,7 +177,7 @@ def select_agent(request) -> str:
         agent_data = load_agent(user_name, id)
         if agent_data is None:
             return HttpResponse("智能体内容不存在", status=500)
-        # 创建历史记录
+        # 创建聊天记录
         history_id = save_history_agent(user_name, agent_data)
 
         return HttpResponse(history_id)
@@ -189,9 +189,9 @@ def select_agent(request) -> str:
 
 @require_http_methods(["GET"])
 def get_historys(request):
-    """获取用户的历史记录
+    """获取用户的聊天记录
     params:keyword 关键字
-    return:历史记录列表
+    return:聊天记录列表
     """
     try:
         user_name = get_user_name(request)
@@ -207,9 +207,9 @@ def get_historys(request):
 
 @require_http_methods(["GET"])
 def get_history_detail(request):
-    """获取历史记录详情
-    params:id 历史记录id
-    return:历史记录详情
+    """获取聊天记录详情
+    params:id 聊天记录id
+    return:聊天记录详情
     """
     try:
         id = request.GET.get("id")
@@ -217,7 +217,7 @@ def get_history_detail(request):
         if id is None:
             return HttpResponse("id is required", status=500)
         detail = load_history(user_name, id)
-        # 将历史记录加载到上下文中
+        # 将聊天记录加载到上下文中
         clear_history_global(user_name)
         set_history_global(user_name, detail.get("content", []))
         return HttpResponse(json.dumps(detail), content_type="application/json")
@@ -229,8 +229,8 @@ def get_history_detail(request):
 @require_http_methods(["DELETE"])
 @csrf_exempt
 def del_user_history(request):
-    """删除历史记录
-    params:id 历史记录id
+    """删除聊天记录
+    params:id 聊天记录id
     return:删除结果
     """
     try:
@@ -247,8 +247,8 @@ def del_user_history(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def rename_user_history(request):
-    """重命名历史记录
-    params:id 历史记录id
+    """重命名聊天记录
+    params:id 聊天记录id
     params:new_title 新标题
     return:重命名结果
     """
@@ -271,8 +271,8 @@ def rename_user_history(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def top_user_history(request):
-    """置顶历史记录
-    params:id 历史记录id
+    """置顶聊天记录
+    params:id 聊天记录id
     return:置顶结果
     """
     try:
@@ -282,6 +282,44 @@ def top_user_history(request):
         if id is None:
             return HttpResponse("id is required", status=500)
         top_history(user_name, id)
+        return HttpResponse(True)
+    except Exception as e:
+        logger.error(print_err(e))
+        return HttpResponse(f"Server error occurred: {e}", status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def clear_history_context(request):
+    """清空上下文
+    params:history_id 聊天记录id
+    return:
+    """
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+        id = payload.get("id")
+        user_name = get_user_name(request)
+        if id is None:
+            return HttpResponse("id is required", status=500)
+
+        clear_context(user_name, id)
+        return HttpResponse(True)
+    except Exception as e:
+        logger.error(print_err(e))
+        return HttpResponse(f"Server error occurred: {e}", status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def clear_history_all(request):
+    """清空所有聊天记录文件
+    params:history_id 聊天记录id
+    return:
+    """
+    try:
+        user_name = get_user_name(request)
+
+        clear_all_history(user_name)
         return HttpResponse(True)
     except Exception as e:
         logger.error(print_err(e))

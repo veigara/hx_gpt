@@ -35,16 +35,24 @@ urlpatterns = [
     path("del_agent", chat_web.get_del_agent, name="get_del_agent"),
     # 选择智能体
     path("select_agent", chat_web.select_agent, name="select_agent"),
-    # 获取历史记录
+    # 获取聊天记录
     path("get_historys", chat_web.get_historys, name="get_historys"),
-    # 获取历史记录详情
+    # 获取聊天记录详情
     path("get_history_detail", chat_web.get_history_detail, name="get_history_detail"),
-    # 删除历史记录
+    # 删除聊天记录
     path("del_history", chat_web.del_user_history, name="del_user_history"),
-    # 重命名历史记录
+    # 重命名聊天记录
     path("rename_history", chat_web.rename_user_history, name="rename_user_history"),
-    # 置顶历史记录
+    # 置顶聊天记录
     path("top_history", chat_web.top_user_history, name="top_user_history"),
+    # 清空上下文
+    path(
+        "clear_history_context",
+        chat_web.clear_history_context,
+        name="clear_history_context",
+    ),
+    # 清空所有聊天记录文件
+    path("clear_history_all", chat_web.clear_history_all, name="clear_history_all"),
     # 获取模型类别
     path("get_model_type", model_web.get_all_model_type, name="get_all_model_type"),
     # 获取所有的模型

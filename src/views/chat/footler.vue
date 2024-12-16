@@ -82,8 +82,8 @@
 						:autosize="{ minRows: 2 }"
 						type="textarea"
 						input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
-						placeholder="Enter 发送，Shift + Enter 换行"
-						@keyup.enter="sendBotMsgClick"
+						placeholder="Enter 发送，Shift + Enter 换行，/ 触发命令"
+						@keyup="sendKeyClick"
 					>
 					</el-input>
 				</div>
@@ -98,7 +98,9 @@
 				</el-button>
 			</div>
 		</div>
+
 		<Agent ref="agentRef" @submit="useSelectAgentApi" />
+		<FnDialog ref="fnDialogRef" :historyId="props.historyId" @clear_all_history="clearHistoryAll" @refresh_history="refreshHistory"/>
 	</div>
 </template>
 
@@ -108,6 +110,7 @@ import { ElNotification } from 'element-plus/es'
 import { useModelsApi, useChatApi } from '@/api/chat'
 import Agent from '@/views/chat/agent.vue'
 import ModeSelect from '@/components/model-select/index.vue'
+import FnDialog from '@/views/chat/fnDialog.vue'
 
 interface Props {
 	// 错误弹框
@@ -147,6 +150,9 @@ const agentRef = ref()
 const convOff = ref(true)
 // 在线搜索显示
 const searchOnline = ref(false)
+//显示功能快捷键
+const showFnVisible = ref(false)
+const fnDialogRef = ref()
 
 const mounted = onMounted(() => {
 	// 获取所有的模型
@@ -154,7 +160,7 @@ const mounted = onMounted(() => {
 })
 
 // 定义事件，方便传值
-const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModel', 'update:selectAgent'])
+const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModel', 'update:selectAgent','update:clearHistoryAll','update:refreshHistory'])
 
 // 监听 chatBotMst 的变化
 watch(curModel, (newVal, oldVal) => {
@@ -173,6 +179,20 @@ const getModelList = () => {
 	})
 }
 
+const sendKeyClick = (event:any) =>{
+	if (event.shiftKey) {
+		//shift+enter 不触发此事件
+		return
+	}
+	if(event.keyCode == 13){
+		// enter
+		sendBotMsgClick(event)
+	}
+	// /键
+	if(event.keyCode == 191){
+		fnDialogRef.value.init()
+	}
+}
 // 发送按钮
 const sendBotMsgClick = (event: any) => {
 	if (event.shiftKey) {
@@ -246,6 +266,16 @@ const init = (modelName: string) => {
 		// 不存在则获取所有的模型
 		getModelList()
 	}
+}
+
+// 清除所有历史记录的事件
+const clearHistoryAll=() =>{
+	emit('update:clearHistoryAll')
+}
+
+// 刷新当前聊天记录
+ const refreshHistory=() =>{
+	emit('update:refreshHistory',props.historyId)
 }
 
 watch(

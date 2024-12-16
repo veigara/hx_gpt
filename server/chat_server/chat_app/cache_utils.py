@@ -1,11 +1,11 @@
 from django.core.cache import cache
 
 # 设置全局变量
-# 全局变量历史记录对话
+# 全局变量聊天记录对话
 _history_key = "history_global_"
 # 智能体配置
 _agent_key = "agent_global_"
-# 全局变量历史记录文档
+# 全局变量聊天记录文档
 _history_doc_key = "history_doc_global_"
 # 模型实例
 _model_instance = "model_instance_"

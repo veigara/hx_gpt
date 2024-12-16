@@ -47,3 +47,11 @@ export const useRenameHistoryApi = (params: any) => {
 export const useTopHistoryApi = (params: any) => {
 	return service.post('/top_history',params)
 }
+
+export const useClearHistoryContextApi = (params: any) => {
+	return service.post('/clear_history_context',params)
+}
+
+export const useClearHistoryAllApi = () => {
+	return service.post('/clear_history_all')
+}

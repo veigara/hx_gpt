@@ -53,7 +53,7 @@ class BaseLLMModel:
 
         history_data = self.get_history()
         if len(history_data) == 0:
-            # 初始化历史记录
+            # 初始化聊天记录
             history_data = load_history(user_name=user_name, id=history_id)
             if history_data is not None:
                 for data in history_data.get("content", []):

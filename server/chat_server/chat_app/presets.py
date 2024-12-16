@@ -11,7 +11,7 @@ IMAGES_COMPLETION_URL = "https://api.openai.com/v1/images/generations"
 COMPLETION_URL = "https://api.openai.com/v1/completions"
 BALANCE_API_URL = "https://api.openai.com/dashboard/billing/credit_grants"
 USAGE_API_URL = "https://api.openai.com/dashboard/billing/usage"
-# 历史记录存放地址
+# 聊天记录存放地址
 HISTORY_DIR = "history"
 # 用户智能体存放地址
 AGENT_DIR = "agentmodels"

@@ -14,24 +14,24 @@ logger = logging.getLogger("chat_app")
 
 def get_user_all_history(user_name, keyword):
     """
-    获取当前用户所有历史记录文件
+    获取当前用户所有聊天记录文件
 
-    根据用户名称和关键词获取用户的所有历史记录文件列表如果关键词不为空，则使用关键词过滤历史记录列表
+    根据用户名称和关键词获取用户的所有聊天记录文件列表如果关键词不为空，则使用关键词过滤聊天记录列表
 
     参数:
     user_name (str): 用户名称
-    keyword (str): 用于搜索历史记录标题的关键词
+    keyword (str): 用于搜索聊天记录标题的关键词
 
     返回:
-    list: 包含历史记录信息的字典列表，每个字典包含历史记录的标题和ID
+    list: 包含聊天记录信息的字典列表，每个字典包含聊天记录的标题和ID
     """
     try:
         history_list = get_user_history(user_name)
         if history_list is None or len(history_list) == 0:
             history_list = []
-            # 创建历史记录
+            # 创建聊天记录
             os.makedirs(os.path.join(HISTORY_DIR, user_name), exist_ok=True)
-            # 获取系统默认的历史记录
+            # 获取系统默认的聊天记录
             for file in os.listdir(os.path.join(HISTORY_DIR, user_name)):
                 if file.endswith(".json"):
                     with open(
@@ -54,23 +54,23 @@ def get_user_all_history(user_name, keyword):
     except Exception as e:
         # 抛出异常
         logger.error(print_err(e))
-        raise Exception(f"{STANDARD_ERROR_MSG}:获取当前用户所有历史记录失败")
+        raise Exception(f"{STANDARD_ERROR_MSG}:获取当前用户所有聊天记录失败")
 
 
 def sort_history_list(history_list):
-    """根据时间排序历史记录列表"""
+    """根据时间排序聊天记录列表"""
     if history_list is None or len(history_list) == 0:
         return None
     return sorted(history_list, key=lambda x: x["create_time"], reverse=True)
 
 
 def get_user_history(user_name) -> list:
-    """获取用户历史记录"""
+    """获取用户聊天记录"""
     return get_history_doc_global(user_name)
 
 
 def set_user_history_all(user_name, jsonDatas) -> None:
-    """将用户历史记录加载进内存中"""
+    """将用户聊天记录加载进内存中"""
     # 查询id相关详情
     set_history_doc_global(user_name, jsonDatas)
 
@@ -88,7 +88,7 @@ def load_history(user_name, id) -> str:
 
 
 def rename_history(user_name, id, new_title) -> None:
-    """重命名历史记录"""
+    """重命名聊天记录"""
     history_list = get_user_history(user_name)
     if history_list is None or len(history_list) == 0:
         return
@@ -102,7 +102,7 @@ def rename_history(user_name, id, new_title) -> None:
 
 
 def del_history(user_name, id) -> None:
-    """删除历史记录文件"""
+    """删除聊天记录文件"""
     # 删除文件
     history_file_path = os.path.join(HISTORY_DIR, user_name, f"{id}.json")
     os.remove(history_file_path)
@@ -111,9 +111,9 @@ def del_history(user_name, id) -> None:
 
 
 def cretate_new_history(user_name, model_name, input_str) -> str:
-    """创建新的历史记录,没有智能体
+    """创建新的聊天记录,没有智能体
     params:input_str 用户输入
-    return:history_id 历史记录id
+    return:history_id 聊天记录id
     """
     agent_data = get_default_agent_data(user_name)
     if agent_data is None:
@@ -125,17 +125,17 @@ def cretate_new_history(user_name, model_name, input_str) -> str:
 
 
 def save_history(user_name, json_str) -> None:
-    """保存历史记录文件
+    """保存聊天记录文件
     {"id": "1b58a6b59a4a4bcba07078d415d74f0b", "title": "文言文翻译", "content": [{"role": "assistant", "content": "用文言文表达输入的内容"}, {"role": "user", "content": "示例：我很开心，因为今天出去玩了"}], "model_name": "llama-3.2-90b-vision", "temperature": 0.8, "top_p": 0.3, "max_tokens": 84492, "presence_penalty": 1.5, "frequency_penalty": 1.7}
     """
     try:
         history_data = json.loads(json_str)
         if history_data is not None:
-            # 历史记录名称
+            # 聊天记录名称
             title = history_data.get("title")
             id = history_data.get("id")
             if title is None:
-                raise "历史记录名称不能为空"
+                raise "聊天记录名称不能为空"
             if id is None or id == "":
                 # 创建uuid
                 id = str(uuid.uuid4()).replace("-", "")
@@ -143,7 +143,7 @@ def save_history(user_name, json_str) -> None:
 
             save_history_file(user_name, history_data)
 
-            # 将历史记录的相关参数保存在全局变量
+            # 将聊天记录的相关参数保存在全局变量
             set_user_history(user_name, history_data)
     except Exception as e:
         # 抛出异常
@@ -152,7 +152,7 @@ def save_history(user_name, json_str) -> None:
 
 
 def save_history_file(user_name, history_data) -> str:
-    """保存历史记录到硬盘中"""
+    """保存聊天记录到硬盘中"""
     # 创建目录
     id = history_data.get("id", str(uuid.uuid4()).replace("-", ""))
     os.makedirs(os.path.join(HISTORY_DIR, user_name), exist_ok=True)
@@ -162,7 +162,7 @@ def save_history_file(user_name, history_data) -> str:
 
 
 def save_history_agent(user_name, agentData) -> str:
-    """从智能体中创建历史记录"""
+    """从智能体中创建聊天记录"""
     try:
         id = str(uuid.uuid4()).replace("-", "")
         agent_title = agentData.get("title", "新的聊天")
@@ -206,18 +206,18 @@ def save_history_agent(user_name, agentData) -> str:
             "assistant_icon": assistant_icon,
         }
         save_history_file(user_name, history_data)
-        # 将历史记录的相关参数保存在全局变量
+        # 将聊天记录的相关参数保存在全局变量
         set_user_history(user_name, history_data)
 
         return id
     except Exception as e:
         # 抛出异常
         logger.error(print_err(e))
-        raise Exception(f"{STANDARD_ERROR_MSG}:从智能体中创建历史记录失败")
+        raise Exception(f"{STANDARD_ERROR_MSG}:从智能体中创建聊天记录失败")
 
 
 def count_user_history_token(contents) -> int:
-    """统计历史记录的token数
+    """统计聊天记录的token数
     params: contents: [{"role": "user", "content": "示例：我很开心，因为今天出去玩了"}, {"role": "assistant", "content": "用文言文表达输入的内容"}]
     """
     if contents is None:
@@ -227,7 +227,7 @@ def count_user_history_token(contents) -> int:
 
 
 def cover_history(jsonData) -> json:
-    """将历史记录转换为需要的格式"""
+    """将聊天记录转换为需要的格式"""
     return {
         "id": jsonData.get("id"),
         "title": jsonData.get("title"),
@@ -239,9 +239,9 @@ def cover_history(jsonData) -> json:
 
 
 def set_user_history(user_name, jsonData) -> None:
-    """将当前历史记录设置在缓存
+    """将当前聊天记录设置在缓存
     user_name (str): 当前用户名称
-    jsonData (json): 历史记录数据
+    jsonData (json): 聊天记录数据
     """
     # 查询id相关详情
     if jsonData is None:
@@ -252,8 +252,8 @@ def set_user_history(user_name, jsonData) -> None:
 def update_history(
     user_name, history_id, contents, agent_data, max_content_len
 ) -> None:
-    """修改历史记录，对话防止超限
-    history_id(str):id 历史记录id
+    """修改聊天记录，对话防止超限
+    history_id(str):id 聊天记录id
     content([]):当前对话
     agent_data(dict):智能体id
     max_content_len(int) 最大上下文
@@ -261,9 +261,9 @@ def update_history(
     try:
         history_data = load_history(user_name, history_id)
         if history_data is None:
-            raise Exception(f"历史记录不存在,id={history_id}")
+            raise Exception(f"聊天记录不存在,id={history_id}")
         if agent_data is None:
-            raise Exception(f"智能体数据不存在,历史记录id={history_id}")
+            raise Exception(f"智能体数据不存在,聊天记录id={history_id}")
         count = history_data.get("count", 0)
         agent_count = agent_data.get("count", 0)
         all_token_counts = history_data.get("all_token_counts", 0)
@@ -280,7 +280,7 @@ def update_history(
             and max_limit > 0
             and max_limit > max_tokens
         ):
-            logger.warning("历史记录对话超过最大限制，自动截断开始。。。。")
+            logger.warning("聊天记录对话超过最大限制，自动截断开始。。。。")
             agent_content_data = content_data[:agent_count]
             chat_content_data = content_data[agent_count + 1 :]
             # 智能体的token和当前对话token
@@ -304,15 +304,15 @@ def update_history(
 
     except Exception as e:
         logger.error(print_err(e))
-        raise Exception(f"{STANDARD_ERROR_MSG}:修改历史记录失败")
+        raise Exception(f"{STANDARD_ERROR_MSG}:修改聊天记录失败")
 
 
 def top_history(user_name, history_id) -> None:
-    """置顶历史记录"""
+    """置顶聊天记录"""
     try:
         history_data = load_history(user_name, history_id)
         if history_data is None:
-            raise Exception(f"历史记录不存在,id={history_id}")
+            raise Exception(f"聊天记录不存在,id={history_id}")
         history_data["create_time"] = datetime.datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S"
         )
@@ -320,4 +320,34 @@ def top_history(user_name, history_id) -> None:
         save_history(user_name, json.dumps(history_data))
     except Exception as e:
         logger.error(print_err(e))
-        raise Exception(f"{STANDARD_ERROR_MSG}:置顶历史记录失败")
+        raise Exception(f"{STANDARD_ERROR_MSG}:置顶聊天记录失败")
+
+
+def clear_all_history(user_name) -> None:
+    """删除所有聊天记录"""
+    # 删除文件
+    os.makedirs(os.path.join(HISTORY_DIR, user_name), exist_ok=True)
+    for file in os.listdir(os.path.join(HISTORY_DIR, user_name)):
+        os.remove(os.path.join(HISTORY_DIR, user_name, file))
+    # 清除缓存
+    clear_history_doc_global(user_name)
+
+
+def clear_context(user_name, history_id) -> None:
+    """清空上下文"""
+    history_data = load_history(user_name, history_id)
+    if history_data is None:
+        raise Exception(f"聊天记录不存在,id={history_id}")
+    agent_id = history_data.get("agent_id")
+    if agent_id is None:
+        raise Exception(f"聊天记录z中智能体不存在,id={history_id}")
+    agent_data = load_agent(user_name, agent_id)
+    if agent_data is None:
+        raise Exception(f"智能体不存在,智能体id={agent_id}")
+    content_data = agent_data.get("content", [])
+    history_data["content"] = content_data
+    history_data["count"] = len(content_data)
+    history_data["all_token_counts"] = count_user_history_token(content_data)
+
+    # 清除缓存
+    save_history(user_name, json.dumps(history_data))

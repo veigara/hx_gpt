@@ -117,7 +117,7 @@
 				<!--尾部-->
 				<Footler ref="footlerRef" :ElNotificationErr="ElNotificationErr" :historyId="curHistoryId" :agentId="curAgent.agent_id"
 					@update:cur-model="item => curModel = item" @update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
-					@update:selectAgent="selectAgent" :sendContent="sendContent" />
+					@update:selectAgent="selectAgent"  @update:clear-history-all="clearHistoryAll"  @update:refreshHistory="refreshHistoryFor"  :sendContent="sendContent" />
 			</el-main>
 		</el-container>
 	</el-card>
@@ -144,7 +144,7 @@ const ElNotificationErr = (err: any) => {
 	})
 }
 
-// 关闭历史记录siber
+// 关闭聊天记录siber
 const chatHistoryDisplay = ref(true)
 
 
@@ -215,19 +215,19 @@ watch([scrollbarRef, chat_msg], ([newScrollVal, newChatVal], [oldScrollVal, oldC
 
 // 选择智能体
 const selectAgent = (historyId: any) => {
-	// 刷新历史记录
+	// 刷新聊天记录
 	curHistoryId.value = historyId
 	historyRef.value.refreshAndSelectFirstHistory(true)
 }                                                                                                                                                                           
 
-// 选择的历史记录
+// 选择的聊天记录
 const selectHistoryItem = (data:any) => {
 	// 清空数据
 	const historyId = data.historyId
 	const isClearChat = data.isClearChat
 	curHistoryId.value = historyId
 	
-	// 获取历史记录详情
+	// 获取聊天记录详情
 	useGetHistoryDetailApi({ "id": historyId }).then(res => {
 		// 填充数据
 		curModel.value = res.model_name
@@ -237,13 +237,13 @@ const selectHistoryItem = (data:any) => {
 		curAgent.user_icon = res.user_icon? res.user_icon:'icon-user'
 		curAgent.assistant_icon = res.assistant_icon?res.assistant_icon:'icon-user'
 		if(isClearChat){
-			//表明是直接点击的历史记录
+			//表明是直接点击的聊天记录
 			chat_msg.chatBotDatas = []
 			chat_msg.history = res.content
 			// 把模型名称传过去
 			footlerRef.value.init(res.model_name)
 		}else{
-			//表明是发送的消息，不是点击的历史记录
+			//表明是发送的消息，不是点击的聊天记录
 			// 填充数据
 			chat_msg.history = []
 		}
@@ -275,7 +275,7 @@ const refreshHistory =(isAlert:boolean)=>{
 			ElMessage.success('已经是最新对话')
 		}
 	}
-	// 历史记录
+	// 聊天记录
 	historyRef.value.clearAll()
 	// 对话部分
 	init()
@@ -305,6 +305,22 @@ const editQuestion=(data:string) =>{
 		sendContent.value = value
 	})
 }
+
+// 清除所有对话记录
+const clearHistoryAll = () => {
+	refreshHistory(false)
+}
+
+// 刷新指定聊天记录
+const refreshHistoryFor = (history_id:string) =>{
+	const data={
+		"historyId":history_id,
+		"isClearChat":true
+	
+	}
+	selectHistoryItem(data)
+}
+
 
 onMounted(() => {
 	init()
