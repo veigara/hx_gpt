@@ -7,14 +7,6 @@
         "multimodal": false,
         "max_content_len": 131072
     },
-    "Llama-3.1 8B": {
-        "model_key": "Llama-3.1 8B",
-        "model_name": "meta-llama-3.1-8b-instruct",
-        "description": "meta-llama-3.1-8b",
-        "model_type": "LMStudio",
-        "multimodal": true,
-        "max_content_len": 131072
-    },
     "llama-3.3-70b": {
         "model_key": "llama-3.3-70b",
         "model_name": "llama-3.3-70b-versatile",
@@ -22,5 +14,13 @@
         "model_type": "Groq",
         "multimodal": false,
         "max_content_len": 131072
+    },
+    "llama-3.2-1b": {
+        "model_key": "llama-3.2-1b",
+        "model_name": "llama-3.2-1b-instruct",
+        "description": "",
+        "model_type": "LMStudio",
+        "multimodal": false,
+        "max_content_len": 8160
     }
 }

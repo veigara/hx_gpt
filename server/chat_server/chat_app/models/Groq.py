@@ -39,7 +39,11 @@ class Groq_Client(BaseLLMModel):
             model=self.model_name,
             messages=messages,
             temperature=self.get_agent_data().get("temperature"),
-            max_tokens=self.get_agent_data().get("max_tokens"),
+            max_tokens=(
+                self.get_agent_data().get("max_tokens")
+                if self.get_agent_data().get("max_tokens") is None
+                else -1
+            ),
             top_p=self.get_agent_data().get("top_p"),
             stream=True,
             presence_penalty=self.get_agent_data().get("presence_penalty"),
@@ -59,7 +63,11 @@ class Groq_Client(BaseLLMModel):
             model=self.model_name,
             messages=messages,
             temperature=self.get_agent_data().get("temperature"),
-            max_tokens=self.get_agent_data().get("max_tokens"),
+            max_tokens=(
+                self.get_agent_data().get("max_tokens")
+                if self.get_agent_data().get("max_tokens") is None
+                else -1
+            ),
             top_p=self.get_agent_data().get("top_p"),
             stream=True,
             presence_penalty=self.get_agent_data().get("presence_penalty"),

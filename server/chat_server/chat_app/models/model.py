@@ -32,7 +32,13 @@ def get_model(
             logger.info(f"正在加载LMStudio本地模型: {model_key}")
             from .LMStudio import LMStudio_Client
 
-            model = LMStudio_Client(model_key, None, user_name=user_name)
+            model = LMStudio_Client(
+                model_key,
+                None,
+                user_name=user_name,
+                history_id=history_id,
+                agent_id=agent_id,
+            )
         else:
             raise Exception(f"{STANDARD_ERROR_MSG}: 模型类型【{model_type}】不支持")
 
