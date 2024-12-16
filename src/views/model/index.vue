@@ -96,8 +96,8 @@ const delview = (item:any) => {
 		'是否确认删除该模型？',
 		'警告',
 		{
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
+			confirmButtonText: '确定',
+			cancelButtonText: '取消',
 			type: 'warning',
 		}
 	)

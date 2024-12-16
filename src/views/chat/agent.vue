@@ -152,8 +152,8 @@ const delview = (item: agentModel) => {
 		'是否确认删除该智能体？',
 		'警告',
 		{
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
+			confirmButtonText: '确定',
+			cancelButtonText: '取消',
 			type: 'warning',
 		}
 	)

@@ -182,8 +182,8 @@ const delHistory = (item: any) => {
 		'是否确认删除该对话记录？',
 		'警告',
 		{
-			confirmButtonText: 'OK',
-			cancelButtonText: 'Cancel',
+			confirmButtonText: '确定',
+			cancelButtonText: '取消',
 			type: 'warning',
 		}
 	)
