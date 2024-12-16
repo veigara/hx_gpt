@@ -40,11 +40,7 @@
 					<icon-select v-model="dataForm.assistant_icon" suffx="icon-avatar-"/>
 				</el-form-item>
 				<el-form-item label="模型(model)" prop="model_name">
-					<el-select v-model="dataForm.model_name" :teleported="false" placeholder="请选择模型"
-						style="width: 100%">
-						<el-option v-for="item in modelList" :key="item.label" :label="item.label" :value="item.label">
-						</el-option>
-					</el-select>
+					<mode-select v-model="dataForm.model_name" style="width: 100%"/>
 				</el-form-item>
 				<el-form-item prop="temperature">
 					<template #label>
@@ -118,6 +114,7 @@ import { ElNotification } from 'element-plus'
 import { useModelsApi, useSaveAgentFileApi } from '@/api/chat'
 import { CirclePlus, Delete } from '@element-plus/icons-vue'
 import IconSelect from '@/components/icon-select/src/index.vue'
+import ModeSelect from '@/components/model-select/index.vue'
 
 const visible = ref(false)
 
@@ -201,14 +198,6 @@ const addAgentContent = () => {
 	dataForm.content.push(agentContent)
 }
 
-// 获取所有的模型
-const modelList = ref()
-const getModelList = () => {
-	useModelsApi().then(res => {
-		modelList.value = res
-	})
-}
-
 const rules = reactive({
 	title: [{ required: true, message: '智能体名称不能为空', trigger: 'blur' }],
 	model_name: [
@@ -240,11 +229,6 @@ const saveAgent = () => {
 		}
 	})
 }
-
-const mounted = onMounted(() => {
-	// 获取所有的模型
-	getModelList()
-})
 
 defineExpose({
 	init
