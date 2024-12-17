@@ -141,41 +141,20 @@ class BaseLLMModel:
         """使用在线搜索"""
         search_results = []
         with DDGS(proxies=None) as ddgs:
-                    ddgs_gen = ddgs.text(input, backend="lite")
-                    for r in islice(ddgs_gen, 10):
-                        search_results.append(r)
-        reference_results = []      
+            ddgs_gen = ddgs.text(input, backend="lite")
+            for r in islice(ddgs_gen, 10):
+                search_results.append(r)
+        reference_results = []
         for idx, result in enumerate(search_results):
             logger.debug(f"搜索结果{idx + 1}：{result}")
             reference_results.append([result["body"], result["href"]])
-        reference_results = add_source_numbers(reference_results) 
-        
+        reference_results = add_source_numbers(reference_results)
+
         today = datetime.datetime.today().strftime("%Y-%m-%d")
-        real_input =WEBSEARCH_PTOMPT_TEMPLATE.replace("{current_date}", today).replace("{query}", input).replace("{web_results}", "\n\n".join(reference_results))
-                    
+        real_input = (
+            WEBSEARCH_PTOMPT_TEMPLATE.replace("{current_date}", today)
+            .replace("{query}", input)
+            .replace("{web_results}", "\n\n".join(reference_results))
+        )
+
         return real_input
-                   
-# class ModelType(Enum):
-#     Unknown = -1
-#     Groq = 1
-#     LMStudio = 2
-
-#     @classmethod
-#     def get_type(cls, model_name: str):
-#         # 1. get model type from model metadata (if exists)
-#         model_type = MODEL_METADATA[model_name]["model_type"]
-#         if model_type is not None:
-#             for member in cls:
-#                 if member.name == model_type:
-#                     return member
-
-#         # 2. infer model type from model name
-#         model_type = None
-#         model_name_lower = model_name.lower()
-
-#         if "groq" in model_name_lower:
-#             model_type = ModelType.Groq
-
-#         else:
-#             model_type = ModelType.LMStudio
-#         return model_type

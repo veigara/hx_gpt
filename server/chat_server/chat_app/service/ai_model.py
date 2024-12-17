@@ -90,6 +90,8 @@ class ModelType(Enum):
 
     GROQ = "Groq"
     LMSTUDIO = "LMStudio"
+    QWEN = "Qwen"
+    SPARK = "Spark"
 
     @classmethod
     def get_all_categories(cls):

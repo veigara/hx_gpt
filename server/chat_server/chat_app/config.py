@@ -12,8 +12,8 @@ def groq_api_key():
     return get_config_data().get("groq_api_key", "")
 
 
-def lmstudio_host():
-    return get_config_data().get("lmstudio_host", "")
+def lmstudio_url():
+    return get_config_data().get("lmstudio_url", "")
 
 
 def lmstudio_api_key():
@@ -22,6 +22,14 @@ def lmstudio_api_key():
 
 def default_model():
     return get_config_data().get("default_model", "")
+
+
+def qwen_api_key():
+    return get_config_data().get("qwen_api_key", "")
+
+
+def spark_api_key():
+    return get_config_data().get("spark_api_key", "")
 
 
 def get_default_model_params():

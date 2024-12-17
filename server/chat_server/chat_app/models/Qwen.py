@@ -5,12 +5,12 @@ from openai import OpenAI
 from ..presets import *
 from ..utils import count_token, construct_system
 from .base_model import BaseLLMModel
-from ..config import lmstudio_api_key, lmstudio_url
+from ..config import qwen_api_key
 
 logger = logging.getLogger("chat_app")
 
 
-class LMStudio_Client(BaseLLMModel):
+class Qwen_Client(BaseLLMModel):
     def __init__(self, model_name, api_key, user_name, agent_id, history_id) -> None:
         super().__init__(
             model_name=model_name,
@@ -20,11 +20,11 @@ class LMStudio_Client(BaseLLMModel):
             config={"api_key": api_key},
         )
         self.client = OpenAI(
-            base_url=lmstudio_url(),
-            api_key=lmstudio_api_key(),
+            base_url=QWEN_BASE_URL,
+            api_key=qwen_api_key(),
         )
 
-    def _get_lm_style_input(self):
+    def _get_qwen_style_input(self):
         messages = [*self.get_history()]
         return messages
 
@@ -57,7 +57,7 @@ class LMStudio_Client(BaseLLMModel):
         return partial_text
 
     def get_answer_stream_iter(self):
-        messages = self._get_lm_style_input()
+        messages = self._get_qwen_style_input()
         completion = self._create_completion(messages, stream=True)
         partial_text = ""
         for chunk in completion:

@@ -4,13 +4,11 @@ from pathlib import Path
 
 # ChatGPT 设置
 INITIAL_SYSTEM_PROMPT = "You are a helpful assistant."
-API_HOST = "api.openai.com"
-OPENAI_API_BASE = "https://api.openai.com/v1"
-CHAT_COMPLETION_URL = "https://api.openai.com/v1/chat/completions"
-IMAGES_COMPLETION_URL = "https://api.openai.com/v1/images/generations"
-COMPLETION_URL = "https://api.openai.com/v1/completions"
-BALANCE_API_URL = "https://api.openai.com/dashboard/billing/credit_grants"
-USAGE_API_URL = "https://api.openai.com/dashboard/billing/usage"
+# qwen
+QWEN_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+# 讯飞星火
+SPARK_BASE_URL = "https://spark-api-open.xf-yun.com/v1"
+
 # 聊天记录存放地址
 HISTORY_DIR = "history"
 # 用户智能体存放地址

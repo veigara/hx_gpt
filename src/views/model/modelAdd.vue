@@ -117,9 +117,9 @@ const rules = reactive({
 	],
 	max_content_len: [
 		{	
-			min: 1000,
-			message: '上下文长度不能小于1000',
-			trigger: 'blur'
+			required: true,
+			message: '上下文长度不能为空',
+			trigger: 'change'
 		}
 	],
 	

@@ -22,5 +22,29 @@
         "model_type": "LMStudio",
         "multimodal": false,
         "max_content_len": 8160
+    },
+    "qwen-plus": {
+        "model_key": "qwen-plus",
+        "model_name": "qwen-plus",
+        "description": "通义千问超大规模语言模型的增强版，支持中文英文等不同语言输入。",
+        "model_type": "Qwen",
+        "multimodal": false,
+        "max_content_len": 8000
+    },
+    "qwq-32b": {
+        "model_key": "qwq-32b",
+        "model_name": "qwq-32b-preview",
+        "description": "QwQ模型是由 Qwen 团队开发的实验性研究模型，专注于增强 AI 推理能力。",
+        "model_type": "Qwen",
+        "multimodal": false,
+        "max_content_len": 8000
+    },
+    "Spark Lite": {
+        "model_key": "Spark Lite",
+        "model_name": "lite",
+        "description": "轻量级大语言模型，低延迟，全免费",
+        "model_type": "Spark",
+        "multimodal": false,
+        "max_content_len": 4095
     }
 }

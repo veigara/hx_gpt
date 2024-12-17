@@ -4,8 +4,14 @@
             <el-form-item label="Groq API Key" prop="groq_api_key">
                 <el-input v-model="form.groq_api_key" placeholder="请输入Groq API Key" clearable></el-input>
             </el-form-item>
-            <el-form-item label="LMStudio Host" prop="lmstudio_host">
-                <el-input v-model="form.lmstudio_host" placeholder="请输入LMStudio Host" clearable></el-input>
+            <el-form-item label="千问API Key" prop="qwen_api_key">
+                <el-input v-model="form.qwen_api_key" placeholder="请输入千问API Key" clearable></el-input>
+            </el-form-item>
+            <el-form-item label="讯飞API Key" prop="qwen_api_key">
+                <el-input v-model="form.spark_api_key" placeholder="请输入讯飞API Key" clearable></el-input>
+            </el-form-item>
+            <el-form-item label="LMStudio url" prop="lmstudio_url">
+                <el-input v-model="form.lmstudio_url" placeholder="请输入LMStudio Host" clearable></el-input>
             </el-form-item>
             <el-form-item label="LMStudio API Key" prop="lmstudio_api_key">
                 <el-input v-model="form.lmstudio_api_key" placeholder="请输入LMStudio API Key" clearable></el-input>
@@ -32,9 +38,11 @@ import { ElNotification } from 'element-plus'
 const visible = ref(false)
 const formData = {
     groq_api_key: '',
-    lmstudio_host: '',
+    lmstudio_url: '',
     lmstudio_api_key: '',
-    default_model: ''
+    default_model: '',
+    qwen_api_key:'',
+    spark_api_key:''
 }
 const form = reactive({
     ...formData
@@ -47,9 +55,11 @@ const clearForm = () => {
 const getConfig = () => {
     useGetConfigApi().then(data => {
         form.groq_api_key = data.groq_api_key
-        form.lmstudio_host = data.lmstudio_host
+        form.lmstudio_url = data.lmstudio_url
         form.lmstudio_api_key = data.lmstudio_api_key
         form.default_model = data.default_model
+        form.qwen_api_key = data.qwen_api_key
+        form.spark_api_key = data.spark_api_key
     })
 
 }

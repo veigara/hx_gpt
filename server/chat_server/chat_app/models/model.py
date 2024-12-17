@@ -39,6 +39,28 @@ def get_model(
                 history_id=history_id,
                 agent_id=agent_id,
             )
+        elif model_type == ModelType.QWEN.value:
+            logger.info(f"正在加载Qwen模型: {model_key}")
+            from .Qwen import Qwen_Client
+
+            model = Qwen_Client(
+                model_key,
+                None,
+                user_name=user_name,
+                history_id=history_id,
+                agent_id=agent_id,
+            )
+        elif model_type == ModelType.SPARK.value:
+            logger.info(f"正在加载讯飞星火模型: {model_key}")
+            from .Spark import Spark_Client
+
+            model = Spark_Client(
+                model_key,
+                None,
+                user_name=user_name,
+                history_id=history_id,
+                agent_id=agent_id,
+            )
         else:
             raise Exception(f"{STANDARD_ERROR_MSG}: 模型类型【{model_type}】不支持")
 
