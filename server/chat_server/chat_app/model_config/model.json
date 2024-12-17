@@ -46,5 +46,13 @@
         "model_type": "Spark",
         "multimodal": false,
         "max_content_len": 4095
+    },
+    "Spark 4.0 Ultra": {
+        "model_key": "Spark 4.0 Ultra",
+        "model_name": "4.0Ultra",
+        "description": "最强大的星火大模型（星火4.0 Turbo），在文本生成、语言理解、知识问答、逻辑推理、数学能力等七大维度全面超越GPT 4-Turbo，优化联网搜索链路，提供更精准回答。",
+        "model_type": "Spark",
+        "multimodal": false,
+        "max_content_len": 8000
     }
 }

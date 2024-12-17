@@ -20,10 +20,6 @@ class Spark_Client(BaseLLMModel):
             history_id=history_id,
             config={"api_key": api_key},
         )
-        # self.client = OpenAI(
-        #     base_url=SPARK_BASE_URL,
-        #     api_key=spark_api_key(),
-        # )
         self.url = SPARK_BASE_URL + "/chat/completions"
         self.header = {"Authorization": f"Bearer {spark_api_key()}"}
 
