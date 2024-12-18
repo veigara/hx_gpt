@@ -166,7 +166,7 @@ onMounted(() => {
 .model_header {
 	display: flex;
 	align-items: center;
-
+	max-width: 700px;
 	.model_icon {
 		display: flex;
 		align-items: center;
@@ -181,9 +181,10 @@ onMounted(() => {
 
 	.model_info {
 		font-size: 12px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		white-space: normal;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		max-width: 100%;
 	}
 }
 
