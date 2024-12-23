@@ -21,6 +21,10 @@ MODEL_CONFIG_DIR = "chat_server/chat_app/model_config/model.json"
 CONFIG_DIR = "chat_server/chat_app/config.json"
 # 系统默认用户
 SYS_USER_NAME = "system"
+# 知识库上传文件地址
+KNOWLEDGE_UPLOAD_FILE_DIR = "knowledge/upload_file"
+# 知识库源文件记录
+KNOWLEDGE_RECORD_FILE_DIR = "knowledge/record"
 
 # 错误信息
 STANDARD_ERROR_MSG = "☹️发生了错误："  # 错误信息的标准前缀

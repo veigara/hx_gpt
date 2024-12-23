@@ -1,7 +1,7 @@
 <template>
 	<div class="chat_main_plane">
 		<div class="chat_main_plane_icon">
-			<!--上传-->
+			<!-- 上传
 			<div class="chat_main_plane_space">
 				<el-popover placement="top" trigger="hover" :show-arrow="false">
 					<template #reference>
@@ -24,7 +24,7 @@
 						</el-tooltip>
 					</div>
 				</el-popover>
-			</div>
+			</div> -->
 			<!--模型-->
 			<div class="chat_main_plane_space">
 				<el-popover placement="top" trigger="hover" :show-arrow="false">

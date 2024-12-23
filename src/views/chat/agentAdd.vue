@@ -37,7 +37,7 @@
 					<icon-select v-model="dataForm.user_icon" suffx="icon-avatar-"/>
 				</el-form-item>
 				<el-form-item label="助理图标" prop="assistant_icon">
-					<icon-select v-model="dataForm.assistant_icon" suffx="icon-avatar-"/>
+					<icon-select v-model="dataForm.assistant_icon" suffx=""/>
 				</el-form-item>
 				<el-form-item label="模型(model)" prop="model_name">
 					<mode-select v-model="dataForm.model_name" style="width: 100%"/>

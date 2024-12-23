@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from chat_app import views
-from chat_app.web import chat_web, model_web, config_web
+from chat_app.web import chat_web, model_web, config_web, knowledge_web
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -69,4 +69,6 @@ urlpatterns = [
     path("get_config", config_web.get_config, name="get_config"),
     # 更新配置信息
     path("update_config", config_web.update_config, name="update_config"),
+    # 上传知识库
+    path("knowledge/upload", knowledge_web.upload_file, name="knowledge_upload_file"),
 ]

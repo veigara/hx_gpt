@@ -19,6 +19,15 @@ export const menuRoutes: RouteRecordRaw[] = [
 			icon: 'icon-fire'
 		}
 	},
+	{
+		path: '/knowledge',
+		name: 'Knowledge',
+		component: () => import('../views/knowledge/index.vue'),
+		meta: {
+			title: '知识库',
+			icon: 'icon-sketch'
+		}
+	},
 ]
 
 export const constantRoutes: RouteRecordRaw[] = [
