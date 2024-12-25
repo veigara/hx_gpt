@@ -2,7 +2,7 @@ import os
 import uuid
 import datetime
 import json
-from ..presets import *
+from ...presets import *
 
 
 def upload_file(user_name, knowledge_id, file):

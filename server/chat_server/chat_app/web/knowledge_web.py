@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.shortcuts import HttpResponse
 from ..utils import *
 from ..presets import *
-from ..service.knowledge import upload_file as UPLOAD_FILE
+from ..service.knowledge.knowledge import upload_file as UPLOAD_FILE
 
 logger = logging.getLogger("chat_app")
 
