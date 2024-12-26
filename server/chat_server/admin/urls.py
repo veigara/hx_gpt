@@ -70,5 +70,23 @@ urlpatterns = [
     # 更新配置信息
     path("update_config", config_web.update_config, name="update_config"),
     # 上传知识库
-    path("knowledge/upload", knowledge_web.upload_file, name="knowledge_upload_file"),
+    path(
+        "knowledge_file/upload", knowledge_web.upload_file, name="knowledge_upload_file"
+    ),
+    # 查询文件
+    path(
+        "knowledge_file/search", knowledge_web.search_file, name="knowledge_search_file"
+    ),
+    # 删除文件
+    path("knowledge_file/delete", knowledge_web.del_file, name="knowledge_del_file"),
+    # 保存/更新知识库基本信息
+    path(
+        "knowledge/save_update",
+        knowledge_web.save_update_knowledge,
+        name="save_update_knowledge",
+    ),
+    # 搜索知识库
+    path("knowledge/search", knowledge_web.search_knowledge, name="search_knowledge"),
+    # 删除知识库
+    path("knowledge/delete", knowledge_web.del_knowledge, name="del_knowledge"),
 ]

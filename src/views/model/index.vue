@@ -61,6 +61,7 @@ import { useAllModelsApi,useRemoveModelApi} from '@/api/model'
 import ModelAdd from '@/views/model/modelAdd.vue'
 import ProjectConfig from '@/views/model/config.vue'
 import { ElMessage, ElMessageBox } from 'element-plus/es'
+import { Delete } from '@element-plus/icons-vue'
 
 const modelList = ref([])
 const search = ref()

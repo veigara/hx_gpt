@@ -33,10 +33,27 @@ service.interceptors.request.use(
 service.interceptors.response.use(
 	response => {
 		if (response.status !== 200) {
+			ElNotification({
+				title: '错误',
+				message: response.statusText,
+				type: 'error',
+				duration: 9500
+			})
 			return Promise.reject(new Error(response.statusText || 'Error'))
 		}
 		
 		const res = response.data
+		
+		if(res.code &&  res.code !== 200){
+			ElNotification({
+				title: '错误',
+				message: res.msg,
+				type: 'error',
+				duration: 9500
+			})
+			return Promise.reject(new Error(response.statusText || 'Error'))
+		}
+
 		// 响应成功
 		return res;
 	},
