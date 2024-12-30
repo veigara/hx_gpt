@@ -144,31 +144,6 @@ def get_loader(loader_name: str, file_path: str, loader_kwargs: Dict = None):
     return loader
 
 
-# 分词器配置
-text_splitter_dict: t.Dict[str, t.Dict[str, t.Any]] = {
-    "ChineseRecursiveTextSplitter": {
-        "source": "",
-        "tokenizer_name_or_path": "",
-    },
-    "SpacyTextSplitter": {
-        "source": "huggingface",
-        "tokenizer_name_or_path": "gpt2",
-    },
-    "RecursiveCharacterTextSplitter": {
-        "source": "tiktoken",
-        "tokenizer_name_or_path": "cl100k_base",
-    },
-    "MarkdownHeaderTextSplitter": {
-        "headers_to_split_on": [
-            ("#", "head1"),
-            ("##", "head2"),
-            ("###", "head3"),
-            ("####", "head4"),
-        ]
-    },
-}
-
-
 @lru_cache()
 def make_text_splitter(
     splitter_name, chunk_size, chunk_overlap, character_separators, recursive_separators
@@ -181,7 +156,7 @@ def make_text_splitter(
         if (
             splitter_name == "MarkdownHeaderTextSplitter"
         ):  # MarkdownHeaderTextSplitter特殊判定
-            headers_to_split_on = text_splitter_dict[splitter_name][
+            headers_to_split_on = KnowTextSplitter.MarkdownHeaderTextSplitter.value[
                 "headers_to_split_on"
             ]
             text_splitter = MarkdownHeaderTextSplitter(
@@ -217,7 +192,7 @@ def make_text_splitter(
     return text_splitter
 
 
-class TextSplitter(Enum):
+class KnowTextSplitter(Enum):
     """分词器"""
 
     ChineseTextSplitter = {"value": "1", "class_name": "ChineseTextSplitter"}
@@ -230,11 +205,21 @@ class TextSplitter(Enum):
         "value": "4",
         "class_name": "RecursiveCharacterTextSplitter",
     }
+    MarkdownHeaderTextSplitter = {
+        "value": "5",
+        "class_name": "MarkdownHeaderTextSplitter",
+        "headers_to_split_on": [
+            ("#", "head1"),
+            ("##", "head2"),
+            ("###", "head3"),
+            ("####", "head4"),
+        ],
+    }
 
     @staticmethod
     def get_text_splitter(value) -> str:
         """根据value获取枚举名称"""
-        for type in TextSplitter:
+        for type in KnowTextSplitter:
             if type.value["value"] == value:
                 return type.value["class_name"]
 
@@ -264,6 +249,7 @@ class KnowDocumentFile:
         self.lock = threading.Lock()
         self.file_type = file_type
         self.file_path = file_path
+        self.title = title
         self.file_config = file_config if file_config is not None else {}
         # 检查文件类型是否在支持的类型列表中
         if self.file_type not in SUPPORTED_TYPE:
@@ -284,7 +270,7 @@ class KnowDocumentFile:
         # 如果文件配置不为空，则根据配置设置文本分割器和相关参数
         if self.file_config:
             text_splitter = file_config.get("text_splitter")
-            self.text_splitter_name = TextSplitter.get_text_splitter(text_splitter)
+            self.text_splitter_name = KnowTextSplitter.get_text_splitter(text_splitter)
             self.chunk_size = file_config.get("max_length")
             self.chunk_overlap = file_config.get("overlap_length")
             # 长度分词器分隔符列表
@@ -376,6 +362,11 @@ class KnowDocumentFile:
         # 如果分割后的docs为空，返回空列表
         if not docs:
             return []
+        else:
+            # 增加文本标题来源
+            if len(docs) > 0:
+                for doc in docs:
+                    doc.metadata["title"] = self.title
 
         # 打印文档分割示例
         print(f"文档切分示例：{docs[0]}")

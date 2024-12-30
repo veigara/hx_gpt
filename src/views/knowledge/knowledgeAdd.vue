@@ -93,7 +93,7 @@
 						上传知识文件：
 						<el-upload class="upload-demo" drag :http-request="upload" multiple
 							accept=".html,.htm,.mhtml,.md,.json,.jsonl,.csv,.pdf,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.bmp,.eml,.msg,.rst,.rtf,.txt,.xml,.epub,.odt,.tsv,.xlsx,.xls,.xlsd,.ipynb,.py,.srt,.toml,.enex"
-							show-file-list :file-list="fileList" :on-change="handleFileChanged">
+							show-file-list :file-list="fileList" :on-change="handleFileChanged" on-remove="handleFileRemove">
 							<i class="el-icon-upload"></i>
 							<div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
 							<div class="el-upload__tip" slot="tip">上传文件且不超过200M</div>
@@ -198,6 +198,7 @@ const textOptions = [
 		options: [
 			{ value: '3', label: 'CharacterTextSplitter', description: '长度分词器(基于长度的拆分)' },
 			{ value: '4', label: 'RecursiveCharacterTextSplitter', description: '结构分词器(基于文本结构的拆分，能保持较大的单元（例如段落）的完整性。)' },
+			{ value: '5', label: 'MarkdownHeaderTextSplitter', description: 'Markdown分词器(基于文本结构的拆分。)' },
 		],
 	}
 ]
@@ -271,6 +272,11 @@ const handleFileChanged = (file: any, yfileList: any) => {
 	}
 
 
+}
+
+// 删除文件
+const handleFileRemove = (file: any) => {
+	fileList.value = fileList.value.filter(item => item.name !== file.name)
 }
 
 // 查询上传文件

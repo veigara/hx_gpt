@@ -57,7 +57,7 @@ def upload_file(user_name, knowledge_id, file, file_config: dict):
                 document_count,
                 index_name,
             )
-
+            logger.info(f"{user_name}上传文件成功")
     except Exception as e:
         # 处理异常，可以记录日志或返回错误信息
         print(f"Error uploading file: {e}")
