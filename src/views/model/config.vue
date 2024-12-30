@@ -19,6 +19,9 @@
             <el-form-item label="默认模型" prop="default_model">
                 <mode-select v-model="form.default_model" style="width: 100%;" />
             </el-form-item>
+            <el-form-item label="向量数据库连接地址" prop="redis_url">
+                <el-input v-model="form.redis_url" placeholder="向量数据库连接地址" clearable></el-input>
+            </el-form-item>
         </el-form>
 
         <template #footer>
@@ -42,7 +45,8 @@ const formData = {
     lmstudio_api_key: '',
     default_model: '',
     qwen_api_key:'',
-    spark_api_key:''
+    spark_api_key:'',
+    redis_url:''
 }
 const form = reactive({
     ...formData
@@ -60,6 +64,7 @@ const getConfig = () => {
         form.default_model = data.default_model
         form.qwen_api_key = data.qwen_api_key
         form.spark_api_key = data.spark_api_key
+        form.redis_url = data.redis_url
     })
 
 }

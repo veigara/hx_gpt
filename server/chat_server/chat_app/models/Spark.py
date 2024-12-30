@@ -34,6 +34,7 @@ class Spark_Client(BaseLLMModel):
                 return self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
+                    stream=stream,
                 )
             else:
                 return self.client.chat.completions.create(

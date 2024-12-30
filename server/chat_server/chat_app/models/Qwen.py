@@ -35,6 +35,7 @@ class Qwen_Client(BaseLLMModel):
                 return self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
+                    stream=stream,
                 )
             else:
                 return self.client.chat.completions.create(
@@ -59,8 +60,6 @@ class Qwen_Client(BaseLLMModel):
         completion = self._create_completion(messages, stream=True)
         partial_text = ""
         for chunk in completion:
-            if not hasattr(chunk, "choices"):
-                break
             partial_text += chunk.choices[0].delta.content or ""
 
         return partial_text
@@ -70,8 +69,6 @@ class Qwen_Client(BaseLLMModel):
         completion = self._create_completion(messages, stream=True)
         partial_text = ""
         for chunk in completion:
-            if not hasattr(chunk, "choices"):
-                break
             partial_text += chunk.choices[0].delta.content or ""
 
         return partial_text

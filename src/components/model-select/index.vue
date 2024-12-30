@@ -1,5 +1,5 @@
 <template>
-    <el-select :teleported="false" v-model="model" v-bind="$attrs" placeholder="请选择模型">
+    <el-select :teleported="false" v-model="model" v-bind="$attrs" placeholder="请选择模型" clearable>
         <el-option-group v-for="item in modelList" :key="item.group" :label="item.group">
             <el-tooltip v-for="data in item.options" :content="data.description" placement="right">
                 <el-option :key="data.label" :label="data.label" :value="data.label">

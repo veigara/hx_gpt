@@ -32,6 +32,10 @@ def spark_api_key():
     return get_config_data().get("spark_api_key", "")
 
 
+def redis_url():
+    return get_config_data().get("redis_url", "")
+
+
 def get_default_model_params():
     # 设置模型默认参数,并获取模型数据
     model_data = get_model_data()

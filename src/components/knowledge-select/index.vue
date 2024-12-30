@@ -1,5 +1,5 @@
 <template>
-	<el-select :teleported="false" v-model="Knowledge" v-bind="$attrs" placeholder="请选择知识库">
+	<el-select :teleported="false" v-model="Knowledge" v-bind="$attrs" placeholder="请选择知识库" clearable>
 		<el-tooltip v-for="item in KnowledgeList" :content="item.description" placement="right">
 			<el-option :key="item.id" :label="item.know_name" :value="item.id" />
 		</el-tooltip>

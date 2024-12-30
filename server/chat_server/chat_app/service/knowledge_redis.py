@@ -9,18 +9,21 @@ from langchain.docstore.document import Document
 from langchain_redis import RedisConfig, RedisVectorStore
 from functools import lru_cache
 from ..base_module.agent_exception import AgentException
-
+from ..config import redis_url as REDIS_URL_CONFIG
 
 logger = logging.getLogger("chat_app")
 
 
 # 创建 Redis 客户端实例并确保连接成功
-REDIS_URL = "redis://localhost:6379"
-redis_client_instance = None
+# REDIS_URL = "redis://localhost:6379"
+# redis_client_instance = None
+REDIS_URL = REDIS_URL_CONFIG()
 
 
 @lru_cache(maxsize=1)
 def get_redis_client():
+    if not REDIS_URL:
+        raise AgentException("Redis连接失败,请配置Redis地址")
     try:
         client = redis.from_url(REDIS_URL)
         if client.ping():
