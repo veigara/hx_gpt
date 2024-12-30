@@ -12,6 +12,7 @@ class KnowledgeFile(models.Model):
     file_path = models.CharField("文件路径(绝对路径)", max_length=255)
     file_index_name = models.CharField("向量文件索引名", max_length=255)
     file_index_ids = models.TextField("向量文件索引ID,用逗号分隔")
+    docment_count = models.IntegerField("文档数量")
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
     update_time = models.DateTimeField("更新时间")
     user_name = models.CharField("用户名", max_length=200)

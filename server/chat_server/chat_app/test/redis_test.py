@@ -5,7 +5,7 @@ from typing import List
 from langchain_huggingface import HuggingFaceEmbeddings
 
 
-from chat_server.chat_app.service.knowledge.docment_load.mydocloader import (
+from chat_server.chat_app.knowledge.docment_loaders.agent_docloader import (
     RapidOCRDocLoader,
 )
 from langchain.schema import Document
@@ -62,14 +62,14 @@ def search_text():
     new_rdvs = RedisVectorStore(
         get_embedding(),
         redis_url="redis://localhost:6379",
-        index_name="rag-chroma1",
+        index_name="rag_kom",
     )
+    print("开始检索。。。。")
+    fake_inputs = "身份证号码"
 
     # 检索
-    print("开始检索。。。。")
-    results = new_rdvs.similarity_search_with_score("身份证号码", k=3)
+    results = new_rdvs.similarity_search_with_score("兴业银行重庆南岸支行", k=10)
 
-    print("Simple Similarity Search Results:")
     for doc, score in results:
         print(f"Score: {score}")
         print(f"Content: {doc.page_content[:100]}...")
@@ -92,6 +92,6 @@ def delete_index(index_name):
 
 
 if __name__ == "__main__":
-    """进入根目录 然后使用python -m chat_server.chat_app.test.chromadb_test测试"""
+    """进入根目录 然后使用python -m chat_server.chat_app.test.redis_test测试"""
     # test_chroma_db()
     search_text()

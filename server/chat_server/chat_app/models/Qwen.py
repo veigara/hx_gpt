@@ -30,16 +30,23 @@ class Qwen_Client(BaseLLMModel):
 
     def _create_completion(self, messages, stream):
         try:
-            return self.client.chat.completions.create(
-                model=self.model_name,
-                messages=messages,
-                temperature=self.get_agent_data().get("temperature"),
-                max_tokens=self.get_agent_data().get("max_tokens", -1),
-                top_p=self.get_agent_data().get("top_p"),
-                stream=stream,
-                presence_penalty=self.get_agent_data().get("presence_penalty"),
-                frequency_penalty=self.get_agent_data().get("frequency_penalty"),
-            )
+            agent_data = self.get_agent_data()
+            if not agent_data:
+                return self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                )
+            else:
+                return self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    temperature=agent_data.get("temperature"),
+                    max_tokens=agent_data.get("max_tokens"),
+                    top_p=agent_data.get("top_p"),
+                    stream=stream,
+                    presence_penalty=agent_data.get("presence_penalty"),
+                    frequency_penalty=agent_data.get("frequency_penalty"),
+                )
         except Exception as e:
             status_code = e.__getattribute__("status_code")
             if status_code == 502:
@@ -52,6 +59,8 @@ class Qwen_Client(BaseLLMModel):
         completion = self._create_completion(messages, stream=True)
         partial_text = ""
         for chunk in completion:
+            if not hasattr(chunk, "choices"):
+                break
             partial_text += chunk.choices[0].delta.content or ""
 
         return partial_text
@@ -61,6 +70,8 @@ class Qwen_Client(BaseLLMModel):
         completion = self._create_completion(messages, stream=True)
         partial_text = ""
         for chunk in completion:
+            if not hasattr(chunk, "choices"):
+                break
             partial_text += chunk.choices[0].delta.content or ""
 
         return partial_text

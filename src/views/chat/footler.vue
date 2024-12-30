@@ -38,6 +38,19 @@
 					<mode-select v-model="curModel" style="width: 120px" />
 				</el-popover>
 			</div>
+			<!--知识库-->
+			<div class="chat_main_plane_space">
+				<el-popover placement="top" trigger="hover" :show-arrow="false">
+					<template #reference>
+						<el-button title="知识库" round>
+							<template #icon>
+								<svg-icon icon="icon-zhihu"></svg-icon>
+							</template>
+						</el-button>
+					</template>
+					<knowledge-select v-model="knowledge" style="width: 120px" />
+				</el-popover>
+			</div>
 			<!--智能体-->
 			<div class="chat_main_plane_space">
 				<el-button title="智能体" round @click="showAgentVisible">
@@ -111,6 +124,7 @@ import { useModelsApi, useChatApi } from '@/api/chat'
 import Agent from '@/views/chat/agent.vue'
 import ModeSelect from '@/components/model-select/index.vue'
 import FnDialog from '@/views/chat/fnDialog.vue'
+import knowledgeSelect from '@/components/knowledge-select/index.vue'
 
 interface Props {
 	// 错误弹框
@@ -148,6 +162,8 @@ const agentRef = ref()
 
 // 连续对话开关显示
 const convOff = ref(true)
+// 知识库
+const knowledge = ref()
 // 在线搜索显示
 const searchOnline = ref(false)
 //显示功能快捷键
@@ -225,7 +241,8 @@ const sendBotMsgClick = (event: any) => {
 		history_id: props.historyId,
 		agent_id: props.agentId,
 		conv_off: convOff.value,
-		online_search: searchOnline.value
+		online_search: searchOnline.value,
+		know_id: knowledge.value
 	}
 	useChatApi(data)
 		.then(res => {

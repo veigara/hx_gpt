@@ -28,5 +28,6 @@ defineProps({
 	padding: 2px !important;
 	margin-bottom:28px;
 	border-radius:5%;
+	
 }
 </style>

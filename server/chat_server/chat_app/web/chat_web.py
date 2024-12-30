@@ -12,6 +12,9 @@ import json
 from ..service.agent import *
 from ..service.history import *
 from ..cache_utils import *
+from ..service.knowledge_se import (
+    knowledge_retrieve as KNOWLEDGE_RETRIEVE,
+)
 
 logger = logging.getLogger("chat_app")
 
@@ -27,6 +30,8 @@ def chat_with_model(request):
         model_name = payload.get("model_name")
         history_id = payload.get("history_id")
         agent_id = payload.get("agent_id")
+        # 知识库
+        know_id = payload.get("know_id")
         # 连续对话
         convOff = payload.get("conv_off", True)
         # 在线搜索
@@ -51,11 +56,18 @@ def chat_with_model(request):
         if model is None:
             return HttpResponse(f"{model_name} load error", status=500)
         else:
+            if know_id:
+                # 知识库(优先)
+                res = KNOWLEDGE_RETRIEVE(know_id=know_id, input=input_text)
+                if res:
+                    # 搜索到后直接返回结果
+                    input_text = res
             if online_search:
                 # 在线搜索
                 input_text = model.online_search(input_text)
 
             if convOff:
+                # 连续对话
                 response = model.stream_next_chatbot(input_text, history_id)
             else:
                 response = model.get_answer_chatbot_at_once(input_text)

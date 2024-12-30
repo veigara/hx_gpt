@@ -8,7 +8,7 @@ from ..utils import *
 from ..presets import *
 from ..base_module.base_response import AgentResponse
 from ..base_module.agent_exception import AgentException
-from ..service.knowledge.knowledge_se import (
+from ..service.knowledge_se import (
     upload_file as UPLOAD_FILE,
     search_knowledge_file as SEARCH_KNOWLEDGE_FILE,
     delete_file as DELETE_FILE,
@@ -16,8 +16,9 @@ from ..service.knowledge.knowledge_se import (
     search_knowledge_data as SEARCH_KNOWLEDGE_DATA,
     update_knowledge_data as UPDATE_KNOWLEDGE_DATA,
     delete_knowledge_data as DELETE_KNOWLEDGE_DATA,
+    knowledge_retrieve as KNOWLEDGE_RETRIEVE,
 )
-
+from ..models.model import get_model
 
 logger = logging.getLogger("chat_app")
 
@@ -29,8 +30,10 @@ def upload_file(request):
         user_name = get_user_name(request)
         uploaded_file = request.FILES["file"]
         knowledge_id = request.POST.get("id")
-
-        UPLOAD_FILE(user_name, knowledge_id, uploaded_file)
+        #  文件配置
+        file_config = request.POST.get("file_config")
+        file_config = json.loads(file_config) if file_config else {}
+        UPLOAD_FILE(user_name, knowledge_id, uploaded_file, file_config)
         return JsonResponse({"status": "success"})
     except Exception as e:
         logger.error(print_err(e))
@@ -135,4 +138,37 @@ def del_knowledge(request):
         logger.error(print_err(e))
         return JsonResponse(
             AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除知识库失败")
+        )
+
+
+@require_http_methods(["GET"])
+def knowledge_retrieve(request):
+    try:
+
+        model_name = request.GET.get("model_name")
+        know_id = request.GET.get("know_id")
+        search_text = request.GET.get("search_text")
+        if not model_name or not know_id or not search_text:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg="检索失败,请选择模型和知识库")
+            )
+        user_name = get_user_name(request)
+        model = get_model(
+            model_key=model_name,
+            user_name=user_name,
+        )
+        # 知识库检索
+        real_input = KNOWLEDGE_RETRIEVE(know_id=know_id, input=search_text)
+        if not real_input:
+            return JsonResponse(AgentResponse.success(data="暂未检索到知识库内容"))
+
+        answer = model.get_answer_chatbot_at_once(real_input)
+
+        return JsonResponse(AgentResponse.success(data=answer))
+    except AgentException as e:
+        return JsonResponse(AgentResponse.fail(fail_msg=e.message))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}检索知识库失败")
         )

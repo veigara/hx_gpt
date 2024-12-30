@@ -114,3 +114,18 @@ Instructions: Using the provided web search results, write a comprehensive reply
 Query: {query}
 Reply in Simplified Chinese
 """
+
+# 知识库检索格式st
+KNOWLEDGE_PROMPT_TEMPLATE = """\
+Context information is below.
+---------------------
+{context_str}
+---------------------
+Current date: {current_date}.
+Using the provided context information, write a comprehensive reply to the given query.
+If the provided context information refer to multiple subjects with the same name, write separate answers for each subject and put this select detail context information at the end in the form.
+Use prior knowledge only if the given context didn't provide enough information.
+ 
+Answer the question: {query_str}
+Reply in Simplified Chinese
+"""

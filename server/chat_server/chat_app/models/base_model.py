@@ -47,27 +47,31 @@ class BaseLLMModel:
         self.agent_id = agent_id
         self.history_id = history_id
         self.config = config
+        self.agent_history_data = []
 
         if user_name is None:
             raise ValueError("user_name is None")
+        if history_id is not None:
+            # 历史记录id存在才加载
+            history_data = self.get_history()
 
-        history_data = self.get_history()
-        if len(history_data) == 0:
-            # 初始化聊天记录
-            history_data = load_history(user_name=user_name, id=history_id)
-            if history_data is not None:
-                for data in history_data.get("content", []):
-                    self.set_history(data)
-        agent_data = self.get_agent_data()
-        if len(agent_data) == 0:
-            # 初始化智能体配置
-            self.init_agent_data(agent_id)
-        else:
-            # 判断当前智能体数据是否一样
-            if agent_id != agent_data["id"]:
-                agent_data = self.init_agent_data(agent_id)
+            if len(history_data) == 0:
+                # 初始化聊天记录
+                history_data = load_history(user_name=user_name, id=history_id)
+                if history_data is not None:
+                    for data in history_data.get("content", []):
+                        self.set_history(data)
+        if agent_id is not None:
+            agent_data = self.get_agent_data()
+            if len(agent_data) == 0:
+                # 初始化智能体配置
+                self.init_agent_data(agent_id)
+            else:
+                # 判断当前智能体数据是否一样
+                if agent_id != agent_data["id"]:
+                    agent_data = self.init_agent_data(agent_id)
 
-        self.agent_history_data = [*agent_data.get("content", [])]
+            self.agent_history_data = [*agent_data.get("content", [])]
 
     def stream_next_chatbot(self, inputs, history_id) -> str:
         """发送一个回答"""
@@ -134,6 +138,8 @@ class BaseLLMModel:
 
     def get_agent_current_input(self):
         """上下文只有智能体和当前对话的"""
+        if self.agent_history_data is None:
+            self.agent_history_data = []
         messages = [*self.agent_history_data, self.input_txt]
         return messages
 

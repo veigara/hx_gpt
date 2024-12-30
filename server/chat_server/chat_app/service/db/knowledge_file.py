@@ -3,7 +3,16 @@ from typing import List
 
 
 def save_knowledge_file(
-    user_name, knowledge_id, file_id, title, file_type, file_path, file_size
+    user_name,
+    knowledge_id,
+    file_id,
+    title,
+    file_type,
+    file_path,
+    file_size,
+    file_index_ids: str,
+    docment_count,
+    index_name,
 ):
     """保存文件信息
     @param user_name: 用户名
@@ -11,6 +20,11 @@ def save_knowledge_file(
     @param file_id: 文件id
     @param title: 文件名
     @param file_type: 文件类型
+    @param file_path: 文件路径
+    @param file_size: 文件大小
+    @param file_index_ids: 向量库索引ID
+    @param docment_count: 文档数量
+    @param index_name: 向量库索引名
     """
 
     table = KnowledgeFile(
@@ -20,9 +34,10 @@ def save_knowledge_file(
         file_type=file_type,
         file_size=file_size,
         title=title,
-        file_index_ids="rag-chroma1:d0bc88e794864be29559a6cc94e1b6af,rag-chroma1:12800b1872ab4dbe9307cf70ccfb7880",
-        file_index_name="rag-chroma1",
+        file_index_ids=file_index_ids,
+        file_index_name=index_name,
         user_name=user_name,
+        docment_count=docment_count,
     )
 
     table.save()
@@ -45,7 +60,13 @@ def search_knowledge_file(user_name, knowledge_id, title) -> List:
 
     results = (
         KnowledgeFile.objects.values(
-            "id", "title", "file_type", "file_size", "file_index_name", "create_time"
+            "id",
+            "title",
+            "file_type",
+            "file_size",
+            "file_index_name",
+            "docment_count",
+            "create_time",
         )
         .order_by("-create_time")
         .filter(**filter)
@@ -80,6 +101,7 @@ def to_dict(data: KnowledgeFile) -> dict:
         "file_path": data.file_path,
         "file_index_name": data.file_index_name,
         "file_index_ids": data.file_index_ids,
+        "docment_count": data.docment_count,
         "create_time": data.create_time,
         "update_time": data.update_time,
         "user_name": data.user_name,

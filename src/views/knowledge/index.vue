@@ -2,7 +2,7 @@
     <el-card class="chat_card" body-style="padding: 0px;">
 
         <div class="chat_card_main">
-            <el-tabs v-model="activeName" type="border-card" class="know-tabs">
+            <el-tabs v-model="activeName" type="border-card" class="know-tabs" @tab-change="tabClick">
                 <el-tab-pane label="知识库管理" name="first">
                     <div>
                         <el-row :gutter="10">
@@ -46,7 +46,9 @@
                     </div>
                     <KnowledgeAdd ref="knowledgeAddRef" @submit="loadData" />
                 </el-tab-pane>
-                <el-tab-pane label="检索知识库" name="second">检索中</el-tab-pane>
+                <el-tab-pane label="检索知识库" name="second">
+                    <knowledgeSearch ref="knowledgeSearchRef" />
+                </el-tab-pane>
             </el-tabs>
 
 
@@ -58,6 +60,7 @@
 import { Delete } from '@element-plus/icons-vue'
 import { ref, onMounted } from 'vue'
 import KnowledgeAdd from '@/views/knowledge/knowledgeAdd.vue'
+import knowledgeSearch from '@/views/knowledge/knowledgeSearch.vue'
 import { useKnowledgeSearchApi, useKnowledgeDelApi } from '@/api/knowledge'
 import { ElMessage, ElMessageBox } from 'element-plus/es'
 import { Search } from '@element-plus/icons-vue'
@@ -66,6 +69,7 @@ import { Search } from '@element-plus/icons-vue'
 const search = ref('')
 const dataList = ref([])
 const knowledgeAddRef = ref()
+const knowledgeSearchRef = ref()
 const activeName = ref('first')
 const handleAdd = () => {
     knowledgeAddRef.value.init()
@@ -103,6 +107,16 @@ const delview = (item: any) => {
                 loadData()
             })
         })
+}
+
+//标签页被改变
+const tabClick = (tab: any) => {
+    if (tab === 'second') {
+        knowledgeSearchRef.value.init()
+        knowledgeSearchRef.value.isRefreshKonw(true)
+    }else{
+        knowledgeSearchRef.value.isRefreshKonw(false)
+    }
 }
 
 onMounted(() => {

@@ -89,4 +89,10 @@ urlpatterns = [
     path("knowledge/search", knowledge_web.search_knowledge, name="search_knowledge"),
     # 删除知识库
     path("knowledge/delete", knowledge_web.del_knowledge, name="del_knowledge"),
+    # 检索知识库
+    path(
+        "knowledge/retrieve",
+        knowledge_web.knowledge_retrieve,
+        name="knowledge_retrieve",
+    ),
 ]

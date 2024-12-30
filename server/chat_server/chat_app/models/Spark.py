@@ -29,14 +29,20 @@ class Spark_Client(BaseLLMModel):
 
     def _create_completion(self, messages, stream):
         try:
-            return {
-                "max_tokens": self.get_agent_data().get("max_tokens", -1),
-                # "top_k": 4,
-                "temperature": self.get_agent_data().get("temperature"),
-                "messages": messages,
-                "model": self.model_name,
-                "stream": stream,
-            }
+            agent_data = self.get_agent_data()
+            if not agent_data:
+                return self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                )
+            else:
+                return self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    temperature=agent_data.get("temperature"),
+                    max_tokens=agent_data.get("max_tokens"),
+                    stream=stream,
+                )
         except Exception as e:
             status_code = e.__getattribute__("status_code")
             if status_code == 502:
