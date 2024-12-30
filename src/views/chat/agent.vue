@@ -1,6 +1,6 @@
 <template>
 	<el-dialog v-model="visible" title="智能体" :close-on-click-modal="false">
-		<template #title>
+		<template #header>
 			<div class="header-title">智能体</div>
 			<div>{{ agentList.length }}个预设定义</div>
 		</template>

@@ -65,7 +65,7 @@
 					<template #reference>
 						<el-button title="连续对话" round>
 							<template #icon>
-								<svg-icon icon="icon-conv" :size="18"></svg-icon>
+								<svg-icon icon="icon-conv" :size="'18'"></svg-icon>
 							</template>
 						</el-button>
 					</template>
@@ -78,7 +78,7 @@
 					<template #reference>
 						<el-button title="在线搜索" round>
 							<template #icon>
-								<svg-icon icon="icon-search-online" :size="15"></svg-icon>
+								<svg-icon icon="icon-search-online" :size="'15'"></svg-icon>
 							</template>
 						</el-button>
 					</template>

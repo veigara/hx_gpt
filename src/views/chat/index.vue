@@ -39,8 +39,8 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon :size="20" icon="icon-edit" v-if="questionEdit"  @click="editQuestion(historyItem.content)"></svg-icon>
-													<svg-icon :size="25" :icon="curAgent.user_icon" v-else></svg-icon>
+													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"  @click="editQuestion(historyItem.content)"></svg-icon>
+													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -58,7 +58,7 @@
 										<div>
 											<el-button>
 												<template #icon>
-													<svg-icon :size="25" :icon="curAgent.assistant_icon"></svg-icon>
+													<svg-icon :size="'25'" :icon="curAgent.assistant_icon"></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -79,8 +79,8 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon :size="20" icon="icon-edit" v-if="questionEdit" @click="editQuestion(data.userCt)"></svg-icon>
-													<svg-icon :size="25" :icon="curAgent.user_icon" v-else></svg-icon>
+													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit" @click="editQuestion(data.userCt)"></svg-icon>
+													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -97,7 +97,7 @@
 										<div>
 											<el-button>
 												<template #icon>
-													<svg-icon :size="25" :icon="curAgent.assistant_icon"></svg-icon>
+													<svg-icon :size="'25'" :icon="curAgent.assistant_icon"></svg-icon>
 												</template>
 											</el-button>
 										</div>

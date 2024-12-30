@@ -208,6 +208,9 @@ const uploadProgressFlag = ref(false)
 // 初始化
 const init = (data?: any) => {
 	visible.value = true
+	fileList.value= []
+	knowSearch.value=''
+	search_file()
 	Object.assign(dataForm, dataFormData)
 	if (data) {
 		Object.assign(dataForm, data)
