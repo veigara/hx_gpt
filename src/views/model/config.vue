@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="visible" title="项目配置" :close-on-click-modal="false" append-to-body>
-        <el-form :model="form" label-width="auto">
+        <el-form :model="form" label-width="auto" :rules="rules">
             <el-form-item label="Groq API Key" prop="groq_api_key">
                 <el-input v-model="form.groq_api_key" placeholder="请输入Groq API Key" clearable></el-input>
             </el-form-item>
@@ -21,6 +21,9 @@
             </el-form-item>
             <el-form-item label="向量数据库连接地址" prop="redis_url">
                 <el-input v-model="form.redis_url" placeholder="向量数据库连接地址" clearable></el-input>
+            </el-form-item>
+            <el-form-item label="本地向量模型地址" prop="embedding">
+                <el-input v-model="form.embedding" placeholder="本地向量模型地址" clearable></el-input>
             </el-form-item>
         </el-form>
 
@@ -46,7 +49,8 @@ const formData = {
     default_model: '',
     qwen_api_key:'',
     spark_api_key:'',
-    redis_url:''
+    redis_url:'',
+    embedding:''
 }
 const form = reactive({
     ...formData
@@ -65,6 +69,7 @@ const getConfig = () => {
         form.qwen_api_key = data.qwen_api_key
         form.spark_api_key = data.spark_api_key
         form.redis_url = data.redis_url
+        form.embedding = data.embedding
     })
 
 }
@@ -86,6 +91,17 @@ const updateConfig = () => {
         clearForm()
     })
 }
+
+const rules = reactive({
+	redis_url: [{ required: true, message: '向量数据库连接地址不能为空', trigger: 'blur' }],
+	embedding: [
+		{
+			required: true,
+			message: '本地向量模型地址不能为空',
+			trigger: 'blur'
+		}
+	]
+})
 
 defineExpose({
     init

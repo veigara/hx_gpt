@@ -9,7 +9,10 @@ from langchain.docstore.document import Document
 from langchain_redis import RedisConfig, RedisVectorStore
 from functools import lru_cache
 from ..base_module.agent_exception import AgentException
-from ..config import redis_url as REDIS_URL_CONFIG
+from ..config import (
+    redis_url as REDIS_URL_CONFIG,
+    embedding_address as EMBEDDING_ADDRESS,
+)
 
 logger = logging.getLogger("chat_app")
 
@@ -18,12 +21,13 @@ logger = logging.getLogger("chat_app")
 # REDIS_URL = "redis://localhost:6379"
 # redis_client_instance = None
 REDIS_URL = REDIS_URL_CONFIG()
+EMBEDDING_URL = EMBEDDING_ADDRESS()
 
 
 @lru_cache(maxsize=1)
 def get_redis_client():
     if not REDIS_URL:
-        raise AgentException("Redis连接失败,请配置Redis地址")
+        raise AgentException("未配置向量数据库地址,请配置向量数据库地址")
     try:
         client = redis.from_url(REDIS_URL)
         if client.ping():
@@ -53,7 +57,10 @@ def redis_client():
 
 def get_embedding():
     """获取向量模型"""
-    model_name = "E:/plugIn/models/huggingface/sentence-transformers/BAAI/bge-large-zh"
+    # model_name = "E:/plugIn/models/huggingface/sentence-transformers/BAAI/bge-large-zh"
+    model_name = EMBEDDING_URL
+    if not model_name:
+        logger.warning("未配置向量模型，请配置向量模型")
     encode_kwargs = {"normalize_embeddings": True}
     return HuggingFaceEmbeddings(model_name=model_name, encode_kwargs=encode_kwargs)
 

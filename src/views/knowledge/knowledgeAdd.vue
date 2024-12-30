@@ -93,7 +93,7 @@
 						上传知识文件：
 						<el-upload class="upload-demo" drag :http-request="upload" multiple
 							accept=".html,.htm,.mhtml,.md,.json,.jsonl,.csv,.pdf,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.bmp,.eml,.msg,.rst,.rtf,.txt,.xml,.epub,.odt,.tsv,.xlsx,.xls,.xlsd,.ipynb,.py,.srt,.toml,.enex"
-							show-file-list :file-list="fileList" :on-change="handleFileChanged" on-remove="handleFileRemove">
+							show-file-list :file-list="fileList" :on-change="handleFileChanged">
 							<i class="el-icon-upload"></i>
 							<div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
 							<div class="el-upload__tip" slot="tip">上传文件且不超过200M</div>
@@ -274,11 +274,6 @@ const handleFileChanged = (file: any, yfileList: any) => {
 
 }
 
-// 删除文件
-const handleFileRemove = (file: any) => {
-	fileList.value = fileList.value.filter(item => item.name !== file.name)
-}
-
 // 查询上传文件
 const search_file = () => {
 	const query = {
@@ -304,6 +299,11 @@ const delFile = (id: string) => {
 			type: 'warning',
 		})
 		.then(() => {
+			ElNotification({
+			title: '温馨提示',
+			message: '删除中，请稍后',
+			type: 'warning'
+		})
 			useKnowledgeFileDelApi(query).then(res => {
 				ElNotification({
 					title: '温馨提示',
@@ -311,6 +311,8 @@ const delFile = (id: string) => {
 					type: 'success'
 				})
 				search_file()
+				// 将上传的归档重置
+				fileList.value = []
 			})
 		})
 }
