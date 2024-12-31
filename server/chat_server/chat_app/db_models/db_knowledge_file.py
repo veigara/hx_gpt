@@ -16,6 +16,7 @@ class KnowledgeFile(models.Model):
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
     update_time = models.DateTimeField("更新时间")
     user_name = models.CharField("用户名", max_length=200)
+    status = models.IntegerField("文件状态(0上传;1解析中2向量化 3完成)", default=0)
 
     def __str__(self):
         return self.title

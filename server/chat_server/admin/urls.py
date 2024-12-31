@@ -95,4 +95,10 @@ urlpatterns = [
         knowledge_web.knowledge_retrieve,
         name="knowledge_retrieve",
     ),
+    # 下载知识库文件
+    path(
+        "knowledge/down",
+        knowledge_web.down_knowledge_file,
+        name="down_knowledge_file",
+    ),
 ]

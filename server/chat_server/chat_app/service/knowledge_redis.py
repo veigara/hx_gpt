@@ -168,7 +168,10 @@ def search_text(index_name: str, query: str, top_k: int = 10):
         vector_store = get_redis_store(index_name)
 
         # 执行相似度搜索，并返回最相关的前top_k个结果
-        results = vector_store.similarity_search_with_score(query, k=top_k)
+        # 简单查询
+        # results = vector_store.similarity_search(query, k=top_k)
+        # 最大边界相关性
+        results = vector_store.max_marginal_relevance_search(query, k=top_k, fetch_k=20)
 
         # 如果没有搜索结果，返回空列表
         if not results:
@@ -177,10 +180,8 @@ def search_text(index_name: str, query: str, top_k: int = 10):
         # 初始化搜索结果列表
         list_result = []
         # 遍历搜索结果，构造搜索结果列表,score分数越低，相关度越高
-        for doc, score in results:
-            list_result.append(
-                {"score": score, "content": doc.page_content, "metadata": doc.metadata}
-            )
+        for doc in results:
+            list_result.append({"content": doc.page_content, "metadata": doc.metadata})
 
         # 返回搜索结果列表
         return list_result

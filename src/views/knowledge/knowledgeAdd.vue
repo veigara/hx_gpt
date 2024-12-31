@@ -14,7 +14,7 @@
 						</el-form-item>
 						<el-form-item label="索引名称(英文)" prop="index_name">
 							<el-input v-model="dataForm.index_name" placeholder="请输入索引名称"
-								:disabled="dataForm.id"></el-input>
+								:disabled="dataForm.id ? true : false"></el-input>
 						</el-form-item>
 						<el-form-item label="描述" prop="description">
 							<el-input :autosize="{ minRows: 2 }" type="textarea" v-model="dataForm.description"
@@ -30,7 +30,8 @@
 						<div style="font-size: 16px;"><svg-icon icon="icon-cloud-upload"
 								style="display: inline-block;" />添加文件到知识库</div>
 					</template>
-					<el-progress v-if="uploadProgressFlag" :percentage="100" :indeterminate="true" :show-text="false" striped/>
+					<el-progress v-if="uploadProgressFlag" :percentage="100" :indeterminate="true" :show-text="false"
+						striped />
 					<div class="know-config">
 						文件处理配置:
 						<div style="border:1px solid rgba(0, 0, 0, 0.1);padding: 10px 10px;">
@@ -129,6 +130,8 @@
 							<el-table-column prop="create_time" label="创建时间" width="170" />
 							<el-table-column fixed="right" label="操作" width="100">
 								<template #default="scope">
+									<el-button link type="success" size="small"
+										@click="downloadFile(scope.row.id)">下载</el-button>
 									<el-button link type="danger" size="small"
 										@click="delFile(scope.row.id)">删除</el-button>
 								</template>
@@ -137,14 +140,14 @@
 					</div>
 				</el-collapse-item>
 			</el-collapse>
-		</el-form>			
+		</el-form>
 	</el-dialog>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import { ElNotification, ElMessageBox } from 'element-plus'
-import { useKnowledgeFileUploadApi, useKnowledgeFileSearchApi, useKnowledgeFileDelApi, useKnowledgeSaveUpdateApi, } from '@/api/knowledge'
+import { useKnowledgeFileUploadApi, useKnowledgeFileSearchApi, useKnowledgeFileDelApi, useKnowledgeSaveUpdateApi, useKnowledDownApiHttp } from '@/api/knowledge'
 
 const visible = ref(false)
 
@@ -208,8 +211,8 @@ const uploadProgressFlag = ref(false)
 // 初始化
 const init = (data?: any) => {
 	visible.value = true
-	fileList.value= []
-	knowSearch.value=''
+	fileList.value = []
+	knowSearch.value = ''
 	search_file()
 	Object.assign(dataForm, dataFormData)
 	if (data) {
@@ -248,7 +251,7 @@ const upload = (data: any) => {
 			type: 'success'
 		})
 		search_file()
-	}).catch(e =>{
+	}).catch(e => {
 		uploadProgressFlag.value = false
 		ElNotification({
 			title: '温馨提示',
@@ -303,10 +306,10 @@ const delFile = (id: string) => {
 		})
 		.then(() => {
 			ElNotification({
-			title: '温馨提示',
-			message: '删除中，请稍后',
-			type: 'warning'
-		})
+				title: '温馨提示',
+				message: '删除中，请稍后',
+				type: 'warning'
+			})
 			useKnowledgeFileDelApi(query).then(res => {
 				ElNotification({
 					title: '温馨提示',
@@ -366,10 +369,18 @@ const rules = reactive({
 	]
 })
 
-// 更新
-onMounted(() => {
-
-})
+// 下载文件
+const downloadFile = (id: string) => {
+	const a = document.createElement('a')
+	a.href = useKnowledDownApiHttp(id)
+	document.body.appendChild(a)
+	a.click()
+	ElNotification({
+		title: '温馨提示',
+		message: '下载成功',
+		type: 'success'
+	})
+}
 
 defineExpose({
 	init

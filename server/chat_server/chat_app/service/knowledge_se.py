@@ -15,6 +15,8 @@ from .knowledge_redis import (
     del_keys as REDIS_DEL_KEYS,
     search_text as REDIS_SEARCH_TEXT,
 )
+from django.http import FileResponse
+from django.utils.encoding import escape_uri_path
 
 logger = logging.getLogger("chat_app")
 
@@ -107,6 +109,34 @@ def delete_file(id):
             os.remove(os.path.join(file_path))
     except Exception as e:
         raise e
+
+
+def down_file(id) -> FileResponse:
+    """下载文件
+    @param id: 主键id
+    """
+    try:
+        with transaction.atomic():
+            detail = search_knowledge_file_id(id)
+            if detail is None:
+                return
+            file_path = detail["file_path"]
+            title = detail["title"]
+            file_type = detail["file_type"]
+            file_name = f"{title}{file_type}"
+            # 读取文件内容
+            if os.path.exists(file_path):
+                response = FileResponse(open(file_path, "rb"))
+                response["Content-Type"] = "application/octet-stream"
+                # 文件名为中文时无法识别，使用escape_uri_path处理
+                response["Content-Disposition"] = (
+                    "attachment; "
+                    "filename*=UTF-8''{}".format(escape_uri_path(file_name))
+                )
+                return response
+    except Exception as e:
+        logger.error("文件下载时发生错误", e)
+        raise AgentException("文件下载失败")
 
 
 def save_knowledge_data(user_name, know_name, index_name, description):

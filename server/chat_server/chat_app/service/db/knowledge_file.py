@@ -1,5 +1,18 @@
 from ...db_models.db_knowledge_file import KnowledgeFile
 from typing import List
+import datetime
+from enum import Enum  # 直接导入 Enum 类
+
+
+class FileStatus(Enum):
+    # 上传
+    UPLOAD = 0
+    # 解析中
+    PARSE = 1
+    # 向量化
+    VECTOR = 2
+    # 完成
+    COMPLETE = 3
 
 
 def save_knowledge_file(
@@ -106,3 +119,10 @@ def to_dict(data: KnowledgeFile) -> dict:
         "update_time": data.update_time,
         "user_name": data.user_name,
     }
+
+
+def update_file_status(id, status_enum: FileStatus):
+    """更新文件状态"""
+    KnowledgeFile.objects.filter(id=id).update(
+        status=status_enum.value, update_time=datetime.now()
+    )

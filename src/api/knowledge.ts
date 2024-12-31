@@ -37,3 +37,10 @@ export const useKnowledgeDelApi = (params: any) => {
 export const useKnowledRetrievetApi = (params: any) => {
 	return service.get('/knowledge/retrieve', { params })
 }
+
+// 下载知识库文件
+export const useKnowledDownApiHttp = (id: string) => {
+	// 组装下载的httptp请求
+	const baseURL =  import.meta.env.VITE_API_URL as any
+	return `${baseURL}/knowledge/down?id=${id}`
+}

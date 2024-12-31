@@ -17,6 +17,7 @@ from ..service.knowledge_se import (
     update_knowledge_data as UPDATE_KNOWLEDGE_DATA,
     delete_knowledge_data as DELETE_KNOWLEDGE_DATA,
     knowledge_retrieve as KNOWLEDGE_RETRIEVE,
+    down_file as DOWN_FILE,
 )
 from ..models.model import get_model
 
@@ -143,6 +144,7 @@ def del_knowledge(request):
 
 @require_http_methods(["GET"])
 def knowledge_retrieve(request):
+    """检索知识库"""
     try:
 
         model_name = request.GET.get("model_name")
@@ -171,4 +173,20 @@ def knowledge_retrieve(request):
         logger.error(print_err(e))
         return JsonResponse(
             AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}检索知识库失败")
+        )
+
+
+@require_http_methods(["GET"])
+def down_knowledge_file(request):
+    """下载知识库文件"""
+    try:
+        id = request.GET.get("id")
+        response = DOWN_FILE(id)
+        return response
+    except AgentException as e:
+        return JsonResponse(AgentResponse.fail(fail_msg=e.message))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}下载知识库文件失败")
         )
