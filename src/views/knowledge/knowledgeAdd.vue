@@ -32,7 +32,7 @@
 					</template>
 					<el-progress v-if="uploadProgressFlag" :percentage="100" :indeterminate="true" :show-text="false"
 						striped />
-					<div class="know-config">
+					<div class="know-config" v-loading="uploadLoading">
 						文件处理配置:
 						<div style="border:1px solid rgba(0, 0, 0, 0.1);padding: 10px 10px;">
 							<el-row style="margin-bottom: 5px;">
@@ -137,7 +137,7 @@
 								<template #default="scope">
 									<el-button link type="success" size="small"
 										@click="downloadFile(scope.row.id)">下载</el-button>
-									<el-button link type="danger" size="small"
+									<el-button v-loading="delLoading" link type="danger" size="small"
 										@click="delFile(scope.row.id)">删除</el-button>
 								</template>
 							</el-table-column>
@@ -153,6 +153,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElNotification, ElMessageBox } from 'element-plus'
 import { useKnowledgeFileUploadApi, useKnowledgeFileSearchApi, useKnowledgeFileDelApi, useKnowledgeSaveUpdateApi, useKnowledDownApiHttp } from '@/api/knowledge'
+import { t } from 'vxe-table'
 
 const visible = ref(false)
 
@@ -219,6 +220,10 @@ const fileStatus=[
 	{key: 2,value:"向量中",type:"danger"},
 	{key: 3,value:"完成",type:"success"}
 ]
+// 上传文件状态load
+const uploadLoading = ref(false)
+// 删除load
+const delLoading = ref(false)
 
 const getFileStatusValue = (status: number) => {
 	const statusItem = fileStatus.find(item => item.key === status);
@@ -265,8 +270,10 @@ const upload = (data: any) => {
 		return false
 	}
 	uploadProgressFlag.value = true
+	uploadLoading.value= true 	
 	return useKnowledgeFileUploadApi(formData).then(res => {
 		uploadProgressFlag.value = false
+		uploadLoading.value= false 	
 		ElNotification({
 			title: '温馨提示',
 			message: '上传成功',
@@ -275,11 +282,9 @@ const upload = (data: any) => {
 		search_file()
 	}).catch(e => {
 		uploadProgressFlag.value = false
-		ElNotification({
-			title: '温馨提示',
-			message: '上传中，请稍后查看',
-			type: 'success'
-		})
+		uploadLoading.value= false 	
+		// 上传文件错误，清空上传列表
+		fileList.value = []
 	})
 }
 
@@ -327,20 +332,20 @@ const delFile = (id: string) => {
 			type: 'warning',
 		})
 		.then(() => {
-			ElNotification({
-				title: '温馨提示',
-				message: '删除中，请稍后',
-				type: 'warning'
-			})
+			delLoading.value= true
 			useKnowledgeFileDelApi(query).then(res => {
 				ElNotification({
 					title: '温馨提示',
 					message: '删除成功',
 					type: 'success'
 				})
+				delLoading.value= false
 				search_file()
 				// 将上传的归档重置
 				fileList.value = []
+				delLoading.value= false
+			}).catch(e => {
+				delLoading.value= false
 			})
 		})
 }
