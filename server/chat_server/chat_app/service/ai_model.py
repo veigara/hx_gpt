@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import List
+from functools import lru_cache
 from ..presets import *
 from .db.ai_model import (
     search_ai_model as SEARCH_AI_MODEL,
@@ -37,6 +38,7 @@ def covert_model_data(key, model_data):
     }
 
 
+@lru_cache()
 def get_model_detail(user_name, model_key) -> List[dict]:
     """获取模型详情"""
     data = SEARCH_AI_MODEL(user_name=user_name, model_key=model_key)
@@ -51,6 +53,8 @@ def update_model_detail(user_name, model_detail) -> None:
     res = UPDATE_AI_MODEL(**buildUpdateParams(user_name, model_detail))
     if res < 1:
         raise AgentException("更新模型详情")
+    # 清空缓存的结果
+    get_model_detail.cache_clear()  # 清除所有缓存
 
 
 def buildUpdateParams(user_name, model_detail):
@@ -88,7 +92,7 @@ def save_model(user_name, model_data):
 
 
 def buildSaveParams(user_name, model_detail):
-    """构建更新参数"""
+    """构建新增参数"""
     return {
         "model_key": model_detail.get("model_key"),
         "model_name": model_detail.get("model_name"),

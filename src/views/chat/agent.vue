@@ -9,6 +9,7 @@
 				<el-input v-model="search" placeholder="搜索智能体" @input="debouncedSearchTitle"></el-input>
 			</el-col>
 			<el-col :span="8">
+				<el-button :icon="Search" circle @click="debouncedSearchTitle" />
 				<el-button title="新建" color="#567bff" @click="handleAdd">
 					<template #icon>
 						<svg-icon icon="icon-add"></svg-icon>
@@ -52,7 +53,7 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus/es'
-import { Delete } from '@element-plus/icons-vue'
+import { Delete,Search } from '@element-plus/icons-vue'
 import AgentAdd from '@/views/chat/agentAdd.vue'
 import { useUserAgentApi, useAgentDetailApi, useDelAgentApi, useSelectAgentApi } from '@/api/chat'
 import { debounce } from 'lodash';
@@ -91,10 +92,10 @@ const agentList = ref([])
 const emit = defineEmits(['submit'])
 
 // 获取当前用户所有智能体
-const getAllAgent = (title) => {
+const getAllAgent = (title:string) => {
 	const params = title ? { keyword: title } : {};
 	useUserAgentApi(params).then(res => {
-		agentList.value = res
+		agentList.value = res.data
 	})
 
 }
@@ -114,6 +115,7 @@ const clearAgentAdd = () => {
 		title: '',
 		content: [],
 		model_name: '',
+		model_key: '',
 		temperature: 0.5,
 		top_p: 0.2,
 		max_tokens: 8000,
@@ -132,7 +134,7 @@ const handview = (item: agentModel) => {
 	// 先清空
 	clearAgentAdd()
 	useAgentDetailApi({ "id": item.id }).then(res => {
-		agentAddRef.value.init(res, item.edit)
+		agentAddRef.value.init(res.data, item.edit)
 	})
 }
 

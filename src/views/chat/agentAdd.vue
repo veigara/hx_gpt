@@ -39,8 +39,8 @@
 				<el-form-item label="助理图标" prop="assistant_icon">
 					<icon-select v-model="dataForm.assistant_icon" suffx=""/>
 				</el-form-item>
-				<el-form-item label="模型(model)" prop="model_name">
-					<mode-select v-model="dataForm.model_name" style="width: 100%"/>
+				<el-form-item label="模型(model)" prop="model_key">
+					<mode-select v-model="dataForm.model_key" style="width: 100%"/>
 				</el-form-item>
 				<el-form-item prop="temperature">
 					<template #label>
@@ -131,7 +131,7 @@ interface agentModel {
 	id: string
 	title: string
 	content: agentContent[]
-	model_name: string
+	model_key: string
 	temperature: number
 	top_p: number
 	max_tokens: number
@@ -145,7 +145,7 @@ const dataForm = reactive<agentModel>({
 	id: '',
 	title: '',
 	content: [],
-	model_name: '',
+	model_key: '',
 	temperature: 0.5,
 	top_p: 0.2,
 	max_tokens: 8000,
@@ -175,7 +175,7 @@ const clearForm = () => {
 		id: '',
 		title: '',
 		content: [],
-		model_name: '',
+		model_key: '',
 		temperature: 0,
 		top_p: 0,
 		max_tokens: 0,
@@ -200,7 +200,7 @@ const addAgentContent = () => {
 
 const rules = reactive({
 	title: [{ required: true, message: '智能体名称不能为空', trigger: 'blur' }],
-	model_name: [
+	model_key: [
 		{
 			required: true,
 			message: '请选择模型',

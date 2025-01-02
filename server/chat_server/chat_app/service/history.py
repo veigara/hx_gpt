@@ -173,7 +173,8 @@ def save_history_agent(user_name, agentData) -> str:
             else history_title
         )
         history = agentData.get("content", [])
-        model_name = agentData.get("model_name")
+        # model_name = agentData.get("model_name")
+        model_key = agentData.get("model_key")
         temperature = agentData["temperature"]
         top_p = agentData["top_p"]
         max_tokens = agentData["max_tokens"]
@@ -190,7 +191,7 @@ def save_history_agent(user_name, agentData) -> str:
             "id": id,
             "title": title,
             "content": history,
-            "model_name": model_name,
+            "model_key": model_key,
             "temperature": temperature,
             "top_p": top_p,
             "max_tokens": max_tokens,

@@ -84,25 +84,25 @@ def get_user_history_doc_key(user_name):
     return f"{_history_doc_key}{user_name}"
 
 
-def get_user_agent_key(user_name):
-    return f"{_agent_key}{user_name}"
+# def get_user_agent_key(user_name):
+#     return f"{_agent_key}{user_name}"
 
 
-def set_agent_data_global(user_name, data):
-    if data is None:
-        return
+# def set_agent_data_global(user_name, data):
+#     if data is None:
+#         return
 
-    cache.set(get_user_agent_key(user_name), data, timeout=None)
-
-
-def get_agent_data_global(user_name):
-    data = cache.get(get_user_agent_key(user_name))
-    return data if data is not None else {}
+#     cache.set(get_user_agent_key(user_name), data, timeout=None)
 
 
-def get_history_global(user_name):
-    data = cache.get(get_user_history_key(user_name))
-    return data if data is not None else []
+# def get_agent_data_global(user_name):
+#     data = cache.get(get_user_agent_key(user_name))
+#     return data if data is not None else {}
+
+
+# def get_history_global(user_name):
+#     data = cache.get(get_user_history_key(user_name))
+#     return data if data is not None else []
 
 
 def clear_history_global(user_name):

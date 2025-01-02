@@ -101,11 +101,11 @@ def chat_with_model(request):
 def get_all_models(request):
     try:
         user_name = get_user_name(request)
-        default_model_name = get_default_model_name()
+        default_model_key = get_default_model_name()
         models = GET_ALL_MODELS(user_name)
         if models is not None:
             for model in models:
-                if model.get("model_key") == default_model_name:
+                if model.get("model_key") == default_model_key:
                     model["default"] = True
 
         return JsonResponse(AgentResponse.success(data=models))
@@ -125,11 +125,18 @@ def save_agent_file(request):
     agent_data = payload.get("agent_data")
     user_name = get_user_name(request)
     try:
-        save_agent(user_name, agent_data)
-        return HttpResponse("Agent file saved successfully")
+        json_data = json.loads(agent_data)
+        id = json_data.get("id")
+        if not id:
+            datas = save_agent(user_name, json_data)
+        else:
+            datas = update_agent(user_name, json_data)
+        return JsonResponse(AgentResponse.success(data=datas))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}保存智能体文件失败")
+        )
 
 
 # 获取所有的智能体
@@ -139,10 +146,13 @@ def get_user_agent(request):
         user_name = get_user_name(request)
         keyword = request.GET.get("keyword")
         agnets = get_user_all_agents(user_name, keyword)
-        return HttpResponse(json.dumps(agnets), content_type="application/json")
+
+        return JsonResponse(AgentResponse.success(data=agnets))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的智能体失败")
+        )
 
 
 # 获取智能体详情
@@ -153,12 +163,14 @@ def get_agent_detail(request):
         # 用户
         user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
+            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
         detail = load_agent(user_name, id)
-        return HttpResponse(json.dumps(detail), content_type="application/json")
+        return JsonResponse(AgentResponse.success(data=detail))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的智能体失败")
+        )
 
 
 # 删除智能体
@@ -169,12 +181,14 @@ def get_del_agent(request):
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
+            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
         del_agent(user_name, id)
-        return HttpResponse(True)
+        return JsonResponse(AgentResponse.success(data=True))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除智能体失败")
+        )
 
 
 @require_http_methods(["GET"])

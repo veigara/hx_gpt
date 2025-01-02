@@ -1,83 +1,100 @@
 import json
-import os
+
+# import os
 from ..presets import *
-import uuid
-import threading
+
+# import uuid
+# import threading
 import logging
 from ..utils import *
+from ..base_module.agent_exception import AgentException
+from .db.ai_agent import (
+    search_ai_agent as SEARCH_AI_AGENT,
+    search_ai_agent_id as SEARCH_AI_AGENT_ID,
+    update_ai_agent as UPDATE_AI_AGENT,
+    save_ai_agent as SAVE_AI_AGENT,
+    delete_ai_agent as DELETE_AI_AGENT,
+)
 
-# 用户存放的模型实例 <p>{1222:{model_name:LALM_11,model_instance:23445}}</p>
-_user_agent_instance = {}
-_user_agent_lock = threading.Lock()
+# # 用户存放的模型实例 <p>{1222:{model_name:LALM_11,model_instance:23445}}</p>
+# _user_agent_instance = {}
+# _user_agent_lock = threading.Lock()
 
 logger = logging.getLogger("chat_app")
 
 
-def save_agent(user_name, json_str) -> None:
-    """保存智能体文件
-    {"id": "1b58a6b59a4a4bcba07078d415d74f0b", "title": "文言文翻译", "content": [{"role": "assistant", "content": "用文言文表达输入的内容"}, {"role": "user", "content": "示例：我很开心，因为今天出去玩了"}], "model_name": "llama-3.2-90b-vision", "temperature": 0.8, "top_p": 0.3, "max_tokens": 84492, "presence_penalty": 1.5, "frequency_penalty": 1.7}
-    """
-    try:
-        agent_data = json.loads(json_str)
-        if agent_data is not None:
-            # 智能体名称
-            title = agent_data.get("title")
-            id = agent_data.get("id")
-            content = agent_data.get("content", [])
-            if title is None:
-                raise "智能体名称不能为空"
-            if id is None or id == "":
-                # 创建uuid
-                id = str(uuid.uuid4()).replace("-", "")
-                agent_data["id"] = id
-                agent_data["user_name"] = user_name
-            agent_data["count"] = len(content)
+def save_agent(user_name, agent_data: dict) -> None:
+    """保存智能体文件"""
+    if agent_data is not None:
+        datas = SAVE_AI_AGENT(**buildSaveParams(user_name, agent_data))
+        return datas
 
-            # 创建目录
-            os.makedirs(os.path.join(AGENT_DIR, user_name), exist_ok=True)
-            history_file_path = os.path.join(AGENT_DIR, user_name, f"{id}.json")
-            with open(history_file_path, "w", encoding="utf-8") as f:
-                json.dump(agent_data, f, ensure_ascii=False)
+    return None
 
-            # 将智能体的相关参数保存在全局变量
-            set_user_agent(user_name, agent_data)
-    except Exception as e:
-        # 抛出异常
-        logger.error(print_err(e))
-        raise Exception(f"{STANDARD_ERROR_MSG}:保存智能体文件失败")
+
+def update_agent(user_name, agent_data: dict) -> None:
+    """修改智能体文件"""
+    if agent_data is not None:
+        res = UPDATE_AI_AGENT(**buildUpdateParams(user_name, agent_data))
+        if res < 1:
+            raise AgentException("修改智能体失败")
+
+    return None
+
+
+def buildSaveParams(user_name, agent_data):
+    """构建新增参数"""
+    return {
+        "title": agent_data.get("title"),
+        "content": json.dumps(agent_data.get("content", [])),
+        "model_key": agent_data.get("model_key"),
+        "temperature": agent_data.get("temperature"),
+        "top_p": agent_data.get("top_p"),
+        "max_tokens": agent_data.get("max_tokens"),
+        "presence_penalty": agent_data.get("presence_penalty"),
+        "frequency_penalty": agent_data.get("frequency_penalty"),
+        "user_icon": agent_data.get("user_icon"),
+        "assistant_icon": agent_data.get("assistant_icon"),
+        "user_name": user_name,
+    }
+
+
+def buildUpdateParams(user_name, agent_data):
+    """构建更新参数"""
+    return {
+        "id": agent_data.get("id"),
+        "title": agent_data.get("title"),
+        "content": json.dumps(agent_data.get("content", [])),
+        "model_key": agent_data.get("model_key"),
+        "temperature": agent_data.get("temperature"),
+        "top_p": agent_data.get("top_p"),
+        "max_tokens": agent_data.get("max_tokens"),
+        "presence_penalty": agent_data.get("presence_penalty"),
+        "frequency_penalty": agent_data.get("frequency_penalty"),
+        "user_icon": agent_data.get("user_icon"),
+        "assistant_icon": agent_data.get("assistant_icon"),
+        "user_name": user_name,
+    }
 
 
 def load_agent(user_name, id) -> str:
     """从文件目录中获取智能体文件的内容"""
-    try:
-        agent_data = None
-        try:
-            with open(get_file_path(user_name, id), "r", encoding="utf-8") as f:
-                agent_data = json.load(f)
-        except Exception as e:
-            # 从内置中加载
-            with open(
-                get_default_agent_path(user_name, id), "r", encoding="utf-8"
-            ) as f:
-                agent_data = json.load(f)
-        return agent_data
-    except Exception as e:
-        # 抛出异常
-        logger.error(print_err(e))
-        raise Exception(f"{STANDARD_ERROR_MSG}:加载智能体文件失败")
+    data = SEARCH_AI_AGENT_ID(id)
+
+    return data
 
 
-def get_file_path(user_name, id):
-    """获取智能体的文件路径"""
-    return os.path.join(AGENT_DIR, user_name, f"{id}.json")
+# def get_file_path(user_name, id):
+#     """获取智能体的文件路径"""
+#     return os.path.join(AGENT_DIR, user_name, f"{id}.json")
 
 
-def get_default_agent_path(user_name, id):
-    """获取内置的智能体的文件路径"""
-    return os.path.join(DEFALUE_AGENT_DIR, f"{id}.json")
+# def get_default_agent_path(user_name, id):
+#     """获取内置的智能体的文件路径"""
+#     return os.path.join(DEFALUE_AGENT_DIR, f"{id}.json")
 
 
-def get_user_all_agents(user_name, keyword):
+def get_user_all_agents(user_name, keyword=None):
     """
     获取当前用户所有智能体文件
 
@@ -91,105 +108,67 @@ def get_user_all_agents(user_name, keyword):
     list: 包含智能体信息的字典列表，每个字典包含智能体的标题和ID
     """
     try:
-        agent_list = get_user_agent(user_name)
+        agent_list = SEARCH_AI_AGENT(user_name, title=keyword)
         if agent_list is None or len(agent_list) == 0:
-            # 获取系统默认的智能体
-            agent_list = get_sys_agent()
-            # 获取用户的智能体
-            os.makedirs(os.path.join(AGENT_DIR, user_name), exist_ok=True)
-            for file in os.listdir(os.path.join(AGENT_DIR, user_name)):
-                if file.endswith(".json"):
-                    with open(
-                        os.path.join(AGENT_DIR, user_name, file), "r", encoding="utf-8"
-                    ) as f:
-                        agent_data = json.load(f)
-                        agent_data["content"] = []
-                        agent_data["edit"] = user_name == agent_data.get("user_name")
-                        agent_list.append(agent_data)
-            set_user_agent_all(user_name, agent_list)
+            return []
+        else:
+            for agent_data in agent_list:
+                agent_data["edit"] = user_name == agent_data.get("user_name")
 
-        if keyword is not None:
-            agent_list = [agent for agent in agent_list if keyword in agent["title"]]
-
-        return agent_list
+            return agent_list
     except Exception as e:
         # 抛出异常
         logger.error(print_err(e))
-        raise Exception(f"{STANDARD_ERROR_MSG}:获取当前用户所有智能体失败")
+        raise AgentException(f"{STANDARD_ERROR_MSG}:获取当前用户所有智能体失败")
 
 
-def set_user_agent(user_name, jsonData) -> None:
-    """设置全局模型
-    user_name (str): 当前用户名称
-    jsonData (json): 智能体数据
-    """
-    # 查询id相关详情
-    if jsonData is None:
-        return
-    jsonData["content"] = []
-    jsonData["edit"] = (user_name == jsonData.get("user_name"),)
-    with _user_agent_lock:
-        if user_name not in _user_agent_instance:
-            _user_agent_instance[user_name] = []
-        agents = _user_agent_instance[user_name]
+# def set_user_agent(user_name, jsonData) -> None:
+#     """设置全局模型
+#     user_name (str): 当前用户名称
+#     jsonData (json): 智能体数据
+#     """
+#     # 查询id相关详情
+#     if jsonData is None:
+#         return
+#     jsonData["content"] = []
+#     jsonData["edit"] = (user_name == jsonData.get("user_name"),)
+#     with _user_agent_lock:
+#         if user_name not in _user_agent_instance:
+#             _user_agent_instance[user_name] = []
+#         agents = _user_agent_instance[user_name]
 
-        # 遍历 agents 列表，查找并修改具有相同 id 的元素
-        found = False
-        for i, existing_agent in enumerate(agents):
-            if existing_agent and existing_agent["id"] == jsonData["id"]:
-                agents[i] = jsonData
-                found = True
-                break
+#         # 遍历 agents 列表，查找并修改具有相同 id 的元素
+#         found = False
+#         for i, existing_agent in enumerate(agents):
+#             if existing_agent and existing_agent["id"] == jsonData["id"]:
+#                 agents[i] = jsonData
+#                 found = True
+#                 break
 
-        # 如果没有找到具有相同 id 的元素，则追加新元素
-        if not found:
-            agents.append(jsonData)
-
-
-def set_user_agent_all(user_name, jsonData) -> None:
-    """将用户智能体加载进内存中"""
-    # 查询id相关详情
-    _user_agent_instance[user_name] = jsonData
+#         # 如果没有找到具有相同 id 的元素，则追加新元素
+#         if not found:
+#             agents.append(jsonData)
 
 
-def get_user_agent(user_name) -> list:
-    """获取全局模型"""
-    global _user_agent_instance
-    if user_name not in _user_agent_instance:
-        return None
-    return _user_agent_instance[user_name]
+# def set_user_agent_all(user_name, jsonData) -> None:
+#     """将用户智能体加载进内存中"""
+#     # 查询id相关详情
+#     _user_agent_instance[user_name] = jsonData
 
 
-def get_sys_agent():
-    """获取系统默认的所有智能体"""
-    agent_list = []
-    for file in os.listdir(os.path.join(DEFALUE_AGENT_DIR)):
-        if file.endswith(".json"):
-            with open(
-                os.path.join(DEFALUE_AGENT_DIR, file), "r", encoding="utf-8"
-            ) as f:
-                agent_data = json.load(f)
-                agent_data["content"] = []
-                # 系统内置，不允许编辑
-                agent_data["edit"] = False
-                agent_list.append(agent_data)
-    return agent_list
+# def get_user_agent(user_name) -> list:
+#     """获取全局模型"""
+#     global _user_agent_instance
+#     if user_name not in _user_agent_instance:
+#         return None
+#     return _user_agent_instance[user_name]
 
 
 def del_agent(user_name, id) -> None:
     """删除智能体文件"""
-    agent_list = get_user_agent(user_name)
-    if agent_list is None:
-        return
-    for i, agent in enumerate(agent_list):
-        if agent["id"] == id:
-            # 删除文件
-            file_user_name = agent.get("user_name")
-
-            history_file_path = get_file_path(file_user_name, id)
-            os.remove(history_file_path)
-            agent_list.pop(i)
-            break
+    res = DELETE_AI_AGENT(id)
+    if res < 1:
+        raise AgentException("删除智能体失败")
 
 
 def get_default_agent_data(user_name):
