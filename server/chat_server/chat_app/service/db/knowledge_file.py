@@ -1,6 +1,6 @@
 from ...db_models.db_knowledge_file import KnowledgeFile
 from typing import List
-import datetime
+from datetime import datetime
 from enum import Enum  # 直接导入 Enum 类
 
 
@@ -26,7 +26,8 @@ def save_knowledge_file(
     file_index_ids: str,
     docment_count,
     index_name,
-):
+    status,
+) -> str:
     """保存文件信息
     @param user_name: 用户名
     @param knowledge_id: 知识库id
@@ -38,6 +39,8 @@ def save_knowledge_file(
     @param file_index_ids: 向量库索引ID
     @param docment_count: 文档数量
     @param index_name: 向量库索引名
+    @param status: 文件状态
+    @return: 文件id
     """
 
     table = KnowledgeFile(
@@ -51,9 +54,13 @@ def save_knowledge_file(
         file_index_name=index_name,
         user_name=user_name,
         docment_count=docment_count,
+        status=status,
     )
 
     table.save()
+    # 获取文件id
+
+    return table.id
 
 
 def search_knowledge_file(user_name, knowledge_id, title) -> List:
@@ -80,6 +87,7 @@ def search_knowledge_file(user_name, knowledge_id, title) -> List:
             "file_index_name",
             "docment_count",
             "create_time",
+            "status",
         )
         .order_by("-create_time")
         .filter(**filter)
@@ -118,6 +126,7 @@ def to_dict(data: KnowledgeFile) -> dict:
         "create_time": data.create_time,
         "update_time": data.update_time,
         "user_name": data.user_name,
+        "status": data.status,
     }
 
 
@@ -125,4 +134,22 @@ def update_file_status(id, status_enum: FileStatus):
     """更新文件状态"""
     KnowledgeFile.objects.filter(id=id).update(
         status=status_enum.value, update_time=datetime.now()
+    )
+
+
+def update_file_docment_count(id, docment_count, status_enum: FileStatus):
+    """更新文档数量"""
+    KnowledgeFile.objects.filter(id=id).update(
+        docment_count=docment_count,
+        status=status_enum.value,
+        update_time=datetime.now(),
+    )
+
+
+def update_file_index_ids(id, file_index_ids, status_enum: FileStatus):
+    """更新文档索引"""
+    KnowledgeFile.objects.filter(id=id).update(
+        file_index_ids=file_index_ids,
+        status=status_enum.value,
+        update_time=datetime.now(),
     )

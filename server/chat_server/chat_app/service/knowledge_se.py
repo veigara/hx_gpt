@@ -10,13 +10,14 @@ from .db.knowledge_file import *
 from .db.knowledge import *
 from ..utils import *
 from ..base_module.agent_exception import AgentException
-from .knowledge_stores import add_stores as ADD_STORES
+from .knowledge_stores import parse_file as PARSE_FILE, add_db_store as ADD_DB_STORE
 from .knowledge_redis import (
     del_keys as REDIS_DEL_KEYS,
     search_text as REDIS_SEARCH_TEXT,
 )
 from django.http import FileResponse
 from django.utils.encoding import escape_uri_path
+from .db.knowledge_file import FileStatus
 
 logger = logging.getLogger("chat_app")
 
@@ -36,37 +37,98 @@ def upload_file(user_name, knowledge_id, file, file_config: dict):
     file_size_mb = "{:.2f}".format(file.size / 1024 / 1024)
     # 保存文件
     file_path = os.path.join(KNOWLEDGE_UPLOAD_FILE_DIR, user_name, file_id)
+    save_data = save_upload_file(
+        user_name,
+        knowledge_id,
+        file,
+        file_type,
+        file_path,
+        file_id,
+        title,
+        file_size_mb,
+    )
+    id = save_data["id"]
+    index_name = save_data["index_name"]
+    # 解析文档
+    doc_data = parse_file(id, user_name, file_path, file_type, file_config, title)
+    # 向量化文档
+    store_file(id, user_name, index_name, doc_data, title)
+
+
+@transaction.atomic
+def save_upload_file(
+    user_name, knowledge_id, file, file_type, file_path, file_id, title, file_size_mb
+) -> dict:
+    """保存本地文件
+    @param user_name: 用户名
+    @param knowledge_id: 知识库id
+    @param file: 文件对象
+    @param file_config: 文件配置
+    """
     try:
-        with transaction.atomic():
-            # 查询知识库基本信息
-            index_name = search_knowledge_id(knowledge_id)["index_name"]
-            # 保存文件
-            save_file(file, file_path)
-            # 保存到向量库
-            doc_data = ADD_STORES(file_path, file_type, index_name, file_config, title)
-            document_count = doc_data["document_count"]
-            document_ids = doc_data["document_ids"]
-            # 入库
-            save_knowledge_file(
-                user_name,
-                knowledge_id,
-                file_id,
-                title,
-                file_type,
-                file_path,
-                file_size_mb,
-                document_ids,
-                document_count,
-                index_name,
-            )
-            logger.info(f"{user_name}上传文件成功")
+
+        # 查询知识库基本信息
+        index_name = search_knowledge_id(knowledge_id)["index_name"]
+        logger.debug(f"{user_name}上传文件中....")
+
+        # 保存文件
+        save_file(file, file_path)
+        # 入库
+        document_count = 0
+        document_ids = None
+        id = save_knowledge_file(
+            user_name,
+            knowledge_id,
+            file_id,
+            title,
+            file_type,
+            file_path,
+            file_size_mb,
+            document_ids,
+            document_count,
+            index_name,
+            status=FileStatus.UPLOAD.value,
+        )
+        logger.debug(f"{user_name}上传文件成功....")
+        return {"id": id, "index_name": index_name}
     except Exception as e:
-        # 处理异常，可以记录日志或返回错误信息
-        print(f"Error uploading file: {e}")
-        # 文件系统中的文件会自动删除，但可以手动删除以确保一致性
+        logger.error(f"上传文件【{title}】失败: {e}")
         if os.path.exists(file_path):
             os.remove(file_path)
-        raise e
+        raise AgentException(f"上传文件【{title}】失败")
+
+
+def parse_file(id, user_name, file_path, file_type, file_config, title):
+    """解析文档"""
+    try:
+        # 解析文档
+        update_file_status(id, status_enum=FileStatus.PARSE)
+        logger.debug(f"{user_name}解析文件中....")
+        doc_data = PARSE_FILE(file_path, file_type, file_config, title)
+        logger.debug(f"{user_name}解析文件成功")
+
+        document_count = len(doc_data)
+        update_file_docment_count(id, document_count, status_enum=FileStatus.VECTOR)
+        logger.debug(f"{user_name}文件向量中....")
+
+        return doc_data
+    except Exception as e:
+        logger.error(f"解析文件【{title}】失败: {e}")
+        raise AgentException(f"解析文件【{title}】失败")
+
+
+def store_file(id, user_name, index_name, doc_data, title):
+    """向量化文档"""
+    try:
+        # 保存向量数据
+        document_ids = ADD_DB_STORE(index_name, doc_data)
+        document_ids = ",".join(document_ids)
+        update_file_index_ids(id, document_ids, status_enum=FileStatus.COMPLETE)
+        logger.debug(f"{user_name}文件向量完成....")
+        logger.info(f"{user_name}上传文件成功")
+    except Exception as e:
+        logger.error(f"向量化文件【{title}】失败: {e}")
+        raise AgentException(f"向量化文件【{title}】失败")
 
 
 def get_file_suffix(original_filename):

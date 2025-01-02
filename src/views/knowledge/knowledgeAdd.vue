@@ -127,6 +127,11 @@
 							<el-table-column prop="file_size" label="文件大小(兆)" width="110" />
 							<el-table-column prop="file_index_name" label="索引名称" width="120" />
 							<el-table-column prop="docment_count" label="文档数量" width="100" />
+							<el-table-column prop="status" label="文件状态" width="100">
+								<template #default="scope">
+									<el-tag v-if="scope.row?.status" :type="getFileStatusType(scope.row.status)">{{ getFileStatusValue(scope.row.status) }}</el-tag>
+								</template>
+							</el-table-column>
 							<el-table-column prop="create_time" label="创建时间" width="170" />
 							<el-table-column fixed="right" label="操作" width="100">
 								<template #default="scope">
@@ -207,6 +212,23 @@ const textOptions = [
 ]
 // 进度条
 const uploadProgressFlag = ref(false)
+// 上传文件状态
+const fileStatus=[
+	{key: 0,value:"上传完成",type:"info"},
+	{key: 1,value:"解析中",type:"warning"},
+	{key: 2,value:"向量中",type:"danger"},
+	{key: 3,value:"完成",type:"success"}
+]
+
+const getFileStatusValue = (status: number) => {
+	const statusItem = fileStatus.find(item => item.key === status);
+    return statusItem ? statusItem.value : '';
+}
+
+const getFileStatusType = (status: number) => {
+    const statusItem = fileStatus.find(item => item.key === status);
+    return statusItem ? statusItem.type : '';
+};
 
 // 初始化
 const init = (data?: any) => {

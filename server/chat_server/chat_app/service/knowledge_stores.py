@@ -17,8 +17,25 @@ from .knowledge_redis import add_redis_store
 logger = logging.getLogger("chat_app")
 
 
-def add_stores(file_path, file_type, index_name, file_config: Dict, title) -> Dict:
-    """把文件添加到向量库"""
+# def add_stores(file_path, file_type, index_name, file_config: Dict, title) -> Dict:
+#     """把文件添加到向量库"""
+#     kb_file = KnowDocumentFile(
+#         title=title,
+#         file_path=file_path,
+#         file_type=file_type,
+#         file_config=file_config,
+#     )
+#     doc = kb_file.file2text()
+
+#     ids = add_redis_store(index_name, doc)
+#     # 转为字符串
+#     ids = ",".join(ids)
+
+#     return {"document_count": len(doc), "document_ids": ids}
+
+
+def parse_file(file_path, file_type, file_config: Dict, title) -> List[Document]:
+    """把文件解析成Document对象"""
     kb_file = KnowDocumentFile(
         title=title,
         file_path=file_path,
@@ -26,11 +43,15 @@ def add_stores(file_path, file_type, index_name, file_config: Dict, title) -> Di
         file_config=file_config,
     )
     doc = kb_file.file2text()
-    ids = add_redis_store(index_name, doc)
-    # 转为字符串
-    ids = ",".join(ids)
+    return doc
 
-    return {"document_count": len(doc), "document_ids": ids}
+
+def add_db_store(
+    index_name: str,
+    documents: List[Document],
+) -> List[str]:
+    """把文件添加到Redis存储中，并生成索引。"""
+    return add_redis_store(index_name, documents)
 
 
 LOADER_DICT = {
