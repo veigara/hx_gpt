@@ -10,10 +10,10 @@ logger = logging.getLogger("chat_app")
 def get_model(
     model_key, access_key=None, user_name="", history_id=None, agent_id=None
 ) -> BaseLLMModel:
-    msg = f"模型设置为了：{model_key}"
-    model = get_model_detail(model_key)
+    model = get_model_detail(user_name, model_key)
     if model is None:
         raise Exception(f"{STANDARD_ERROR_MSG}: 模型不存在")
+    model = model[0]
     model_type = model["model_type"]
 
     try:

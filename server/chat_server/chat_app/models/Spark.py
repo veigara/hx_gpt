@@ -12,9 +12,9 @@ logger = logging.getLogger("chat_app")
 
 
 class Spark_Client(BaseLLMModel):
-    def __init__(self, model_name, api_key, user_name, agent_id, history_id) -> None:
+    def __init__(self, model_key, api_key, user_name, agent_id, history_id) -> None:
         super().__init__(
-            model_name=model_name,
+            model_key=model_key,
             user_name=user_name,
             agent_id=agent_id,
             history_id=history_id,
@@ -32,13 +32,13 @@ class Spark_Client(BaseLLMModel):
             agent_data = self.get_agent_data()
             if not agent_data:
                 return self.client.chat.completions.create(
-                    model=self.model_name,
+                    model=self.model_key,
                     messages=messages,
                     stream=stream,
                 )
             else:
                 return self.client.chat.completions.create(
-                    model=self.model_name,
+                    model=self.model_key,
                     messages=messages,
                     temperature=agent_data.get("temperature"),
                     max_tokens=agent_data.get("max_tokens"),

@@ -186,11 +186,11 @@ watch(curModel, (newVal, oldVal) => {
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		res
+		res.data
 			.filter(item => item.default == true)
 			.forEach(model => {
 				// 获取默认的模型
-				curModel.value = model.label
+				curModel.value = model.model_key
 			})
 	})
 }
@@ -237,7 +237,7 @@ const sendBotMsgClick = (event: any) => {
 	// 对话
 	const data = {
 		input_text: message,
-		model_name: curModel.value,
+		model_key: curModel.value,
 		history_id: props.historyId,
 		agent_id: props.agentId,
 		conv_off: convOff.value,
@@ -246,7 +246,7 @@ const sendBotMsgClick = (event: any) => {
 	}
 	useChatApi(data)
 		.then(res => {
-			chatData.assistantCt = res
+			chatData.assistantCt = res.data
 			chatData.isLoading = false
 			// 将更新后的数据传递给父组件
 			emit('update:chatBotDatAssert', chatData)

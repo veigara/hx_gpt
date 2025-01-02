@@ -17,31 +17,23 @@ logger = logging.getLogger("chat_app")
 class BaseLLMModel:
     def __init__(
         self,
-        model_name,
+        model_key,
         user_name="",
         agent_id=None,
         history_id=None,
         config=None,
     ) -> None:
+        """
+        @param model_key: 模型名称
+
+        """
         # 使用全局变量 MODEL_METADATA 获取模型参数
-        MODEL_METADATA = get_default_model_params()
-        if config is not None:
-            temp = MODEL_METADATA[model_name].copy()
-            keys_with_diff_values = {
-                key: temp[key]
-                for key in temp
-                if key in DEFAULT_METADATA and temp[key] != DEFAULT_METADATA[key]
-            }
-            config.update(keys_with_diff_values)
-            temp.update(config)
-            config = temp
-        else:
-            config = MODEL_METADATA[model_name]
+        config = get_default_model_params(user_name, model_key)
 
         self.api_key = config["api_key"]
         self.api_host = config["api_host"]
         self.stream = config["stream"]
-        self.model_name = config["model_name"]
+        self.model_key = config["model_key"]
         self.max_content_len = config["max_content_len"]
         self.user_name = user_name
         self.agent_id = agent_id

@@ -2,12 +2,15 @@ import requests
 from ..models.model import get_model
 from ..config import get_default_model_name
 from ..utils import *
-from ..config import get_default_model_params
+from ..presets import *
 from ..models.base_model import *
 from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import logging
 from django.views.decorators.csrf import csrf_exempt
+from ..base_module.base_response import AgentResponse
+from ..base_module.agent_exception import AgentException
 import json
 from ..service.agent import *
 from ..service.history import *
@@ -15,6 +18,7 @@ from ..cache_utils import *
 from ..service.knowledge_se import (
     knowledge_retrieve as KNOWLEDGE_RETRIEVE,
 )
+from ..service.ai_model import get_all_models as GET_ALL_MODELS
 
 logger = logging.getLogger("chat_app")
 
@@ -27,7 +31,7 @@ def chat_with_model(request):
         # 从 POST 请求的查询参数中获取 input_text
         payload = json.loads(request.body.decode("utf-8"))
         input_text = payload.get("input_text")
-        model_name = payload.get("model_name")
+        model_key = payload.get("model_key")
         history_id = payload.get("history_id")
         agent_id = payload.get("agent_id")
         # 知识库
@@ -38,23 +42,29 @@ def chat_with_model(request):
         online_search = payload.get("online_search", False)
         user_name = get_user_name(request)
         if input_text is None:
-            return HttpResponse("input_text text is required", status=500)
-        if model_name is None:
-            return HttpResponse("model_name text is required", status=500)
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}输入内容不能为空")
+            )
+        if model_key is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}请选择模型")
+            )
         if history_id is None or history_id == "":
             # 没有选择智能体，要创建一个默认的
-            history_id = cretate_new_history(user_name, model_name, input_text)
+            history_id = cretate_new_history(user_name, model_key, input_text)
             agent_data = get_default_agent_data(user_name)
             agent_id = agent_data.get("id")
         model = get_model(
-            model_key=model_name,
+            model_key=model_key,
             user_name=user_name,
             history_id=history_id,
             agent_id=agent_id,
         )
 
         if model is None:
-            return HttpResponse(f"{model_name} load error", status=500)
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}加载{model_key}失败")
+            )
         else:
             if know_id:
                 # 知识库(优先)
@@ -72,46 +82,39 @@ def chat_with_model(request):
             else:
                 response = model.get_answer_chatbot_at_once(input_text)
 
-            return HttpResponse(response)
+            return JsonResponse(AgentResponse.success(data=response))
     except requests.exceptions.ConnectTimeout:
         status_text = STANDARD_ERROR_MSG + CONNECTION_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
-        return HttpResponse(status_text, status=500)
+        return AgentResponse.fail(fail_msg=status_text)
     except requests.exceptions.ReadTimeout:
         status_text = STANDARD_ERROR_MSG + READ_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
-        return HttpResponse(status_text, status=500)
+        return AgentResponse.fail(fail_msg=status_text)
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred:{e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}对话失败")
+        )
 
 
 # 获取所有的模型
 @require_http_methods(["GET"])
 def get_all_models(request):
     try:
-        MODEL_METADATA = get_default_model_params()
+        user_name = get_user_name(request)
         default_model_name = get_default_model_name()
-        if MODEL_METADATA is not None:
-            model_data_list = []
-            for key, value in MODEL_METADATA.items():
-                model_name = value["model_name"]
-                model_data = ModelData(
-                    label=key,
-                    model_name=model_name,
-                    description=value["description"],
-                    model_type=value["model_type"],
-                ).to_dict()
-                if key == default_model_name:
-                    model_data["default"] = True
+        models = GET_ALL_MODELS(user_name)
+        if models is not None:
+            for model in models:
+                if model.get("model_key") == default_model_name:
+                    model["default"] = True
 
-                model_data_list.append(model_data)
+        return JsonResponse(AgentResponse.success(data=models))
 
-            # 将列表转换为 JSON 格式并返回
-            return HttpResponse(
-                json.dumps(model_data_list), content_type="application/json"
-            )
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的模型失败")
+        )
 
 
 # 保存智能体文件

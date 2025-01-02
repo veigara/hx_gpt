@@ -15,8 +15,6 @@ HISTORY_DIR = "history"
 AGENT_DIR = "agentmodels"
 # 系统默认智能体存放地址
 DEFALUE_AGENT_DIR = "chat_server/chat_app/agentmodels"
-# 模型配置文件存放地址
-MODEL_CONFIG_DIR = "chat_server/chat_app/model_config/model.json"
 # 配置文件存放地址
 CONFIG_DIR = "chat_server/chat_app/config.json"
 # 系统默认用户

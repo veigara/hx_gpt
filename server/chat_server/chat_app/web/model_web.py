@@ -5,12 +5,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, HttpResponse
 from ..utils import *
+from ..base_module.base_response import AgentResponse
 from ..service.ai_model import (
     get_model_type as GET_MODEL_TYPE,
     get_all_models as GET_ALL_MODELS,
     get_model_detail as GET_MODEL_DETAIL,
     update_model_detail as UPDATE_MODEL_DETAIL,
     remove_model as REMOVE_MODEL,
+    save_model as SAVE_MODEL,
 )
 
 logger = logging.getLogger("chat_app")
@@ -20,10 +22,12 @@ logger = logging.getLogger("chat_app")
 @require_http_methods(["GET"])
 def get_all_model_type(request):
     try:
-        return JsonResponse(GET_MODEL_TYPE(), safe=False)
+        return JsonResponse(AgentResponse.success(data=GET_MODEL_TYPE()))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred:{e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取模型类别失败")
+        )
 
 
 # 获取所有的模型
@@ -31,10 +35,15 @@ def get_all_model_type(request):
 def get_all_models(request):
     try:
         keyword = request.GET.get("keyword")
-        return JsonResponse(GET_ALL_MODELS(keyword), safe=False)
+        user_name = get_user_name(request)
+        return JsonResponse(
+            AgentResponse.success(data=GET_ALL_MODELS(user_name, keyword))
+        )
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred:{e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的模型失败")
+        )
 
 
 @require_http_methods(["GET"])
@@ -45,10 +54,12 @@ def get_model_detail(request):
     """
     try:
         model_name = request.GET.get("model_name")
-        return JsonResponse(GET_MODEL_DETAIL(model_name), safe=False)
+        return JsonResponse(AgentResponse.success(data=GET_MODEL_DETAIL(model_name)))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred:{e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取模型详情失败")
+        )
 
 
 @csrf_exempt
@@ -60,13 +71,20 @@ def update_model_detail(request):
     return:模型详情
     """
     try:
+        user_name = get_user_name(request)
         payload = json.loads(request.body.decode("utf-8"))
-        model_key = payload.get("model_key")
         data = payload.get("data")
-        return HttpResponse(UPDATE_MODEL_DETAIL(model_key, data))
+        if data is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}模型数据不能为空")
+            )
+        UPDATE_MODEL_DETAIL(user_name, data)
+        return JsonResponse(AgentResponse.success(data=data))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred:{e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}模型操作失败")
+        )
 
 
 @csrf_exempt
@@ -77,7 +95,21 @@ def add_model(request):
     params:model_detail 模型详情
     return:模型详情
     """
-    return update_model_detail(request)
+    try:
+        user_name = get_user_name(request)
+        payload = json.loads(request.body.decode("utf-8"))
+        data = payload.get("data")
+        if data is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}模型数据不能为空")
+            )
+        data = SAVE_MODEL(user_name, data)
+        return JsonResponse(AgentResponse.success(data=data))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}添加模型失败")
+        )
 
 
 @csrf_exempt
@@ -88,8 +120,11 @@ def remove_model(request):
     return:模型详情
     """
     try:
-        model_key = request.GET.get("model_key")
-        return HttpResponse(REMOVE_MODEL(model_key))
+        id = request.GET.get("id")
+        REMOVE_MODEL(id)
+        return JsonResponse(AgentResponse.success(data={"id": id}))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred:{e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除模型失败")
+        )

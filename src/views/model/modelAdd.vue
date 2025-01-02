@@ -1,13 +1,12 @@
 <template>
-	<el-dialog v-model="visible" :title="!editFlag ? '新增模型' : '修改模型'" :close-on-click-modal="false"
-		append-to-body>
+	<el-dialog v-model="visible" :title="!editFlag ? '新增模型' : '修改模型'" :close-on-click-modal="false" append-to-body>
 		<el-form ref="dataFormRef" :model="dataForm" label-width="auto" label-position="left" :rules="rules">
 			<div class="model-config">
-				<el-form-item label="模型显示名称" prop="model_key">
-					<el-input v-model="dataForm.model_key" placeholder="请输入模型显示名称" :disabled="editFlag"></el-input>
+				<el-form-item label="模型显示名称" prop="model_name">
+					<el-input v-model="dataForm.model_name" placeholder="请输入模型显示名称"  clearable></el-input>
 				</el-form-item>
-				<el-form-item label="模型" prop="model_name">
-					<el-input v-model="dataForm.model_name" placeholder="请输入模型名称"></el-input>
+				<el-form-item label="模型" prop="model_key">
+					<el-input v-model="dataForm.model_key" placeholder="请输入模型名称" :disabled="editFlag" clearable></el-input>
 				</el-form-item>
 
 				<el-form-item label="模型类型" prop="model_type">
@@ -32,7 +31,7 @@
 						</div>
 					</template>
 					<div style="width: 100%">
-						<el-slider v-model="dataForm.max_content_len" show-input  :max="128*1024" :min="0" />
+						<el-slider v-model="dataForm.max_content_len" show-input :max="128 * 1024" :min="0" />
 					</div>
 				</el-form-item>
 				<el-form-item label="模型描述" prop="description">
@@ -61,6 +60,7 @@ const dataFormRef = ref()
 const emit = defineEmits(['submit'])
 
 const dataFormData = {
+	id: undefined,
 	model_key: '',
 	model_name: '',
 	description: '',
@@ -73,11 +73,11 @@ const dataForm = reactive({ ...dataFormData })
 
 const editFlag = ref(false)
 // 初始化
-const init = (flag:boolean, data?: any) => {
+const init = (flag: boolean, data?: any) => {
 	visible.value = true
 	editFlag.value = flag
 	Object.assign(dataForm, dataFormData)
-	if(data){
+	if (data) {
 		Object.assign(dataForm, data)
 	}
 }
@@ -86,7 +86,7 @@ const init = (flag:boolean, data?: any) => {
 const modelTypeList = ref()
 const getModelTypeList = () => {
 	useModelTypeApi().then(res => {
-		modelTypeList.value = res
+		modelTypeList.value = res.data
 	})
 }
 
@@ -116,13 +116,13 @@ const rules = reactive({
 		}
 	],
 	max_content_len: [
-		{	
+		{
 			required: true,
 			message: '上下文长度不能为空',
 			trigger: 'change'
 		}
 	],
-	
+
 })
 
 // 保存模型
@@ -140,10 +140,11 @@ const saveModel = () => {
 						message: '修改模型成功',
 						type: 'success'
 					})
+					emit('submit')
+					// 关闭弹窗
+					visible.value = false
 				})
-				// 关闭弹窗
-				visible.value = false
-				emit('submit')
+
 			} else {
 				useAddModelApi(sData).then(res => {
 					ElNotification({
@@ -151,10 +152,11 @@ const saveModel = () => {
 						message: '添加模型成功',
 						type: 'success'
 					})
+					emit('submit')
+					// 关闭弹窗
+					visible.value = false
 				})
-				// 关闭弹窗
-				visible.value = false
-				emit('submit')
+
 			}
 		}
 	})

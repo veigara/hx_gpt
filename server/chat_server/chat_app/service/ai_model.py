@@ -1,9 +1,15 @@
 """模型设置"""
 
-import os
-import json
 from enum import Enum
+from typing import List
 from ..presets import *
+from .db.ai_model import (
+    search_ai_model as SEARCH_AI_MODEL,
+    update_ai_model as UPDATE_AI_MODEL,
+    delete_ai_model as DELETE_AI_MODEL,
+    save_ai_model as SAVE_AI_MODEL,
+)
+from ..base_module.agent_exception import AgentException
 
 
 def get_model_type() -> list:
@@ -11,21 +17,12 @@ def get_model_type() -> list:
     return ModelType.get_all_categories()
 
 
-def get_all_models(keyword) -> list:
+def get_all_models(user_name, model_name=None) -> list:
     """获取所有模型名称"""
-    josn_data = get_model_data()
-    if keyword is not None:
-        datas = [
-            covert_model_data(key, value)
-            for key, value in josn_data.items()
-            if keyword.lower() in key.lower()
-        ]
-        return datas
-    if josn_data is not None:
-        datas = [covert_model_data(key, value) for key, value in josn_data.items()]
-        return datas
-    else:
-        return []
+    all = SEARCH_AI_MODEL(user_name=user_name, model_name=model_name)
+    if all is not None and len(all) > 0:
+        return all
+    return []
 
 
 def covert_model_data(key, model_data):
@@ -40,49 +37,67 @@ def covert_model_data(key, model_data):
     }
 
 
-def get_model_detail(model_name) -> dict:
+def get_model_detail(user_name, model_key) -> List[dict]:
     """获取模型详情"""
-    josn_data = get_model_data()
-    if josn_data is not None:
-        return josn_data.get(model_name)
+    data = SEARCH_AI_MODEL(user_name=user_name, model_key=model_key)
+    if data is not None:
+        return data
     else:
-        return {}
+        return []
 
 
-def update_model_detail(model_name, model_detail):
+def update_model_detail(user_name, model_detail) -> None:
     """更新模型详情"""
-    josn_data = get_model_data()
-    josn_data[model_name] = model_detail
+    res = UPDATE_AI_MODEL(**buildUpdateParams(user_name, model_detail))
+    if res < 1:
+        raise AgentException("更新模型详情")
 
-    save_model(josn_data)
+
+def buildUpdateParams(user_name, model_detail):
+    """构建更新参数"""
+    return {
+        "id": model_detail.get("id"),
+        "model_key": model_detail.get("model_key"),
+        "model_name": model_detail.get("model_name"),
+        "description": model_detail.get("description"),
+        "model_type": model_detail.get("model_type"),
+        "multimodal": model_detail.get("multimodal"),
+        "max_content_len": model_detail.get("max_content_len"),
+        "user_name": user_name,
+    }
 
 
-def remove_model(model_name):
+def remove_model(id):
     """删除模型"""
-    josn_data = get_model_data()
-    josn_data.pop(model_name)
+    res = DELETE_AI_MODEL(id)
+    if res < 1:
+        raise AgentException("删除模型详情")
 
-    save_model(josn_data)
 
-
-def get_model_name_list():
+def get_model_name_list(user_name):
     """获取模型名称列表"""
-    return [model_key for model_key in get_model_data()]
+    all = SEARCH_AI_MODEL(user_name=user_name)
+    return [item.get("model_key") for item in all]
 
 
-def get_model_data():
-    """获取模型数据"""
-    model_config_path = os.path.join(MODEL_CONFIG_DIR)
-    with open(model_config_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+def save_model(user_name, model_data):
+    """保存模型数据"""
+    res = SAVE_AI_MODEL(**buildSaveParams(user_name, model_data))
+    if not res:
+        raise AgentException("保存模型数据失败")
 
 
-def save_model(model_data):
-    """写入模型数据到文件"""
-    model_config_path = os.path.join(MODEL_CONFIG_DIR)
-    # 写入文件
-    with open(model_config_path, "w", encoding="utf-8") as f:
-        json.dump(model_data, f, ensure_ascii=False, indent=4)
+def buildSaveParams(user_name, model_detail):
+    """构建更新参数"""
+    return {
+        "model_key": model_detail.get("model_key"),
+        "model_name": model_detail.get("model_name"),
+        "description": model_detail.get("description"),
+        "model_type": model_detail.get("model_type"),
+        "multimodal": model_detail.get("multimodal"),
+        "max_content_len": model_detail.get("max_content_len"),
+        "user_name": user_name,
+    }
 
 
 class ModelType(Enum):

@@ -3,7 +3,6 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import HttpResponse
 from ..utils import *
 from ..presets import *
 from ..base_module.base_response import AgentResponse
@@ -35,7 +34,7 @@ def upload_file(request):
         file_config = request.POST.get("file_config")
         file_config = json.loads(file_config) if file_config else {}
         UPLOAD_FILE(user_name, knowledge_id, uploaded_file, file_config)
-        return JsonResponse({"status": "success"})
+        return JsonResponse(AgentResponse.success(data={"status": "success"}))
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(

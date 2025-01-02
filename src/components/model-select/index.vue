@@ -2,7 +2,7 @@
     <el-select :teleported="false" v-model="model" v-bind="$attrs" placeholder="请选择模型" clearable>
         <el-option-group v-for="item in modelList" :key="item.group" :label="item.group">
             <el-tooltip v-for="data in item.options" :content="data.description" placement="right">
-                <el-option :key="data.label" :label="data.label" :value="data.label">
+                <el-option :key="data.label" :label="data.label" :value="data.value">
                 </el-option>
             </el-tooltip>
         </el-option-group>
@@ -29,24 +29,25 @@ const mounted = onMounted(() => {
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		modelList.value = groupedModels(res)
+		modelList.value = groupedModels(res.data)
 	})
 }
 
 // 模型按照类别分类
 const groupedModels = (dataList: any[]) => {
-	return dataList.reduce((acc, model) => {
+	const data =  dataList.reduce((acc, model) => {
 		const existingGroup = acc.find(g => g.group === model.model_type);
 		if (existingGroup) {
-			existingGroup.options.push({ label: model.label, description: model.description,default: model.default });
+			existingGroup.options.push({ label: model.model_name,value:model.model_key, description: model.description,default: model.default });
 		} else {
 			acc.push({
 				group: model.model_type,
-				options: [{ label: model.label, description: model.description,default: model.default }]
+				options: [{ label: model.model_name,value:model.model_key, description: model.description,default: model.default }]
 			});
 		}
 		return acc;
 	}, []);	
+	return data
 }
 
 

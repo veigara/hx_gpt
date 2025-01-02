@@ -5,9 +5,10 @@
             <div>
                 <el-row :gutter="10">
                     <el-col :span="16">
-                        <el-input v-model="search" placeholder="搜索模型" @input="debouncedSearchTitle"></el-input>
+                        <el-input v-model="search" placeholder="搜索模型" clearable></el-input>
                     </el-col>
                     <el-col :span="8">
+						<el-button :icon="Search" circle @click="getModelList" />
                         <el-button title="新建" color="#567bff" @click="handleAdd">
                             <template #icon>
                                 <svg-icon icon="icon-add"></svg-icon>
@@ -55,13 +56,12 @@
 </template>
 
 <script setup lang="ts">
-import { debounce } from 'lodash';
 import { ref, onMounted } from 'vue'
 import { useAllModelsApi,useRemoveModelApi} from '@/api/model'
 import ModelAdd from '@/views/model/modelAdd.vue'
 import ProjectConfig from '@/views/model/config.vue'
 import { ElMessage, ElMessageBox } from 'element-plus/es'
-import { Delete } from '@element-plus/icons-vue'
+import { Delete,Search } from '@element-plus/icons-vue'
 
 const modelList = ref([])
 const search = ref()
@@ -74,12 +74,9 @@ const getModelList =() =>{
         keyword:search.value
     }
     useAllModelsApi(data).then(res => {
-        modelList.value = res
+        modelList.value = res.data
     })
 }
-
-// 300ms 的防抖时间
-const debouncedSearchTitle = debounce(getModelList, 300);
 
 // 新建
 const handleAdd = () => {
@@ -103,7 +100,7 @@ const delview = (item:any) => {
 		}
 	)
 		.then(() => {
-			useRemoveModelApi({ "model_key": item.model_key }).then(res => {
+			useRemoveModelApi({ "id": item.id }).then(res => {
 				ElMessage.success('删除成功')
 				// 刷新列表
 				getModelList()
