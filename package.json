@@ -1,9 +1,9 @@
 {
-  "name": "maku-generator-ui",
+  "name": "hx-chatgpt-ui",
   "version": "3.0.2",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint --fix --ext .vue,.jsx,.ts,.tsx ."
   },

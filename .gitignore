@@ -37,3 +37,4 @@ package-lock.json
 /server/chat_server/chat_app/models/__pycache__
 /server/chat_server/chat_app/service/__pycache__
 /server/history
+/web

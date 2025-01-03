@@ -1,4 +1,4 @@
-# maku-generator-ui
+# hx-chatgpt-ui
 
 ## Project setup
 

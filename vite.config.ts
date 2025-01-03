@@ -24,5 +24,10 @@ export default defineConfig({
 		host: '0.0.0.0',
 		port: 3000, // 端口号
 		open: false // 是否自动打开浏览器
-	}
+	},
+	// 将打包存放到web目录下，并且将所有的静态文件打包到static目录中
+	build: {
+		outDir: 'web',
+		assetsDir:'static'
+	  }
 })
