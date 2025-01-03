@@ -34,13 +34,13 @@
 					<el-input v-model="dataForm.title" placeholder="智能体名称"></el-input>
 				</el-form-item>
 				<el-form-item label="用户图标" prop="user_icon">
-					<icon-select v-model="dataForm.user_icon" suffx="icon-avatar-"/>
+					<icon-select v-model="dataForm.user_icon" suffx=""/>
 				</el-form-item>
 				<el-form-item label="助理图标" prop="assistant_icon">
-					<icon-select v-model="dataForm.assistant_icon" suffx=""/>
+					<icon-select v-model="dataForm.assistant_icon" suffx="icon-avatar-"/>
 				</el-form-item>
 				<el-form-item label="模型(model)" prop="model_key">
-					<mode-select v-model="dataForm.model_key" style="width: 100%"/>
+					<mode-select v-model="dataForm.model_key" style="width: 100%" @change="modelChange(dataForm.model_key)" />
 				</el-form-item>
 				<el-form-item prop="temperature">
 					<template #label>
@@ -72,7 +72,7 @@
 						</div>
 					</template>
 					<div style="width: 100%">
-						<el-slider v-model="dataForm.max_tokens" show-input :max="100000" :min="0" :step="1" />
+						<el-slider v-model="dataForm.max_tokens" show-input :max="maxTokens" :min="100" :step="1" />
 					</div>
 				</el-form-item>
 				<el-form-item prop="presence_penalty">
@@ -111,7 +111,8 @@
 <script setup lang="ts">
 import { reactive, ref, watch, onMounted } from 'vue'
 import { ElNotification } from 'element-plus'
-import { useModelsApi, useSaveAgentFileApi } from '@/api/chat'
+import { useSaveAgentFileApi } from '@/api/chat'
+import { useModelDetailApi } from '@/api/model'
 import { CirclePlus, Delete } from '@element-plus/icons-vue'
 import IconSelect from '@/components/icon-select/src/index.vue'
 import ModeSelect from '@/components/model-select/index.vue'
@@ -148,7 +149,7 @@ const dataForm = reactive<agentModel>({
 	model_key: '',
 	temperature: 0.5,
 	top_p: 0.2,
-	max_tokens: 8000,
+	max_tokens: 4000,
 	presence_penalty: 0,
 	frequency_penalty: 0,
 	user_icon:'',
@@ -158,6 +159,10 @@ const dataForm = reactive<agentModel>({
 const role = ref(['user', 'system', 'assistant'])
 
 const editFlag = ref(false)
+
+// 初始最大tokens
+const maxTokens= ref(100000)
+
 // 初始化
 const init = (data: agentModel, edit: boolean) => {
 	visible.value = true
@@ -200,6 +205,7 @@ const addAgentContent = () => {
 
 const rules = reactive({
 	title: [{ required: true, message: '智能体名称不能为空', trigger: 'blur' }],
+	max_tokens: [{ required: true, message: '请选择最大上下文长度', trigger: 'change' }],
 	model_key: [
 		{
 			required: true,
@@ -229,6 +235,17 @@ const saveAgent = () => {
 		}
 	})
 }
+
+// 模型选择要选出配置的最大上下文
+const modelChange=(model_key:string) =>{
+	useModelDetailApi({model_key:model_key}).then(res =>{
+		const datas = res.data
+		if(datas && datas.length > 0){
+			maxTokens.value = datas[0]?.max_content_len
+		}
+	})
+}
+
 
 defineExpose({
 	init
