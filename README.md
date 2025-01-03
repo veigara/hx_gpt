@@ -15,6 +15,6 @@ npm run dev
 ### Compiles and minifies for production
 
 ```bash
-npm run build
+npm run build 
 ```
 
