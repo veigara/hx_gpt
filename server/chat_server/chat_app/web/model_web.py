@@ -49,12 +49,15 @@ def get_all_models(request):
 @require_http_methods(["GET"])
 def get_model_detail(request):
     """获取模型详情
-    params:model_name 模型名称
+    params:model_key 模型名称
     return:模型详情
     """
     try:
-        model_name = request.GET.get("model_name")
-        return JsonResponse(AgentResponse.success(data=GET_MODEL_DETAIL(model_name)))
+        user_name = get_user_name(request)
+        model_key = request.GET.get("model_key")
+        return JsonResponse(
+            AgentResponse.success(data=GET_MODEL_DETAIL(user_name, model_key))
+        )
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(

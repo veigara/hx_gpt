@@ -14,7 +14,6 @@ from ..base_module.agent_exception import AgentException
 import json
 from ..service.agent import *
 from ..service.history import *
-from ..cache_utils import *
 from ..service.knowledge_se import (
     knowledge_retrieve as KNOWLEDGE_RETRIEVE,
 )
@@ -202,18 +201,22 @@ def select_agent(request) -> str:
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
+            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
         agent_data = load_agent(user_name, id)
         if agent_data is None:
-            return HttpResponse("智能体内容不存在", status=500)
+            return AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}智能体内容不能为空"
+            )
         # 创建聊天记录
         history_id = save_history_agent(user_name, agent_data)
 
-        return HttpResponse(history_id)
+        return JsonResponse(AgentResponse.success(data=history_id))
 
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除智能体失败")
+        )
 
 
 @require_http_methods(["GET"])
@@ -225,13 +228,14 @@ def get_historys(request):
     try:
         user_name = get_user_name(request)
         keyword = request.GET.get("keyword")
-        return HttpResponse(
-            json.dumps(get_user_all_history(user_name, keyword)),
-            content_type="application/json",
-        )
+        data = get_user_all_history(user_name, keyword)
+        return JsonResponse(AgentResponse.success(data=data))
+
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取用户的聊天记录失败")
+        )
 
 
 @require_http_methods(["GET"])
@@ -244,15 +248,16 @@ def get_history_detail(request):
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
-        detail = load_history(user_name, id)
-        # 将聊天记录加载到上下文中
-        clear_history_global(user_name)
-        set_history_global(user_name, detail.get("content", []))
-        return HttpResponse(json.dumps(detail), content_type="application/json")
+            return AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            )
+        data = load_history(id)
+        return JsonResponse(AgentResponse.success(data=data))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取聊天记录详情失败")
+        )
 
 
 @require_http_methods(["DELETE"])
@@ -266,11 +271,16 @@ def del_user_history(request):
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
+            return AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            )
         del_history(user_name, id)
-        return HttpResponse(True)
+        return JsonResponse(AgentResponse.success(data=True))
     except Exception as e:
         logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除聊天记录失败")
+        )
 
 
 @csrf_exempt
@@ -287,14 +297,20 @@ def rename_user_history(request):
         new_title = payload.get("new_title")
         user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
+            return AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            )
         if new_title is None:
-            return HttpResponse("new_title is required", status=500)
+            return AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}重命名标题不能为空"
+            )
         rename_history(user_name, id, new_title)
-        return HttpResponse(True)
+        return JsonResponse(AgentResponse.success(data=True))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名聊天记录失败")
+        )
 
 
 @csrf_exempt
@@ -307,14 +323,17 @@ def top_user_history(request):
     try:
         payload = json.loads(request.body.decode("utf-8"))
         id = payload.get("id")
-        user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
-        top_history(user_name, id)
-        return HttpResponse(True)
+            return AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            )
+        top_history(id)
+        return JsonResponse(AgentResponse.success(data=True))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名聊天记录失败")
+        )
 
 
 @csrf_exempt
@@ -329,19 +348,22 @@ def clear_history_context(request):
         id = payload.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return HttpResponse("id is required", status=500)
-
+            return AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            )
         clear_context(user_name, id)
-        return HttpResponse(True)
+        return JsonResponse(AgentResponse.success(data=True))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名聊天记录失败")
+        )
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def clear_history_all(request):
-    """清空所有聊天记录文件
+    """清空所有聊天记录
     params:history_id 聊天记录id
     return:
     """
@@ -349,10 +371,28 @@ def clear_history_all(request):
         user_name = get_user_name(request)
 
         clear_all_history(user_name)
-        return HttpResponse(True)
+        return JsonResponse(AgentResponse.success(data=True))
     except Exception as e:
         logger.error(print_err(e))
-        return HttpResponse(f"Server error occurred: {e}", status=500)
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}清空所有聊天记录失败")
+        )
+
+
+@require_http_methods(["GET"])
+def get_cur_history_counts(request):
+    """获取当前聊天记录的token"""
+    try:
+        id = request.GET.get("id")
+        data = get_count_tokens(id)
+        return JsonResponse(AgentResponse.success(data=data))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}获取当前聊天记录的token失败"
+            )
+        )
 
 
 class ModelData:

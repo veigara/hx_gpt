@@ -52,7 +52,7 @@ def update_ai_model(
 
 
 def search_ai_model(
-    user_name: str, model_name: str = None, model_key=None
+    user_name: str = None, model_name: str = None, model_key=None
 ) -> List[Dict[str, Any]]:
     """根据模型名称搜索模型基本信息
 
@@ -64,10 +64,10 @@ def search_ai_model(
         List[Dict[str, Any]]: 搜索结果
     """
     try:
-        if not user_name or not isinstance(user_name, str):
-            return []
+        filters = {}
+        if user_name:
+            filters["user_name"] = user_name
 
-        filters = {"user_name": user_name}
         if model_name and isinstance(model_name, str):
             filters["model_name__icontains"] = model_name.strip()
 

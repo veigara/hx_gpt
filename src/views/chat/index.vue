@@ -116,7 +116,7 @@
 
 				<!--尾部-->
 				<Footler ref="footlerRef" :ElNotificationErr="ElNotificationErr" :historyId="curHistoryId" :agentId="curAgent.agent_id"
-					@update:cur-model="item => curModel = item" @update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
+					@update:cur-model-key="curModelKeyFn" @update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
 					@update:selectAgent="selectAgent"  @update:clear-history-all="clearHistoryAll"  @update:refreshHistory="refreshHistoryFor"  :sendContent="sendContent" />
 			</el-main>
 		</el-container>
@@ -129,7 +129,8 @@ import { ElNotification, ElScrollbar, ElMessage,ElMessageBox } from 'element-plu
 import TextComponent from '@/components/Message/Text.vue'
 import HistoryAside from '@/views/chat/historyAside.vue'
 import Footler from '@/views/chat/footler.vue'
-import { useGetHistoryDetailApi } from '@/api/chat'
+import { useGetHistoryDetailApi,useHistoryTokensApi } from '@/api/chat'
+import { useModelDetailApi } from '@/api/model'
 
 
 
@@ -229,19 +230,21 @@ const selectHistoryItem = (data:any) => {
 	
 	// 获取聊天记录详情
 	useGetHistoryDetailApi({ "id": historyId }).then(res => {
+		data = res.data
+		const agentData = res.data?.agent_data
 		// 填充数据
-		curModel.value = res.model_name
-		curAgent.agent_id = res.agent_id
-		curAgent.agent_title = res.agent_title
-		curAgent.token_count = res.all_token_counts
-		curAgent.user_icon = res.user_icon? res.user_icon:'icon-user'
-		curAgent.assistant_icon = res.assistant_icon?res.assistant_icon:'icon-user'
+		curAgent.token_count = data.all_token_counts
+		curAgent.agent_id = data.agent_id
+		curModel.value = agentData.model_name
+		curAgent.agent_title = agentData.title
+		curAgent.user_icon = agentData.user_icon? agentData.user_icon:'icon-user'
+		curAgent.assistant_icon = agentData.assistant_icon?agentData.assistant_icon:'icon-user'
 		if(isClearChat){
 			//表明是直接点击的聊天记录
 			chat_msg.chatBotDatas = []
-			chat_msg.history = res.content
+			chat_msg.history = data.content
 			// 把模型名称传过去
-			footlerRef.value.init(res.model_name)
+			footlerRef.value.init(agentData.model_key)
 		}else{
 			//表明是发送的消息，不是点击的聊天记录
 			// 填充数据
@@ -259,7 +262,17 @@ const updateChatBotDatas = (data: any) => {
 	if (curHistoryId.value == '') {
 		// 刷新历史列表,不清空chat
 		historyRef.value.refreshAndSelectFirstHistory(false)
+	}else{
+		const historyId = curHistoryId.value
+		// 刷新token和对话
+		useHistoryTokensApi({id:historyId}).then(res =>{
+			data = res.data
+			const count = data.count
+			curAgent.token_count= data.all_token_counts
+			historyRef.value.setHistoryCount(historyId,count)
+		})
 	}
+	
 }
 // 首先发送
 const updateChatBotDatasUser = (data: any) => {
@@ -321,7 +334,18 @@ const refreshHistoryFor = (history_id:string) =>{
 	selectHistoryItem(data)
 }
 
-
+const curModelKeyFn = (modelKey:string) => {
+	if (modelKey){
+		// 查询模型详情
+		useModelDetailApi({ "model_key": modelKey }).then(res =>{
+			const datas = res.data
+			if(datas && datas.length > 0){
+				curModel.value = datas[0]?.model_name
+			}
+			
+		})
+	}
+}
 onMounted(() => {
 	init()
 })
@@ -551,6 +575,8 @@ onMounted(() => {
 .question_item {
 	display: flex;
 	flex-direction: row-reverse;
+	margin-top: 10px;
+
 }
 
 .question_item>.question_item_container {

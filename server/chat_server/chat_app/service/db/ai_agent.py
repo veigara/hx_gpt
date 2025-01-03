@@ -111,13 +111,24 @@ def search_ai_agent_id(id) -> dict:
     return to_dict(data)
 
 
-def delete_ai_agent(id):
+def delete_ai_agent(id) -> int:
     """根据主键删除
     @return int: 删除的行数
     """
     deleted_count, _ = AiAgent.objects.filter(id=id).delete()
 
     return deleted_count
+
+
+def search_system_agent() -> dict:
+    """获取系统智能体"""
+    results = AiAgent.objects.filter(user_name=SYS_USER_NAME).order_by("create_time")
+    # 添加字段后，自动转为dict
+    datas = list(results)
+    if len(datas) == 0:
+        return []
+
+    return [to_dict(item) for item in datas]
 
 
 def to_dict(data: AiAgent) -> dict:
@@ -128,7 +139,7 @@ def to_dict(data: AiAgent) -> dict:
     user_name = data.user_name
     model_name = None
     if model_key is not None:
-        model = GET_MODEL_DETAIL(user_name, model_key)
+        model = GET_MODEL_DETAIL(model_key=model_key)
         if model is not None and len(model) > 0:
             model_name = model[0]["model_name"]
     return {
@@ -136,6 +147,7 @@ def to_dict(data: AiAgent) -> dict:
         "title": data.title,
         "content": content,
         "model_key": data.model_key,
+        "model_name": model_name,
         "temperature": float(data.temperature),
         "top_p": float(data.top_p),
         "max_tokens": data.max_tokens,

@@ -53,6 +53,12 @@ urlpatterns = [
     ),
     # 清空所有聊天记录文件
     path("clear_history_all", chat_web.clear_history_all, name="clear_history_all"),
+    # 获取当前聊天记录的tokens
+    path(
+        "get_count_tokens",
+        chat_web.get_cur_history_counts,
+        name="get_cur_history_counts",
+    ),
     # 获取模型类别
     path("get_model_type", model_web.get_all_model_type, name="get_all_model_type"),
     # 获取所有的模型

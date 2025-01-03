@@ -67,14 +67,14 @@ const emits = defineEmits(['click:history', 'refresh:history'])
 // 获取用户聊天记录
 const getUserHistory = () => {
 	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
-		historys.value = res
+		historys.value = res.data
 	})
 }
 
 // 设置记录为激活状态
 const activeHistoryItem = (historyId: String) => {
 	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
-		historys.value = res
+		historys.value = res.data
 		historys.value.find(item => item.id == historyId).active = true
 	})
 }
@@ -83,8 +83,8 @@ const activeHistoryItem = (historyId: String) => {
 const refreshAndSelectFirstHistory = (isClearChat: boolean) => {
 	// 刷新聊天记录
 	useGetHistorysApi({ "keyword": searchTxt.value }).then(res => {
-		historys.value = res
-		if (res && res.length > 0) {
+		historys.value = res.data
+		if (res && res.data && res.data.length > 0) {
 			// 激活第一个
 			historys.value[0].active = true
 			emits('click:history', { historyId: historys.value[0].id, isClearChat: isClearChat })
@@ -98,10 +98,16 @@ const clearAll = () => {
 	getUserHistory()
 }
 
+// 设置聊天记录条数
+const setHistoryCount=(historyId:string,num: number) =>{
+	historys.value.find(item => item.id == historyId).count = num
+}
+
 defineExpose({
 	activeHistoryItem,
 	refreshAndSelectFirstHistory,
-	clearAll
+	clearAll,
+	setHistoryCount
 })
 
 // 点击聊天记录 

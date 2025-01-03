@@ -118,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted, onUpdated, computed, watch } from 'vue'
+import { reactive, ref, onMounted, watch } from 'vue'
 import { ElNotification } from 'element-plus/es'
 import { useModelsApi, useChatApi } from '@/api/chat'
 import Agent from '@/views/chat/agent.vue'
@@ -176,21 +176,21 @@ const mounted = onMounted(() => {
 })
 
 // 定义事件，方便传值
-const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModel', 'update:selectAgent','update:clearHistoryAll','update:refreshHistory'])
+const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModelKey', 'update:selectAgent','update:clearHistoryAll','update:refreshHistory'])
 
 // 监听 chatBotMst 的变化
 watch(curModel, (newVal, oldVal) => {
-	emit('update:curModel', newVal)
+	emit('update:curModelKey', newVal)
 })
 
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		res.data
-			.filter(item => item.default == true)
+		res.data.filter(item => item.default == true)			
 			.forEach(model => {
 				// 获取默认的模型
 				curModel.value = model.model_key
+				console.log('curModel.value',curModel.value)
 			})
 	})
 }
@@ -270,7 +270,7 @@ const useSelectAgentApi = (historyId: string) => {
 }
 
 // 初始化发送框
-const init = (modelName: string) => {
+const init = (modelKey: string) => {
 	chatData.assistantCt = ''
 	chatData.userCt = ''
 	chatData.isLoading = false
@@ -278,8 +278,8 @@ const init = (modelName: string) => {
 	chatBotMst.value = ''
 	// 智能体显示弹窗
 	agentVisible.value = false
-	curModel.value = modelName
-	if (!modelName) {
+	curModel.value = modelKey
+	if (!modelKey) {
 		// 不存在则获取所有的模型
 		getModelList()
 	}

@@ -55,3 +55,7 @@ export const useClearHistoryContextApi = (params: any) => {
 export const useClearHistoryAllApi = () => {
 	return service.post('/clear_history_all')
 }
+
+export const useHistoryTokensApi = (params: any) => {
+	return service.get('/get_count_tokens',{params})
+}

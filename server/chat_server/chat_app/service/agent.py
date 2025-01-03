@@ -1,10 +1,5 @@
 import json
-
-# import os
 from ..presets import *
-
-# import uuid
-# import threading
 import logging
 from ..utils import *
 from ..base_module.agent_exception import AgentException
@@ -14,11 +9,8 @@ from .db.ai_agent import (
     update_ai_agent as UPDATE_AI_AGENT,
     save_ai_agent as SAVE_AI_AGENT,
     delete_ai_agent as DELETE_AI_AGENT,
+    search_system_agent as SEARCH_SYSTEM_AGENT,
 )
-
-# # 用户存放的模型实例 <p>{1222:{model_name:LALM_11,model_instance:23445}}</p>
-# _user_agent_instance = {}
-# _user_agent_lock = threading.Lock()
 
 logger = logging.getLogger("chat_app")
 
@@ -82,16 +74,6 @@ def load_agent(user_name, id) -> str:
     data = SEARCH_AI_AGENT_ID(id)
 
     return data
-
-
-# def get_file_path(user_name, id):
-#     """获取智能体的文件路径"""
-#     return os.path.join(AGENT_DIR, user_name, f"{id}.json")
-
-
-# def get_default_agent_path(user_name, id):
-#     """获取内置的智能体的文件路径"""
-#     return os.path.join(DEFALUE_AGENT_DIR, f"{id}.json")
 
 
 def get_user_all_agents(user_name, keyword=None):
@@ -173,8 +155,7 @@ def del_agent(user_name, id) -> None:
 
 def get_default_agent_data(user_name):
     """获取默认的智能体数据"""
-    agent_list = get_user_all_agents(user_name, None)
-    if agent_list is None or len(agent_list) == 0:
-        return None
-    """默认第一个"""
-    return agent_list[0]
+    datas = SEARCH_SYSTEM_AGENT()
+    if len(datas) > 0:
+        return datas[0]
+    return None

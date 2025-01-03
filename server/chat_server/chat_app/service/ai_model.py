@@ -39,7 +39,7 @@ def covert_model_data(key, model_data):
 
 
 @lru_cache()
-def get_model_detail(user_name, model_key) -> List[dict]:
+def get_model_detail(user_name=None, model_key=None) -> List[dict]:
     """获取模型详情"""
     data = SEARCH_AI_MODEL(user_name=user_name, model_key=model_key)
     if data is not None:

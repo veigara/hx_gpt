@@ -29,7 +29,7 @@ class Spark_Client(BaseLLMModel):
 
     def _create_completion(self, messages, stream):
         try:
-            agent_data = self.get_agent_data()
+            agent_data = self.agent_data
             if not agent_data:
                 return self.client.chat.completions.create(
                     model=self.model_key,
