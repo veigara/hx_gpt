@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import sys
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -59,7 +60,7 @@ ROOT_URLCONF = "admin.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "web")],  # 配置模板查找路径
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -128,6 +129,15 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+
+# 静态文件在开发过程中的查找目录
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "web"),
+    os.path.join(BASE_DIR, "web/static"),
+]
+
+# 收集静态文件后的存放目录
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # 如果在 Windows 上运行，导入 colorama
 LOG_REQUEST_ID_HEADER = "HTTP_X_REQUEST_ID"

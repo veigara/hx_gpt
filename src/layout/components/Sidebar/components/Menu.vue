@@ -1,8 +1,8 @@
 <template>
 	<el-scrollbar>
 		<div class="sidebar-logo">
-			<el-avatar src="./favicon.ico"></el-avatar>
-			<span class="logo-title">chat-gpt</span>
+			<el-avatar :src="favicon"></el-avatar>
+			<span class="logo-title">hx-gpt</span>
 		</div>
 		<el-menu :default-active="defaultActive" background-color="transparent" :collapse-transition="false"
 			mode="vertical" router>
@@ -16,6 +16,7 @@ import MenuItem from './MenuItem.vue'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 import { menuRoutes } from '@/router'
+import favicon from '@/assets/favicon.ico' 
 
 const route = useRoute()
 

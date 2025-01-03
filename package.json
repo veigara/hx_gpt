@@ -1,5 +1,5 @@
 {
-  "name": "hx-chatgpt-ui",
+  "name": "hx-gpt-ui",
   "version": "3.0.2",
   "scripts": {
     "dev": "vite",

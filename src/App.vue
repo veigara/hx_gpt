@@ -10,5 +10,5 @@ import { RouterView } from 'vue-router'
 import { useTitle } from '@vueuse/core'
 
 // 设置标题
-useTitle('ChatGPT')
+useTitle('HxGPT')
 </script>

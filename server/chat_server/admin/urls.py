@@ -15,9 +15,10 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
 from chat_app import views
 from chat_app.web import chat_web, model_web, config_web, knowledge_web
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -107,4 +108,7 @@ urlpatterns = [
         knowledge_web.down_knowledge_file,
         name="down_knowledge_file",
     ),
+    # vue页面
+    path("", TemplateView.as_view(template_name="index.html"), name="index"),
+    re_path(r"^.*/$", TemplateView.as_view(template_name="index.html")),
 ]

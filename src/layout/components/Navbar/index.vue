@@ -1,7 +1,7 @@
 <template>
 	<div class="navbar-container">
 		<Logo />
-		<div class="navbar-left">ChatGpt</div>
+		<div class="navbar-left">HxGpt</div>
 		<!-- <div class="navbar-right">
 			<a href="https://github.com/makunet/maku-generator" target="_blank">
 				<svg-icon icon="icon-github-fill"></svg-icon>

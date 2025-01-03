@@ -1,7 +1,7 @@
 <template>
 	<div class="sidebar-logo">
-		<el-avatar src="./favicon.ico"></el-avatar>
-		<span class="logo-title">Maku Generator</span>
+		<el-avatar src="@/assets/favicon.ico"></el-avatar>
+		<span class="logo-title"></span>
 	</div>
 </template>
 
