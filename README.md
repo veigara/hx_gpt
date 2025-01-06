@@ -36,6 +36,7 @@
 ## 功能介绍
 
 ### 模型接入
+本项目支持多种大型语言模型的接入，包括但不限于
 支持 [Groq](https://console.groq.com/playground)、[讯飞星火](https://xinghuo.xfyun.cn/)、[通义千问](https://www.aliyun.com/product/bailian)、[LMStudio](https://lmstudio.ai/)厂商大模型
 
 Groq: 注册后可免费调用
@@ -43,15 +44,15 @@ Groq: 注册后可免费调用
 通义千问:首次注册送限定时序的调用token
 LMStudio: 提供基于open ai 的接口，带GUI的本地模型调用
 
-在页面上模型中方便快捷配置各种模型，不用修改源码
+这些模型的接入方式简便快捷，无需修改源码即可在页面上配置各种模型。
 ![输入图片说明](img/model.png.png)
 
 ### 自定义智能体
-通过预制的prompt和上下文打造属于自己的智能助手
+通过预制的提示词（prompt）和上下文，用户可以轻松打造属于自己的智能助手。
 ![输入图片说明](img/agent.png.png)
 
 ### 可切换的模型
-在对话中，可随时切换各种大模型
+在对话过程中，用户可以随时切换不同的大模型，以获得最佳的响应效果。
 ![输入图片说明](img/chat.png)
 
 ### 在线搜索
@@ -59,7 +60,7 @@ LMStudio: 提供基于open ai 的接口，带GUI的本地模型调用
 ![输入图片说明](img/websearch.png)
 
 ### 知识库
-上传自己专属文档，打造自己的专有知识库
+用户可以上传专属文档，构建自己的专有知识库。
 
 ![输入图片说明](img/knowlege.png)
 
@@ -68,7 +69,7 @@ LMStudio: 提供基于open ai 的接口，带GUI的本地模型调用
 ### 源码安装部署/开发部署
 #### 0. 拉取项目代码
                                               
-如果您是想要使用源码启动的用户，请直接拉取 master 分支代码
+如果您希望使用源码启动项目，请直接拉取 master 分支代码：
 
 ```shell
 git clone https://gitee.com/vfcm/hx_gpt.git
