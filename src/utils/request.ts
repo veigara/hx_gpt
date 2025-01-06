@@ -59,13 +59,24 @@ service.interceptors.response.use(
 	},
 	error => {
 		console.log(error)
-		const msg = error.response.data?error.response.data:error.message
-		ElNotification({
-			title: '错误',
-			message: msg,
-			type: 'error',
-			duration: 9500
-		})
+		const code= error?.code
+		if(code && code === 'ERR_NETWORK'){
+			ElNotification({
+				title: '错误',
+				message: '连接服务器失败',
+				type: 'error',
+				duration: 9500
+			})
+		}else{
+			const msg = error.response.data?error.response.data:error.message
+			ElNotification({
+				title: '错误',
+				message: msg,
+				type: 'error',
+				duration: 9500
+			})
+		}
+		
 		return Promise.reject(error)
 	}
 )
