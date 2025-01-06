@@ -18,6 +18,8 @@ def update_config(data):
 def get_config_data():
     """获取配置数据"""
     config_path = os.path.join(CONFIG_DIR)
+    if os.path.exists(config_path) is False:
+        create_config()
     with open(config_path, "r", encoding="utf-8") as f:
         data = json.load(f)
         if data is None:
@@ -30,6 +32,15 @@ def save_config(data):
         return
     """写入配置数据到文件"""
     config_path = os.path.join(CONFIG_DIR)
+    if os.path.exists(config_path) is False:
+        create_config()
     # 写入文件
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False)
+
+
+def create_config():
+    """创建配置文件"""
+    config_path = os.path.join(CONFIG_DIR)
+    with open(config_path, "w", encoding="utf-8") as f:
+        json.dump({}, f, ensure_ascii=False)

@@ -20,12 +20,12 @@ logger = logging.getLogger("chat_app")
 # 创建 Redis 客户端实例并确保连接成功
 # REDIS_URL = "redis://localhost:6379"
 # redis_client_instance = None
-REDIS_URL = REDIS_URL_CONFIG()
-EMBEDDING_URL = EMBEDDING_ADDRESS()
 
 
 @lru_cache(maxsize=1)
 def get_redis_client():
+    REDIS_URL = REDIS_URL_CONFIG()
+    # 获取缓存的结果
     if not REDIS_URL:
         raise AgentException("未配置向量数据库地址,请配置向量数据库地址")
     try:
@@ -52,12 +52,17 @@ def get_redis_client():
 
 
 def redis_client():
-    return get_redis_client()
+    try:
+        get_redis_client()
+    except Exception as e:
+        get_redis_client.cache_clear()
+        raise e
 
 
 def get_embedding():
     """获取向量模型"""
     # model_name = "E:/plugIn/models/huggingface/sentence-transformers/BAAI/bge-large-zh"
+    EMBEDDING_URL = EMBEDDING_ADDRESS()
     model_name = EMBEDDING_URL
     if not model_name:
         logger.warning("未配置向量模型，请配置向量模型")
@@ -172,7 +177,7 @@ def search_text(index_name: str, query: str, top_k: int = 10):
         # results = vector_store.similarity_search(query, k=top_k)
         # 最大边界相关性
         results = vector_store.max_marginal_relevance_search(query, k=top_k, fetch_k=20)
-
+        logger.debug(f"知识库检索搜索成功: {results}")
         # 如果没有搜索结果，返回空列表
         if not results:
             return []

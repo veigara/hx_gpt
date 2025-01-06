@@ -20,8 +20,7 @@ class Spark_Client(BaseLLMModel):
             history_id=history_id,
             config={"api_key": api_key},
         )
-        self.url = SPARK_BASE_URL + "/chat/completions"
-        self.header = {"Authorization": f"Bearer {spark_api_key()}"}
+        self.client = OpenAI(api_key=spark_api_key(), base_url=SPARK_BASE_URL)
 
     def _get_spark_style_input(self):
         messages = [*self.get_history()]
@@ -62,18 +61,9 @@ class Spark_Client(BaseLLMModel):
         return self._send_message(messages, True)
 
     def _send_message(self, messages, stream) -> str:
-        data = self._create_completion(messages, stream=True)
-        response = requests.post(self.url, headers=self.header, json=data, stream=True)
-
-        # 流式响应解析示例
-        response.encoding = "utf-8"
+        completion = self._create_completion(messages, stream=True)
         partial_text = ""
-        for line in response.iter_lines(decode_unicode="utf-8"):
-            if "data:" not in line:
-                continue
-            if "data: [DONE]" in line:
-                continue
-            json_line = json.loads(line.split("data: ")[1])
-            partial_text += json_line["choices"][0]["delta"].get("content", "")
+        for chunk in completion:
+            partial_text += chunk.choices[0].delta.content or ""
 
         return partial_text
