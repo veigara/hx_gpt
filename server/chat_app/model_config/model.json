@@ -1,0 +1,58 @@
+{
+    "llama-3.2-90b-vision": {
+        "model_key": "llama-3.2-90b-vision",
+        "model_name": "llama-3.2-90b-vision-preview",
+        "description": "3.2 90b大模型",
+        "model_type": "Groq",
+        "multimodal": false,
+        "max_content_len": 131072
+    },
+    "llama-3.3-70b": {
+        "model_key": "llama-3.3-70b",
+        "model_name": "llama-3.3-70b-versatile",
+        "description": "llama-3.3大模型，支持上下文:128k,输出token:32,768",
+        "model_type": "Groq",
+        "multimodal": false,
+        "max_content_len": 131072
+    },
+    "llama-3.2-1b": {
+        "model_key": "llama-3.2-1b",
+        "model_name": "llama-3.2-1b-instruct",
+        "description": "",
+        "model_type": "LMStudio",
+        "multimodal": false,
+        "max_content_len": 8160
+    },
+    "qwen-plus": {
+        "model_key": "qwen-plus",
+        "model_name": "qwen-plus",
+        "description": "通义千问超大规模语言模型的增强版，支持中文英文等不同语言输入。",
+        "model_type": "Qwen",
+        "multimodal": false,
+        "max_content_len": 8000
+    },
+    "qwq-32b": {
+        "model_key": "qwq-32b",
+        "model_name": "qwq-32b-preview",
+        "description": "QwQ模型是由 Qwen 团队开发的实验性研究模型，专注于增强 AI 推理能力。",
+        "model_type": "Qwen",
+        "multimodal": false,
+        "max_content_len": 8000
+    },
+    "Spark Lite": {
+        "model_key": "Spark Lite",
+        "model_name": "lite",
+        "description": "轻量级大语言模型，低延迟，全免费",
+        "model_type": "Spark",
+        "multimodal": false,
+        "max_content_len": 4095
+    },
+    "Spark 4.0 Ultra": {
+        "model_key": "Spark 4.0 Ultra",
+        "model_name": "4.0Ultra",
+        "description": "最强大的星火大模型（星火4.0 Turbo），在文本生成、语言理解、知识问答、逻辑推理、数学能力等七大维度全面超越GPT 4-Turbo，优化联网搜索链路，提供更精准回答。",
+        "model_type": "Spark",
+        "multimodal": false,
+        "max_content_len": 8000
+    }
+}

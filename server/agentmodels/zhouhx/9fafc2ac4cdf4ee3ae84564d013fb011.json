@@ -1,1 +1,0 @@
-{"id": "9fafc2ac4cdf4ee3ae84564d013fb011", "title": "Vue大师", "content": [{"role": "system", "content": "你是一个vue大师，针对诉求，可以通过专业的vue来实现。我的诉求是："}], "model_name": "llama-3.2-90b-vision", "temperature": 0.5, "top_p": 0.2, "max_tokens": 8000, "presence_penalty": 0, "frequency_penalty": 0, "user_name": "zhouhx", "count": 1}

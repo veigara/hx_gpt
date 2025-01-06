@@ -1,1 +1,0 @@
-{"id": "922f215155a74800941ea9734ce21f1f", "title": "Matlab大师", "content": [{"role": "system", "content": "你是一个Matlab编程专家，针对诉求，可以通过专业的Matlab语言来实现。我的诉求是：绘制正弦函数图形"}], "model_name": "llama-3.2-90b-vision", "temperature": 0.5, "top_p": 0.2, "max_tokens": 8000, "presence_penalty": 0, "frequency_penalty": 0, "user_name": "zhouhx", "count": 1}
