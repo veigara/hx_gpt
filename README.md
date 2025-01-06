@@ -152,7 +152,7 @@ DATABASES = {
 }
 ```    
 
-4、执行python manage.py  runserver 启动项目
+4、执行python manage.py runserver 0.0.0.0:8000 启动项目(允许ip地址访问)
 
 5、打开浏览器访问 http://127.0.0.1:3000
 
