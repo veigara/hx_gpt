@@ -18,6 +18,7 @@
     * [知识库](README.md#知识库)
 * [快速上手](README.md#快速上手)
     * [源码安装部署/开发部署](README.md#源码安装部署开发部署)
+* [各大厂商key注册](README.md#厂商key)
 
 ## 概述
 鉴于当前大多数大型语言模型主要依赖收费的token机制，给用户带来了使用上的不便。本项目应运而生，旨在构建一个免费且易于使用的大型模型系统，基于大模型技术，为用户打造专属的知识库与智能助手，让用户能够更加便捷、高效地获取信息与服务。
@@ -179,3 +180,13 @@ npm run build
 6、点击模型,选择项目配置
 7、配置大模型key和向量的模型路径
 
+## 厂商key
+
+### 讯飞星火(lite模型可免费使用,其他模型送限时token)
+[讯飞星火控制台](https://console.xfyun.cn/services/cbm)
+
+### 通义千问(首次注册送限时token)
+[阿里百炼控制台](https://bailian.console.aliyun.com/?spm=5176.29619931.J__Z58Z6CX7MY__Ll8p1ZOR.1.74cd59fcPqWd57#/home)
+
+### Groq(注册后可免费使用,限制起上下文)
+[Groq注册地址](https://console.groq.com/playground)
