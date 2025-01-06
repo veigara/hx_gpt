@@ -137,7 +137,7 @@ npm run dev
 
 1、安装虚拟环境，使用venv、conda或者其他包
 2、执行pip install -r requirements.txt
-3、打开chat_server\admin\settings.py,找到DATABASES，修改mysql数据库配置
+3、打开admin\settings.py,找到DATABASES，修改mysql数据库配置
 ```
 DATABASES = {
     "default": {
@@ -151,7 +151,7 @@ DATABASES = {
 }
 ```    
 
-4、执行python .\chat_server\manage.py  runserver 启动项目
+4、执行python manage.py  runserver 启动项目
 
 5、打开浏览器访问 http://127.0.0.1:3000
 
@@ -168,17 +168,14 @@ DATABASES = {
 // 安装依赖包
 npm install
 
-// 前端打包
+// 前端打包,运行命令后会自动生成web目录
 npm run build
 ````
-打包目录在当前目录的web文件夹中
 
 ##### 2.2.2 启动后端项目
 1、2、3步骤跟[前后端分离-启动后端项目](README.md#####启动后端项目)一致
-4、将前端打包文件复制到server\chat_server\web\目录下
-
-5、执行python .\chat_server\manage.py  runserver 启动项目
-6、打开浏览器访问 http://127.0.0.1:8000
+4、执行python .\manage.py  runserver 启动项目
+5、打开浏览器访问 http://127.0.0.1:8000
 6、点击模型,选择项目配置
 7、配置大模型key和向量的模型路径
 

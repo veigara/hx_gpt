@@ -27,7 +27,7 @@ export default defineConfig({
 	},
 	// 将打包存放到web目录下，并且将所有的静态文件打包到static目录中
 	build: {
-		outDir: 'web',
+		outDir: 'server/web',
 		assetsDir:'static'
 	  }
 })
