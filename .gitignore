@@ -39,3 +39,6 @@ package-lock.json
 /server/history
 /web
 /server/chat_server/web
+/server/agentmodels
+/server/knowledge
+/server/web
