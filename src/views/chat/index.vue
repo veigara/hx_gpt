@@ -239,6 +239,8 @@ const selectHistoryItem = (data:any) => {
 		curAgent.agent_title = agentData.title
 		curAgent.user_icon = agentData.user_icon? agentData.user_icon:'icon-user'
 		curAgent.assistant_icon = agentData.assistant_icon?agentData.assistant_icon:'icon-user'
+		// 更新聊天记录数量
+		historyRef.value.setHistoryCount(historyId,data.count)
 		if(isClearChat){
 			//表明是直接点击的聊天记录
 			chat_msg.chatBotDatas = []

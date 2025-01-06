@@ -245,8 +245,8 @@ def clear_context(user_name, history_id) -> None:
     history_data["count"] = len(content_data)
     history_data["all_token_counts"] = count_user_history_token(content_data)
 
-    # 保存历史记录
-    save_history(user_name, history_data)
+    # 更新聊天记录
+    update_history_all(user_name, history_data)
 
 
 def get_count_tokens(history_id) -> dict:

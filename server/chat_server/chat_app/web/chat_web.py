@@ -356,7 +356,7 @@ def clear_history_context(request):
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名聊天记录失败")
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}清空当前聊天记录失败")
         )
 
 

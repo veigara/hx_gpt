@@ -40,6 +40,7 @@ class BaseLLMModel:
         self.history_data = []
         self.agent_history_data = []
         self.history_content = []
+        self.agent_data = None
         if user_name is None:
             raise AgentException("当前用户不能为空")
         if history_id is not None:
