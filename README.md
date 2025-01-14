@@ -18,6 +18,7 @@
     * [知识库](README.md#知识库)
 * [快速上手](README.md#快速上手)
     * [源码安装部署/开发部署](README.md#源码安装部署开发部署)
+    * [docker-compose安装部署/开发部署](README.md#docker-compose安装部署开发部署)
 * [各大厂商key注册](README.md#厂商key)
 
 ## 概述
@@ -65,7 +66,6 @@ LMStudio: 提供基于open ai 的接口，带GUI的本地模型调用
 ![输入图片说明](img/knowlege.png)
 
 ## 快速上手
-### 源码安装部署/开发部署
 ### 源码安装部署/开发部署
 #### 0. 拉取项目代码
                                               
@@ -193,5 +193,29 @@ npm run build
 [Groq注册地址](https://console.groq.com/playground)
 
 
+## docker-compose安装部署开发部署
+### 1. 安装 docker-compose
+寻找适合你环境的 docker-compose 版本, 请参考 [Docker-Compose](https://github.com/docker/compose).
 
+举例: Linux X86 环境 可下载 [docker-compose-linux-x86_64](https://github.com/docker/compose/releases/download/v2.27.3/docker-compose-linux-x86_64) 使用.
+```shell
+cd ~
+wget https://github.com/docker/compose/releases/download/v2.27.3/docker-compose-linux-x86_64
+mv docker-compose-linux-x86_64 /usr/bin/docker-compose
+which docker-compose
+```
+/usr/bin/docker-compose
+```shell
+docker-compose -v
+```
+Docker Compose version v2.27.3
+### 2. 创建网络
+```shell
 docker network create hx_network
+```
+### 3. 启动项目
+```shell
+docker-compose up -d
+```
+打开浏览器访问 http://127.0.0.1:8000
+其他配置见[源码安装部署/开发部署](README.md#源码安装部署开发部署)
