@@ -1,19 +1,32 @@
 version: '1.0'
+name: "HX-GPT"
 services:
   mysql:   
-    image: mysql:8.0.40-debian
-    restart: always
-    network_mode: "host"
+    image: mysql:8.0
+    container_name: "mysql-8.0"
     environment:
-      MYSQL_DATABASE: 'ai_agent'
-      MYSQL_USER: 'root'
-      MYSQL_PASSWORD: '123456'
-      MYSQL_ROOT_PASSWORD: '123456'
+      - MYSQL_DATABASE= ai_agent
+      - MYSQL_ROOT_PASSWORD=123456
+      - TZ=Asia/Shanghai
+      - SET_CONTAINER_TIMEZONE=true
+      - CONTAINER_TIMEZONE=Asia/Shanghai
     ports:
       - "3306:3306"
-
-
-  web:
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+    networks:
+      - hx_network    
+  redis-stack:
+    image: redis/redis-stack:7.2.0-v14
+    container_name: "redis-stack"  
+    ports:
+      - "6379:6379"
+      - "8001:8001"
+    networks:
+      - hx_network         
+  hx-server:
     build:
       context: .
       dockerfile: dockerfile
@@ -22,3 +35,10 @@ services:
       - "8000:8000"
     depends_on:
       - mysql
+      - redis-stack
+    networks:
+      - hx_network   
+
+networks:
+  hx_network:
+    external: true      

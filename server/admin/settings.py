@@ -85,7 +85,7 @@ DATABASES = {
         "NAME": "ai_agent",
         "USER": "root",  # 数据库用户名
         "PASSWORD": "123456",  # 数据库密码
-        "HOST": "mysql",  # 数据库主机地址
+        "HOST": "localhost",  # 数据库主机地址
         "PORT": "3306",  # 数据库端口号
         # 'OPTIONS': {
         #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
