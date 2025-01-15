@@ -29,7 +29,7 @@ def redis_client():
         raise AgentException("未配置向量数据库地址,请配置向量数据库地址")
     try:
         client = redis.from_url(REDIS_URL)
-        logger.info("Redis address: {REDIS_URL}")
+        logger.info(f"connect Redis address: {REDIS_URL}")
         if client.ping():
             logger.info(
                 f"Redis connect success at {time.strftime('%Y-%m-%d %H:%M:%S')}"
