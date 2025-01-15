@@ -23,14 +23,13 @@ logger = logging.getLogger("chat_app")
 
 
 @lru_cache(maxsize=1)
-def get_redis_client():
-    REDIS_URL = REDIS_URL_CONFIG()
-    # 获取缓存的结果
+def redis_client():
+    REDIS_URL = str(REDIS_URL_CONFIG())
     if not REDIS_URL:
         raise AgentException("未配置向量数据库地址,请配置向量数据库地址")
     try:
-        logger.info(f"Redis URL: {REDIS_URL}")
         client = redis.from_url(REDIS_URL)
+        logger.info("Redis address: {REDIS_URL}")
         if client.ping():
             logger.info(
                 f"Redis connect success at {time.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -50,14 +49,6 @@ def get_redis_client():
         logger.error(f"Unexpected error: {e} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
         raise AgentException("Redis连接失败")
     return client
-
-
-def redis_client():
-    try:
-        get_redis_client()
-    except Exception as e:
-        get_redis_client.cache_clear()
-        raise e
 
 
 def get_embedding():
