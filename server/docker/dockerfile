@@ -1,5 +1,5 @@
 # 基础镜像
-FROM python:3.11
+FROM python:3.11.11
 
 
 WORKDIR /root
@@ -7,6 +7,12 @@ WORKDIR /root
 # 初始化环境
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone
+
+# 安装阿里的源
+WORKDIR /etc/apt
+# 创建文件
+ADD sources.list /etc/apt
+RUN apt-get clean
 
 # 更新apt包索引并安装依赖
 RUN apt-get update && apt-get install -y \
@@ -37,6 +43,9 @@ RUN apt-get update && apt-get install -y \
     vim \
     && rm -rf /var/lib/apt/lists/*
  
+# 升级pip
+RUN python -m pip install --upgrade pip
+
 # 安装ModelScope
 RUN pip install modelscope
 
@@ -59,11 +68,11 @@ RUN cd /root/hx_gpt && npm install && npm run build
 WORKDIR /root/hx_gpt/server
 RUN echo "Files in /root/hx_gpt/server:" && ls -la /root/hx_gpt/server
 
+#创建虚拟环境
+RUN python -m venv env
+
 # 确认 requirements.txt 存在
 RUN if [ ! -f requirements.txt ]; then echo "requirements.txt not found"; exit 1; fi
-
-# 升级pip
-RUN python -m pip install --upgrade pip
 
 # 安装依赖
 RUN pip install --no-cache-dir -r requirements.txt
