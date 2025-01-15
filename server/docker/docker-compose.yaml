@@ -13,7 +13,7 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysql8"]
       timeout: 10s
       retries: 10
     hostname: mysql8  

@@ -9,11 +9,13 @@ https://docs.djangoproject.com/en/3.1/howto/deployment/wsgi/
 
 import os
 import nltk
-
+import logging
 from django.core.wsgi import get_wsgi_application
 from chat_app.initialize import initialize_model
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "chat_server.settings")
+
+logger = logging.getLogger("chat_app")
 
 # 初始化服务
 # initialize_model()
@@ -25,5 +27,6 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 nltk_data_dir = os.path.join(parent_dir, "chat_app/libs/nltk_data")
 
 nltk.data.path.append(nltk_data_dir)
+logger.info(f"添加nltk_data_dir: {nltk_data_dir}")
 
 application = get_wsgi_application()
