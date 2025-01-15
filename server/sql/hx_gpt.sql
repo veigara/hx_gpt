@@ -108,11 +108,6 @@ CREATE TABLE `knowledge`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '知识库' ROW_FORMAT = Dynamic;
 
--- ----------------------------
--- Records of knowledge
--- ----------------------------
-INSERT INTO `knowledge` VALUES (5, '本地知识库', 'local_doc', '本地的一些常用知识', '2024-12-30 13:38:08', NULL, 'zhouhx');
-INSERT INTO `knowledge` VALUES (8, 'pdf文档', 'pdf_index', '一些pdf文档', '2024-12-30 16:30:01', NULL, 'zhouhx');
 
 -- ----------------------------
 -- Table structure for knowledge_file

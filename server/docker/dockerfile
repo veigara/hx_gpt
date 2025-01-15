@@ -41,8 +41,8 @@ RUN apt-get update && apt-get install -y \
 RUN pip install modelscope
 
 # 下载向量模型
-WORKDIR /root/models
-RUN modelscope download --model 'BAAI/bge-large-zh' --local_dir '/root/models'
+WORKDIR /root/models/bge-large-zh
+RUN modelscope download --model 'BAAI/bge-large-zh' --local_dir '/root/models/bge-large-zh'
 
 
 # 切换工作目录

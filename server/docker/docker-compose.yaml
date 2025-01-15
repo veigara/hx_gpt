@@ -3,9 +3,9 @@ name: "HX-GPT"
 services:
   mysql:   
     image: mysql:8.0
-    container_name: "mysql-8.0"
+    container_name: "mysql8"
     environment:
-      - MYSQL_DATABASE= ai_agent
+      - MYSQL_DATABASE=hx_gpt
       - MYSQL_ROOT_PASSWORD=123456
       - TZ=Asia/Shanghai
       - SET_CONTAINER_TIMEZONE=true
@@ -16,8 +16,12 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 10s
       retries: 10
+    hostname: mysql8  
     networks:
-      - hx_network    
+      - hx_network
+    volumes:  
+      # 容器的初始化过程中执行一个SQL脚本,假设你的SQL文件在当前目录下的init文件夹中
+      - ../sql/:/docker-entrypoint-initdb.d/       
   redis-stack:
     image: redis/redis-stack:7.2.0-v14
     container_name: "redis-stack"  

@@ -1,1 +1,1 @@
-{"groq_api_key": "", "lmstudio_url": "192.168.2.60:9000", "lmstudio_api_key": "not-nee", "default_model": "llama-3.2-90b-vision-preview", "qwen_api_key": "", "spark_api_key": "", "redis_url": "redis://redis-stack:6379", "embedding": "/root/models/BAAI/bge-large-zh"}
+{"groq_api_key": "", "lmstudio_url": "192.168.2.60:9000", "lmstudio_api_key": "not-nee", "default_model": "llama-3.2-90b-vision-preview", "qwen_api_key": "", "spark_api_key": "", "redis_url": "redis://redis-stack:6379", "embedding": "/root/models/bge-large-zh"}

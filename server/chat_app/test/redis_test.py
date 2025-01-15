@@ -5,7 +5,7 @@ from typing import List
 from langchain_huggingface import HuggingFaceEmbeddings
 
 
-from chat_server.chat_app.knowledge.docment_loaders.agent_docloader import (
+from chat_app.knowledge.docment_loaders.agent_docloader import (
     RapidOCRDocLoader,
 )
 from langchain.schema import Document
@@ -15,7 +15,7 @@ from langchain_redis import RedisVectorStore
 
 def get_load() -> List[Document]:
     """获取加载器"""
-    file_path = "E:/idea_workspace/pythonProject/ai_agent_ui/server/knowledge/upload_file/3bad75c2-ea22-4fb3-bf83-da8322761aca.docx"
+    file_path = "E:/idea_workspace/pythonProject/hx_gpt/server/knowledge/upload_file/3bad75c2-ea22-4fb3-bf83-da8322761aca.docx"
     loader = RapidOCRDocLoader(file_path=file_path)
     return loader
 
@@ -45,14 +45,13 @@ def test_chroma_db():
     # 向量入库
     from langchain_redis import RedisConfig, RedisVectorStore
 
-    index_name = "rag-chroma1"
-    config = RedisConfig(index_name=index_name, redis_url="redis://localhost:6379")
+    index_name = "rag_kom"
+    config = RedisConfig(index_name=index_name, redis_url="redis://192.168.0.147:6379")
     vector_store = RedisVectorStore(get_embedding(), config=config)
     ids = vector_store.add_documents(documents)
     print("ids:", ids)
     print("生成索引成功。。。。")
-    vector_store.index.schema.to_yaml("redis_schema_rag-chroma1.yaml")
-    print("生成索引路径成功。。。。")
+
     return
 
 
@@ -61,7 +60,7 @@ def search_text():
 
     new_rdvs = RedisVectorStore(
         get_embedding(),
-        redis_url="redis://localhost:6379",
+        redis_url="redis://192.168.0.147:6379",
         index_name="rag_kom",
     )
     print("开始检索。。。。")
@@ -93,5 +92,5 @@ def delete_index(index_name):
 
 if __name__ == "__main__":
     """进入根目录 然后使用python -m chat_server.chat_app.test.redis_test测试"""
-    # test_chroma_db()
-    search_text()
+    test_chroma_db()
+    # search_text()

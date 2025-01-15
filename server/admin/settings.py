@@ -82,10 +82,10 @@ WSGI_APPLICATION = "admin.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "ai_agent",
+        "NAME": "hx_gpt",
         "USER": "root",  # 数据库用户名
         "PASSWORD": "123456",  # 数据库密码
-        "HOST": "mysql",  # 数据库主机地址
+        "HOST": "mysql8",  # 数据库主机地址
         "PORT": "3306",  # 数据库端口号
         # 'OPTIONS': {
         #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
