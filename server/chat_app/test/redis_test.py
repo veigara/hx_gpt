@@ -91,6 +91,6 @@ def delete_index(index_name):
 
 
 if __name__ == "__main__":
-    """进入根目录 然后使用python -m chat_server.chat_app.test.redis_test测试"""
+    """进入根目录 然后使用python -m chat_app.test.redis_test测试"""
     test_chroma_db()
     # search_text()

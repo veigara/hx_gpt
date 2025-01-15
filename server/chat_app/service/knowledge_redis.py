@@ -29,6 +29,7 @@ def get_redis_client():
     if not REDIS_URL:
         raise AgentException("未配置向量数据库地址,请配置向量数据库地址")
     try:
+        logger.info(f"Redis URL: {REDIS_URL}")
         client = redis.from_url(REDIS_URL)
         if client.ping():
             logger.info(
