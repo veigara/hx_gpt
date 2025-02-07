@@ -56,7 +56,7 @@ class Spark_Client(BaseLLMModel):
         return self._send_message(messages, True)
 
     def get_answer_stream_iter(self):
-        messages = self._get_spark_style_input()
+        messages = self.get_history_limits()
 
         return self._send_message(messages, True)
 

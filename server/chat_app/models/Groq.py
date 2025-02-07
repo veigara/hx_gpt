@@ -56,7 +56,7 @@ class Groq_Client(BaseLLMModel):
             raise Exception(f"{STANDARD_ERROR_MSG}:{body}")
 
     def get_answer_stream_iter(self):
-        messages = self._get_groq_style_input()
+        messages = self.get_history_limits()
         completion = self._create_completion(messages, stream=True)
 
         partial_text = ""

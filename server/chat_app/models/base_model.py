@@ -9,6 +9,7 @@ from ..utils import *
 from ..config import get_default_model_params
 from ..service.agent import *
 from ..service.history import *
+from ..service.history import count_user_history_token as COUNT_USER_HISTORY_TOKEN
 
 logger = logging.getLogger("chat_app")
 
@@ -58,6 +59,7 @@ class BaseLLMModel:
         logger.info(f"用户输入为：{inputs}")
         user_content = construct_user(inputs)
         self.set_history(user_content)
+        self.inputs = user_content
         stream_iter = self.get_answer_stream_iter()
         logger.info(f"模型输出为：{stream_iter}")
         assistant_content = construct_assistant(stream_iter)
@@ -127,3 +129,41 @@ class BaseLLMModel:
         )
 
         return real_input
+
+    def get_history_limits(self) -> list:
+        """获取限制的上下文"""
+        inputs = self.inputs
+        if not inputs:
+            return []
+        history_data = self.history_data
+        if history_data is not None:
+            agent_data = history_data.get("agent_data", {})
+            all_token_counts = history_data["all_token_counts"]
+            content_data = history_data.get("content", [])
+            if agent_data:
+                max_tokens = agent_data.get("max_tokens", 0)
+                agent_count = agent_data.get("count", 0)
+                max_limit = int(max_tokens)
+                cur_chat_token = COUNT_USER_HISTORY_TOKEN([inputs])
+                if all_token_counts >= max_tokens:
+                    logger.warning("聊天记录对话超过最大限制，自动截断开始。。。。")
+                    agent_content_data = content_data[:agent_count]
+                    chat_content_data = content_data[agent_count + 1 :]
+                    # 智能体的token和当前对话token
+                    cur_token = (
+                        COUNT_USER_HISTORY_TOKEN(agent_content_data) + cur_chat_token
+                    )
+
+                    real_chat_data = []
+                    total_token = cur_token
+                    for history in chat_content_data[::-1]:
+                        token = COUNT_USER_HISTORY_TOKEN([history])
+                        total_token = total_token + token
+                        if total_token < max_limit:
+                            # 倒叙添加
+                            real_chat_data.insert(0, history)
+                        else:
+                            break
+                    agent_content_data.extend(real_chat_data)
+
+                    return agent_content_data

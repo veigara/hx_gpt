@@ -65,7 +65,7 @@ class LMStudio_Client(BaseLLMModel):
         return partial_text
 
     def get_answer_stream_iter(self):
-        messages = self._get_lm_style_input()
+        messages = self.get_history_limits()
         completion = self._create_completion(messages, stream=True)
         partial_text = ""
         for chunk in completion:
