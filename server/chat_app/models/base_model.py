@@ -167,3 +167,9 @@ class BaseLLMModel:
                     agent_content_data.extend(real_chat_data)
 
                     return agent_content_data
+
+            if len(content_data) == 0:
+                content_data = [inputs]
+            return content_data
+
+        return [inputs]
