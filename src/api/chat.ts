@@ -1,4 +1,5 @@
 import service from '@/utils/request'
+import type { Ref } from 'vue'
 
 export const useChatApi = (dataForm: any) => {
 	return service.post('/chat' ,dataForm)

@@ -99,7 +99,7 @@
 				</div>
 			</el-scrollbar>
 			<div class="chat_input_send">
-				<el-button v-if="chatData?.isLoading" color="#ff0000" disabled>加载中</el-button>
+				<el-button v-if="chatData?.streamLoading" color="#ff0000" @click="abortRequest">停止</el-button>
 				<el-button v-else color="#626aef" @click="sendBotMsgClick">
 					<div style="margin-right: 5px">
 						<svg-icon icon="icon-send_right" />
@@ -151,7 +151,8 @@ const curModel = ref()
 const chatData = reactive({
 	userCt: '',
 	assistantCt: '',
-	isLoading: false
+	isLoading: false,
+	streamLoading:false
 })
 // 对话输入框的数据
 const chatBotMst = ref('')
@@ -208,6 +209,8 @@ const sendKeyClick = (event: any) => {
 		fnDialogRef.value.init()
 	}
 }
+
+let abortController = null
 // 发送按钮
 const sendBotMsgClick = (event: any) => {
 	if (event.shiftKey) {
@@ -245,45 +248,80 @@ const sendBotMsgClick = (event: any) => {
 	}
 
 	const fetchStream = async (dataForm: any) => {
+		abortController = new AbortController()
+		chatData.assistantCt = ''
 		try {
 			chatData.assistantCt = ''
-			
-			let abortController = new AbortController()
+
 			await fetchEventSource('http://localhost:8000/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json', 'authorization': 'zhouhx' },
 				body: JSON.stringify(dataForm),
-				onopen: async () => chatData.isLoading = true,
+				signal: abortController.signal, // 绑定中断信号
+				onopen: async () => {
+					chatData.isLoading = true
+					chatData.streamLoading = true
+				},
 				onmessage: (e) => {
 					// if (e.data === '[DONE]') {
 					// 	abortController.abort()
 					// 	return
 					// }
-					console.log('e.data数据：', e.data)	
-					chatData.assistantCt +=e.data.replace('[TEXT]', '').replace('[/TEXT]', '')// 转换换行符为HTML
-					.replace(/<br>/g, '\n\n')
-					chatData.isLoading = false
+					console.log('e.data数据：', e.data)
+					const datas = e.data.replace('[TEXT]', '').replace('[/TEXT]', '').replace(/<br>/g, '\n\n')// 转换换行符为HTML
+					datas.split('').forEach((char, index) => {
+						setTimeout(() => {
+							chatData.assistantCt += char, 50 * index
+							chatData.isLoading = false
+							emit('update:chatBotDatAssert', chatData)
+						})
+					})
+
+				},
+				onclose: () => {
+					chatData.isLoading = false,
+					chatData.streamLoading = false
 					emit('update:chatBotDatAssert', chatData)
 				},
-				onclose: () => chatData.isLoading = false,
 				onerror: (err) => {
 					console.error(err)
 					chatData.assistantCt = '请求异常，请重试'
+					chatData.streamLoading = false
 					chatData.isLoading = false
 					emit('update:chatBotDatAssert', chatData)
 				}
 			})
 		} catch (error) {
 			console.error('请求失败:', error)
-			chatData.assistantCt = '请求异常，请重试'
+			if (error.name === 'AbortError') {
+				console.log('请求已被中止')
+				chatData.assistantCt = "请求已被中止"
+			} else {
+				chatData.assistantCt = '请求失败'
+			}
 			chatData.isLoading = false
+			chatData.streamLoading = false
 			emit('update:chatBotDatAssert', chatData)
+		} finally {
+			abortController = null
 		}
 
 	}
 
 	fetchStream(data)
 	chatBotMst.value = ''
+}
+
+// 中断请求方法
+const abortRequest = () => {
+  if (abortController) {
+    abortController.abort() // 触发中止
+	chatData.assistantCt += "\n\n 请求已被中止"
+    chatData.isLoading = false
+	chatData.streamLoading = false
+    abortController = null
+	emit('update:chatBotDatAssert', chatData)
+  }
 }
 
 // 展示智能体弹窗
