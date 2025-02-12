@@ -1,5 +1,7 @@
 import logging
 from groq import Groq
+from django.http import StreamingHttpResponse
+from django.db import transaction
 
 from .base_model import BaseLLMModel
 from ..config import groq_api_key
@@ -55,24 +57,63 @@ class Groq_Client(BaseLLMModel):
             body = e.__getattribute__("body")
             raise Exception(f"{STANDARD_ERROR_MSG}:{body}")
 
-    def get_answer_stream_iter(self):
-        messages = self.get_history_limits()
-        completion = self._create_completion(messages, stream=True)
+    def get_answer_stream_iter(self, history_id, user_content):
+        full_content = []
+        save_required = True  # 用于跟踪是否需要保存
 
-        partial_text = ""
-        for chunk in completion:
-            partial_text += chunk.choices[0].delta.content or ""
-
-        return partial_text
+        return StreamingHttpResponse(
+            self.event_stream(
+                full_content, save_required, history_id, user_content, False
+            ),
+            content_type="text/event-stream",
+        )
 
     def get_answer_at_once(self):
         """单次对话"""
-        messages = self.get_agent_current_input()
-        completion = self._create_completion(messages, stream=True)
+        full_content = []
+        save_required = True  # 用于跟踪是否需要保存
 
-        partial_text = ""
+        return StreamingHttpResponse(
+            self.event_stream(full_content, save_required, None, None, True),
+            content_type="text/event-stream",
+        )
 
-        for chunk in completion:
-            partial_text += chunk.choices[0].delta.content or ""
+    def update_history_record(self, history_id, user_content, full_content):
+        """更新历史记录"""
+        super().update_history_record(history_id, user_content, full_content)
 
-        return partial_text
+    def event_stream(
+        self, full_content, save_required, history_id, user_content, is_once: bool
+    ):
+        """发布stram流"""
+
+        try:
+            if not is_once:
+                messages = self.get_history_limits()
+            else:
+                messages = self.get_agent_current_input()
+            response = self._create_completion(messages, stream=True)
+
+            for chunk in response:
+                if content := chunk.choices[0].delta.content:
+                    full_content.append(content)
+                    # 添加格式标识前缀,保证前端格式
+                    show_content = content.replace("\r\n", "\n").replace("\n", "<br>")
+                    formatted_content = f"[TEXT]{show_content}[/TEXT]"
+                    # SSE格式
+                    yield f"data: {formatted_content}\n\n"
+
+        except Exception as e:
+            save_required = False
+            yield f"event: error\ndata: {str(e)}\n\n"
+            raise
+        finally:
+            # 确保在流结束时保存
+            if save_required and full_content:
+                full_content = "".join(full_content)
+                logger.info(f"模型输出为：{full_content}")
+                if not is_once:
+                    with transaction.atomic():
+                        self.update_history_record(
+                            history_id, user_content, full_content
+                        )

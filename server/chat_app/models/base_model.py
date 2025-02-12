@@ -60,16 +60,18 @@ class BaseLLMModel:
         user_content = construct_user(inputs)
         self.set_history(user_content)
         self.inputs = user_content
-        stream_iter = self.get_answer_stream_iter()
-        logger.info(f"模型输出为：{stream_iter}")
-        assistant_content = construct_assistant(stream_iter)
-        self.set_history(assistant_content)
-        # 修改文件
-        update_history(self.user_name, history_id, [user_content, assistant_content])
+        stream_iter = self.get_answer_stream_iter(history_id, user_content)
 
         return stream_iter
 
-    def get_answer_stream_iter(self):
+    def update_history_record(self, history_id, user_content, full_content):
+        """修改历史记录"""
+        assistant_content = construct_assistant(full_content)
+        self.set_history(assistant_content)
+        # 修改历史记录
+        update_history(self.user_name, history_id, [user_content, assistant_content])
+
+    def get_answer_stream_iter(self, history_id, user_content):
         return "未实现功能"
 
     def get_answer_at_once(self):

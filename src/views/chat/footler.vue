@@ -9,22 +9,22 @@
 							<template #icon>
 								<svg-icon icon="icon-upload"></svg-icon>
 							</template>
-						</el-button>
-					</template>
-					<div class="history-menu">
-						<el-tooltip effect="light" content="支持PDF、World、Execl,最大100M" placement="right" :offset="-5">
-							<div class="history-menu-item">
-								<span><svg-icon icon="icon-upload-flie" /></span>上传文档
-							</div>
-						</el-tooltip>
-						<el-tooltip effect="light" content="上传1张不超过10M的PNG/JPG的图片" placement="right" :offset="-5">
-							<div class="history-menu-item" style="color: #181818 !important; border-top: none">
-								<span><svg-icon icon="icon-upload-image" /></span>上传图片
-							</div>
-						</el-tooltip>
-					</div>
-				</el-popover>
-			</div> -->
+</el-button>
+</template>
+<div class="history-menu">
+	<el-tooltip effect="light" content="支持PDF、World、Execl,最大100M" placement="right" :offset="-5">
+		<div class="history-menu-item">
+			<span><svg-icon icon="icon-upload-flie" /></span>上传文档
+		</div>
+	</el-tooltip>
+	<el-tooltip effect="light" content="上传1张不超过10M的PNG/JPG的图片" placement="right" :offset="-5">
+		<div class="history-menu-item" style="color: #181818 !important; border-top: none">
+			<span><svg-icon icon="icon-upload-image" /></span>上传图片
+		</div>
+	</el-tooltip>
+</div>
+</el-popover>
+</div> -->
 			<!--模型-->
 			<div class="chat_main_plane_space">
 				<el-popover placement="top" trigger="hover" :show-arrow="false">
@@ -69,7 +69,8 @@
 							</template>
 						</el-button>
 					</template>
-					连续对话：<el-switch v-model="convOff" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+					连续对话：<el-switch v-model="convOff"
+						style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
 				</el-popover>
 			</div>
 			<!--在线搜索-->
@@ -82,7 +83,8 @@
 							</template>
 						</el-button>
 					</template>
-					在线搜索：<el-switch v-model="searchOnline" style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
+					在线搜索：<el-switch v-model="searchOnline"
+						style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" />
 				</el-popover>
 			</div>
 		</div>
@@ -90,14 +92,9 @@
 		<div class="chat_main_plane_label">
 			<el-scrollbar :max-height="100" style="width: 100%">
 				<div class="chat_textarea">
-					<el-input
-						v-model="chatBotMst"
-						:autosize="{ minRows: 2 }"
-						type="textarea"
+					<el-input v-model="chatBotMst" :autosize="{ minRows: 2 }" type="textarea"
 						input-style="height: 100%;width: 100%;border-radius: 10px;border: none;box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.00);background-color: white;color: black;font-family: inherit;padding: 10px 30px 10px 14px;resize: none;outline: none;box-sizing: border-box;resize:none !important;overflow: hidden;"
-						placeholder="Enter 发送，Shift + Enter 换行，/ 触发命令"
-						@keyup="sendKeyClick"
-					>
+						placeholder="Enter 发送，Shift + Enter 换行，/ 触发命令" @keyup="sendKeyClick">
 					</el-input>
 				</div>
 			</el-scrollbar>
@@ -113,14 +110,16 @@
 		</div>
 
 		<Agent ref="agentRef" @submit="useSelectAgentApi" />
-		<FnDialog ref="fnDialogRef" :historyId="props.historyId" @clear_all_history="clearHistoryAll" @refresh_history="refreshHistory"/>
+		<FnDialog ref="fnDialogRef" :historyId="props.historyId" @clear_all_history="clearHistoryAll"
+			@refresh_history="refreshHistory" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, onMounted, watch } from 'vue'
 import { ElNotification } from 'element-plus/es'
-import { useModelsApi, useChatApi } from '@/api/chat'
+import { useModelsApi, useChatApi, useChatStream } from '@/api/chat'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
 import Agent from '@/views/chat/agent.vue'
 import ModeSelect from '@/components/model-select/index.vue'
 import FnDialog from '@/views/chat/fnDialog.vue'
@@ -176,7 +175,7 @@ const mounted = onMounted(() => {
 })
 
 // 定义事件，方便传值
-const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModelKey', 'update:selectAgent','update:clearHistoryAll','update:refreshHistory'])
+const emit = defineEmits(['update:chatBotDataUser', 'update:chatBotDatAssert', 'update:curModelKey', 'update:selectAgent', 'update:clearHistoryAll', 'update:refreshHistory'])
 
 // 监听 chatBotMst 的变化
 watch(curModel, (newVal, oldVal) => {
@@ -186,26 +185,26 @@ watch(curModel, (newVal, oldVal) => {
 // 获取所有的模型
 const getModelList = () => {
 	useModelsApi().then(res => {
-		res.data.filter(item => item.default == true)			
+		res.data.filter(item => item.default == true)
 			.forEach(model => {
 				// 获取默认的模型
 				curModel.value = model.model_key
-				console.log('curModel.value',curModel.value)
+				console.log('curModel.value', curModel.value)
 			})
 	})
 }
 
-const sendKeyClick = (event:any) =>{
+const sendKeyClick = (event: any) => {
 	if (event.shiftKey) {
 		//shift+enter 不触发此事件
 		return
 	}
-	if(event.keyCode == 13){
+	if (event.keyCode == 13) {
 		// enter
 		sendBotMsgClick(event)
 	}
 	// /键
-	if(event.keyCode == 191){
+	if (event.keyCode == 191) {
 		fnDialogRef.value.init()
 	}
 }
@@ -244,18 +243,46 @@ const sendBotMsgClick = (event: any) => {
 		online_search: searchOnline.value,
 		know_id: knowledge.value
 	}
-	useChatApi(data)
-		.then(res => {
-			chatData.assistantCt = res.data
+
+	const fetchStream = async (dataForm: any) => {
+		try {
+			chatData.assistantCt = ''
+			
+			let abortController = new AbortController()
+			await fetchEventSource('http://localhost:8000/chat', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'authorization': 'zhouhx' },
+				body: JSON.stringify(dataForm),
+				onopen: async () => chatData.isLoading = true,
+				onmessage: (e) => {
+					// if (e.data === '[DONE]') {
+					// 	abortController.abort()
+					// 	return
+					// }
+					console.log('e.data数据：', e.data)	
+					chatData.assistantCt +=e.data.replace('[TEXT]', '').replace('[/TEXT]', '')// 转换换行符为HTML
+					.replace(/<br>/g, '\n\n')
+					chatData.isLoading = false
+					emit('update:chatBotDatAssert', chatData)
+				},
+				onclose: () => chatData.isLoading = false,
+				onerror: (err) => {
+					console.error(err)
+					chatData.assistantCt = '请求异常，请重试'
+					chatData.isLoading = false
+					emit('update:chatBotDatAssert', chatData)
+				}
+			})
+		} catch (error) {
+			console.error('请求失败:', error)
+			chatData.assistantCt = '请求异常，请重试'
 			chatData.isLoading = false
-			// 将更新后的数据传递给父组件
 			emit('update:chatBotDatAssert', chatData)
-		})
-		.catch(err => {
-			chatData.isLoading = false
-			emit('update:chatBotDatAssert', chatData)
-		})
-	// 清空发送的消息
+		}
+
+	}
+
+	fetchStream(data)
 	chatBotMst.value = ''
 }
 
@@ -286,13 +313,13 @@ const init = (modelKey: string) => {
 }
 
 // 清除所有历史记录的事件
-const clearHistoryAll=() =>{
+const clearHistoryAll = () => {
 	emit('update:clearHistoryAll')
 }
 
 // 刷新当前聊天记录
- const refreshHistory=() =>{
-	emit('update:refreshHistory',props.historyId)
+const refreshHistory = () => {
+	emit('update:refreshHistory', props.historyId)
 }
 
 watch(

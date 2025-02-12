@@ -81,7 +81,8 @@ def chat_with_model(request):
             else:
                 response = model.get_answer_chatbot_at_once(input_text)
 
-            return JsonResponse(AgentResponse.success(data=response))
+            # return JsonResponse(AgentResponse.success(data=response))
+            return response
     except requests.exceptions.ConnectTimeout:
         status_text = STANDARD_ERROR_MSG + CONNECTION_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
         return AgentResponse.fail(fail_msg=status_text)
