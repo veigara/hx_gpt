@@ -21,7 +21,7 @@
                     <el-input v-model="queryForm.search_text" placeholder="请输入检索内容" clearable  @keyup.enter="search" />
                 </el-col>
                 <el-col :span="8">
-                    <el-button v-if="isLoading" color="#ff0000" disabled>加载中</el-button>
+                    <el-button v-if="streamLoading" color="#ff0000" @click="abortRequest">停止</el-button>
                     <el-button v-else type="primary" @click="search">检索</el-button>
                 </el-col>
             </el-row>
@@ -42,6 +42,7 @@ import TextComponent from '@/components/Message/Text.vue'
 import { ref, reactive } from 'vue'
 import { useKnowledRetrievetApi } from '@/api/knowledge'
 import { ElNotification } from 'element-plus'
+import { fetchEventSource } from '@microsoft/fetch-event-source'
 
 
 const inintData = () => {
@@ -57,21 +58,86 @@ const queryForm = reactive({ ...inintData })
 const answer = ref<any>()
 // 加载中
 const isLoading = ref(false)
+// 流
+const streamLoading = ref(false)
 // 
 const knowKey = ref(true)
+
+let abortController = null
 // 检索
 const search = () => {
     if(!checkParms()){
         return
     };
     isLoading.value = true
+    streamLoading.value = true
     answer.value = ''
-    useKnowledRetrievetApi(queryForm).then(res => {
-        answer.value = res.data
-        isLoading.value = false
-    }).catch(err => {
-        isLoading.value = false
-    })
+
+    const fetchStream = async (dataForm: any) => {
+		abortController = new AbortController()
+		try {
+            const url = import.meta.env.VITE_API_URL as any
+            const user = import.meta.env.VITE_USER_AUTHORIZATION as any
+			await fetchEventSource(url+'/knowledge/retrieve', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', 'authorization': user },
+				body: JSON.stringify(dataForm),
+				signal: abortController.signal, // 绑定中断信号
+				onopen: async (response) => {
+					isLoading.value = true
+                    streamLoading.value = true
+                    if (response.status !== 200) {
+                        // 主动读取错误流
+                        const errorData = await response.json(); 
+                        throw new Error(errorData.error || '请求失败');
+                    }
+				},
+				onmessage: (e) => {
+					const datas = e.data.replace('[TEXT]', '').replace('[/TEXT]', '').replace(/<br>/g, '\n\n')// 转换换行符为HTML
+					datas.split('').forEach((char, index) => {
+						setTimeout(() => {
+							answer.value += char, 50 * index
+							isLoading.value = false
+						})
+					})
+
+				},
+				onclose: () => {
+					isLoading.value = false
+                    streamLoading.value = false
+				},
+				onerror: (err) => {
+                    // 禁用重试
+                    throw err
+				}
+			})
+		} catch (error) {
+			console.error('请求失败:', error)
+			if (error.name === 'AbortError') {
+				console.log('请求已被中止')
+				answer.value = "请求已被中止"
+			} else {
+				answer.value = "请求失败："+error.message
+			}
+			isLoading.value = false
+            streamLoading.value = false
+		} finally {
+			abortController = null
+		}
+
+	}
+
+	fetchStream(queryForm)
+}
+
+// 中断请求方法
+const abortRequest = () => {
+  if (abortController) {
+    abortController.abort() // 触发中止
+	answer.value += "\n\n 请求已被中止"
+    isLoading.value = false
+    abortController = null
+  }
 }
 
 const checkParms = () => {

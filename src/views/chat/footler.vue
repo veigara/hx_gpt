@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, watch } from 'vue'
 import { ElNotification } from 'element-plus/es'
-import { useModelsApi, useChatApi, useChatStream } from '@/api/chat'
+import { useModelsApi, useChatApi} from '@/api/chat'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
 import Agent from '@/views/chat/agent.vue'
 import ModeSelect from '@/components/model-select/index.vue'
@@ -234,6 +234,7 @@ const sendBotMsgClick = (event: any) => {
 	}
 	chatData.userCt = message
 	chatData.isLoading = true
+	chatData.streamLoading = true
 	// 传输数据
 	emit('update:chatBotDataUser', curMsg)
 	// 对话
@@ -252,22 +253,23 @@ const sendBotMsgClick = (event: any) => {
 		chatData.assistantCt = ''
 		try {
 			chatData.assistantCt = ''
-
-			await fetchEventSource('http://localhost:8000/chat', {
+			const url = import.meta.env.VITE_API_URL as any
+            const user = import.meta.env.VITE_USER_AUTHORIZATION as any	
+			await fetchEventSource(url+'/chat', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', 'authorization': 'zhouhx' },
+				headers: { 'Content-Type': 'application/json', 'authorization': user },
 				body: JSON.stringify(dataForm),
 				signal: abortController.signal, // 绑定中断信号
-				onopen: async () => {
+				onopen: async (response) => {
 					chatData.isLoading = true
 					chatData.streamLoading = true
+					if (response.status !== 200) {
+                        // 主动读取错误流
+                        const errorData = await response.json(); 
+                        throw new Error(errorData.error || '请求失败');
+                    }
 				},
 				onmessage: (e) => {
-					// if (e.data === '[DONE]') {
-					// 	abortController.abort()
-					// 	return
-					// }
-					console.log('e.data数据：', e.data)
 					const datas = e.data.replace('[TEXT]', '').replace('[/TEXT]', '').replace(/<br>/g, '\n\n')// 转换换行符为HTML
 					datas.split('').forEach((char, index) => {
 						setTimeout(() => {
@@ -284,11 +286,8 @@ const sendBotMsgClick = (event: any) => {
 					emit('update:chatBotDatAssert', chatData)
 				},
 				onerror: (err) => {
-					console.error(err)
-					chatData.assistantCt = '请求异常，请重试'
-					chatData.streamLoading = false
-					chatData.isLoading = false
-					emit('update:chatBotDatAssert', chatData)
+					// 禁用重试
+                    throw err
 				}
 			})
 		} catch (error) {
@@ -297,7 +296,7 @@ const sendBotMsgClick = (event: any) => {
 				console.log('请求已被中止')
 				chatData.assistantCt = "请求已被中止"
 			} else {
-				chatData.assistantCt = '请求失败'
+				chatData.assistantCt = "请求失败："+error.message
 			}
 			chatData.isLoading = false
 			chatData.streamLoading = false

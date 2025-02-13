@@ -11,6 +11,7 @@ import logging
 from django.views.decorators.csrf import csrf_exempt
 from ..base_module.base_response import AgentResponse
 from ..base_module.agent_exception import AgentException
+from django.http import StreamingHttpResponse
 import json
 from ..service.agent import *
 from ..service.history import *
@@ -41,12 +42,14 @@ def chat_with_model(request):
         online_search = payload.get("online_search", False)
         user_name = get_user_name(request)
         if input_text is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}输入内容不能为空")
+            fail_msg = f"{STANDARD_ERROR_MSG}输入内容不能为空"
+            return StreamingHttpResponse(
+                error_stream(fail_msg), status=500, content_type="application/json"
             )
         if model_key is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}请选择模型")
+            fail_msg = f"{STANDARD_ERROR_MSG}请选择模型"
+            return StreamingHttpResponse(
+                error_stream(fail_msg), status=500, content_type="application/json"
             )
         if history_id is None or history_id == "":
             # 没有选择智能体，要创建一个默认的
@@ -61,8 +64,9 @@ def chat_with_model(request):
         )
 
         if model is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}加载{model_key}失败")
+            fail_msg = f"{STANDARD_ERROR_MSG}加载{model_key}失败"
+            return StreamingHttpResponse(
+                error_stream(fail_msg), status=500, content_type="application/json"
             )
         else:
             if know_id:
@@ -81,19 +85,30 @@ def chat_with_model(request):
             else:
                 response = model.get_answer_chatbot_at_once(input_text)
 
-            # return JsonResponse(AgentResponse.success(data=response))
             return response
     except requests.exceptions.ConnectTimeout:
         status_text = STANDARD_ERROR_MSG + CONNECTION_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
-        return AgentResponse.fail(fail_msg=status_text)
+        return StreamingHttpResponse(
+            error_stream(status_text), status=500, content_type="application/json"
+        )
     except requests.exceptions.ReadTimeout:
         status_text = STANDARD_ERROR_MSG + READ_TIMEOUT_MSG + ERROR_RETRIEVE_MSG
-        return AgentResponse.fail(fail_msg=status_text)
+        return StreamingHttpResponse(
+            error_stream(status_text), status=500, content_type="application/json"
+        )
     except Exception as e:
         logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}对话失败")
+
+        # 返回500错误和错误信息
+        fail_msg = f"{STANDARD_ERROR_MSG}对话失败,{e}"
+        return StreamingHttpResponse(
+            error_stream(fail_msg), status=500, content_type="application/json"
         )
+
+
+def error_stream(fail_msg):
+    yield json.dumps({"error": str(fail_msg)}).encode("utf-8")
+    yield b"\n"  # 可以在这里添加额外的信息或格式化输出
 
 
 # 获取所有的模型

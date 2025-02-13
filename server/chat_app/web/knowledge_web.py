@@ -3,6 +3,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.http import StreamingHttpResponse
 from ..utils import *
 from ..presets import *
 from ..base_module.base_response import AgentResponse
@@ -141,18 +142,18 @@ def del_knowledge(request):
         )
 
 
-@require_http_methods(["GET"])
+@csrf_exempt
+@require_http_methods(["POST"])
 def knowledge_retrieve(request):
     """检索知识库"""
     try:
+        payload = json.loads(request.body.decode("utf-8"))
+        model_name = payload.get("model_name")
+        know_id = payload.get("know_id")
+        search_text = payload.get("search_text")
 
-        model_name = request.GET.get("model_name")
-        know_id = request.GET.get("know_id")
-        search_text = request.GET.get("search_text")
         if not model_name or not know_id or not search_text:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg="检索失败,请选择模型和知识库")
-            )
+            raise AgentException("检索失败,请选择模型和知识库")
         user_name = get_user_name(request)
         model = get_model(
             model_key=model_name,
@@ -161,18 +162,27 @@ def knowledge_retrieve(request):
         # 知识库检索
         real_input = KNOWLEDGE_RETRIEVE(know_id=know_id, input=search_text)
         if not real_input:
-            return JsonResponse(AgentResponse.success(data="暂未检索到知识库内容"))
+            raise AgentException("暂未检索到知识库内容")
 
         answer = model.get_answer_chatbot_at_once(real_input)
-
-        return JsonResponse(AgentResponse.success(data=answer))
+        return answer
     except AgentException as e:
-        return JsonResponse(AgentResponse.fail(fail_msg=e.message))
+        return StreamingHttpResponse(
+            error_stream(e.message), status=500, content_type="application/json"
+        )
     except Exception as e:
         logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}检索知识库失败")
+        # 返回500错误和错误信息
+        fail_msg = f"{STANDARD_ERROR_MSG}检索失败,{e}"
+
+        return StreamingHttpResponse(
+            error_stream(fail_msg), status=500, content_type="application/json"
         )
+
+
+def error_stream(fail_msg):
+    yield json.dumps({"error": str(fail_msg)}).encode("utf-8")
+    yield b"\n"  # 可以在这里添加额外的信息或格式化输出
 
 
 @require_http_methods(["GET"])

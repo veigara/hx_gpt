@@ -16,8 +16,9 @@ service.interceptors.request.use(
 		if (config.method?.toUpperCase() === 'GET') {
 			config.params = { ...config.params, t: new Date().getTime() }
 		}
+		const user = import.meta.env.VITE_USER_AUTHORIZATION as any	
 		// 添加请求参数
-		config.headers["authorization"]= "zhouhx"
+		config.headers["authorization"]= user
 		if (Object.values(config.headers).includes('application/x-www-form-urlencoded')) {
 			config.data = qs.stringify(config.data)
 		}

@@ -35,7 +35,7 @@ export const useKnowledgeDelApi = (params: any) => {
 
 // 检索知识库
 export const useKnowledRetrievetApi = (params: any) => {
-	return service.get('/knowledge/retrieve', { params })
+	return service.post('/knowledge/retrieve', { params })
 }
 
 // 下载知识库文件
