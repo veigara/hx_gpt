@@ -66,7 +66,7 @@ service.interceptors.response.use(
 				title: '错误',
 				message: '连接服务器失败',
 				type: 'error',
-				duration: 9500
+				duration: 1000
 			})
 		}else{
 			const msg = error.response.data?error.response.data:error.message
@@ -74,7 +74,7 @@ service.interceptors.response.use(
 				title: '错误',
 				message: msg,
 				type: 'error',
-				duration: 9500
+				duration: 1000
 			})
 		}
 		

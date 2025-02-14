@@ -24,7 +24,7 @@ const props = defineProps<Props>()
 const textRef = ref<HTMLElement>()
 
 const mdi = new MarkdownIt({
-  html: false,
+  html: true,
   linkify: true,
   highlight(code, language) {
     const validLang = !!(language && hljs.getLanguage(language))
@@ -42,9 +42,16 @@ mdi.use(MdLinkAttributes, { attrs: { target: '_blank', rel: 'noopener' } }).use(
 
 const text = computed(() => {
   const value = props.text ?? ''
+  // 针对deepseek,有<think>标签时，需要特殊处理
+  if (value.includes('<think>') || value.includes('</think>')) {
+    // const escapedText = value.replace(/<think>/g, '<h4>深度思考</h4>').replace(/<\/think>/g, '')
+    // return mdi.render(escapedText)
+    const escapedText = value.replace(/<think>/g, '<div class="accordion"><div class="accordion-title" onclick="toggleAccordion()">深度思考</div><div class="accordion-content active"><p>').replace(/<\/think>/g, '</p></div></div>')
+    return mdi.render(escapedText)
+  }
   // 对数学公式进行处理，自动添加 $$ 符号
   const escapedText = escapeBrackets(escapeDollarNumber(value))
-    return mdi.render(escapedText)
+  return mdi.render(escapedText)
   return value
 })
 
@@ -63,12 +70,12 @@ function addCopyEvents() {
         const code = btn.parentElement?.parentElement?.nextElementSibling?.textContent
         if (code) {
           copyToClip(code).then(() => {
-          btn.querySelector('path')?.setAttribute('d', copiedPath);
-          ElNotification({
-            title: '成功',
-            message: '复制成功',
-            type: 'success'
-          })
+            btn.querySelector('path')?.setAttribute('d', copiedPath);
+            ElNotification({
+              title: '成功',
+              message: '复制成功',
+              type: 'success'
+            })
             setTimeout(() => {
               btn.querySelector('path')?.setAttribute('d', initialSvg);
             }, 1000)
@@ -117,16 +124,43 @@ function escapeBrackets(text: string) {
   })
 }
 
+function toggleAccordion() {
+  if (textRef.value) {
+    const copyBtn = textRef.value.querySelectorAll('.accordion-title')
+    copyBtn.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const contentP = btn?.nextElementSibling
+        if (contentP) {
+          contentP?.classList.toggle('active');
+        }
+      })
+    })
+  }
+
+}
+
+function removeToggleAccordion() {
+  if (textRef.value) {
+    const btn = textRef.value.querySelectorAll('.accordion-title')
+    btn.forEach((btn) => {
+      btn.removeEventListener('click', () => { })
+    })
+  }
+}
+
 onMounted(() => {
   addCopyEvents()
+  toggleAccordion()
 })
 
 onUpdated(() => {
   addCopyEvents()
+  toggleAccordion()
 })
 
 onUnmounted(() => {
   removeCopyEvents()
+  removeToggleAccordion()
 })
 </script>
 
@@ -134,15 +168,15 @@ onUnmounted(() => {
   <div class="text-black">
     <div ref="textRef" class="leading-relaxed break-words">
       <div>
-        <div v-if="!props.loading"  class="markdown-body"  v-html="text" />
+        <div v-if="!props.loading" class="markdown-body" v-html="text" />
         <div v-else class="loading-container">
           <div class="moving-div">
             <svg-icon className="load-icon" icon="icon-loading"></svg-icon>
           </div>
         </div>
         <div v-show="!text && !props.loading">
-            <el-empty description="数据为空" />
-        </div>  
+          <el-empty description="数据为空" />
+        </div>
       </div>
     </div>
   </div>
@@ -152,20 +186,22 @@ onUnmounted(() => {
 .markdown-body {
   background-color: transparent;
   font-size: 14px;
-  white-space: pre-wrap; /* 保留空格和换行符 */
-}  
+  white-space: pre-wrap;
+  /* 保留空格和换行符 */
+}
+
 pre {
-    padding: 0px !important;
+  padding: 0px !important;
 }
 
 :deep(.tongyi-design-highlighter-header) {
-    align-items: center;
-    background-color: #585a73;
-    color: #fafafc;
-    display: flex;
-    font-size: 14px;
-    height: 32px;
-    padding: 0 14px
+  align-items: center;
+  background-color: #585a73;
+  color: #fafafc;
+  display: flex;
+  font-size: 14px;
+  height: 32px;
+  padding: 0 14px
 }
 
 :deep(.tongyi-design-highlighter) {
@@ -173,46 +209,46 @@ pre {
 }
 
 :deep(.tongyi-design-highlighter-right-actions) {
-    align-items: center;
-    display: flex
+  align-items: center;
+  display: flex
 }
 
 :deep(.tongyi-design-highlighter-lang) {
-    color: #fafafa;
-    font-weight: 500;
-    margin-right: auto
+  color: #fafafa;
+  font-weight: 500;
+  margin-right: auto
 }
 
 :deep(.tongyi-design-highlighter-lang:first-letter) {
-    text-transform: uppercase
+  text-transform: uppercase
 }
 
 :deep(.tongyi-design-highlighter-copy-btn) {
-    fill: #fafafa;
+  fill: #fafafa;
 }
 
 :deep(.tongyi-design-highlighter-header)+div>pre {
-    padding: 16px!important;
+  padding: 16px !important;
 }
 
-:deep(.markdown-body)  pre {
-    background-color: #f6f8fa;
-    border-radius: 6px;
-    color: #1f2328;
-    font-size: 100%;
-    line-height: 1.45;
-    overflow: auto;
-    word-wrap: normal;
-    margin-bottom: 1em;
-    margin-top: 1em;
-    padding: 0px;
+:deep(.markdown-body) pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  color: #1f2328;
+  font-size: 100%;
+  line-height: 1.45;
+  overflow: auto;
+  word-wrap: normal;
+  margin-bottom: 1em;
+  margin-top: 1em;
+  padding: 0px;
 }
 
 :deep(.tongyi-design-highlighter-copy-btn) {
-    fill: #f2f3f7;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
+  fill: #f2f3f7;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 :deep(.load-icon) {
@@ -228,8 +264,10 @@ pre {
 
 .moving-div {
   position: absolute;
-  width: 100px; /* 根据实际需求调整 */
-  height: 60px; /* 根据实际需求调整 */
+  width: 100px;
+  /* 根据实际需求调整 */
+  height: 60px;
+  /* 根据实际需求调整 */
   animation: moveRight 5s linear infinite;
 }
 
@@ -237,8 +275,47 @@ pre {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(50vw);
   }
+}
+
+:deep(.accordion) {
+  border: 1px solid #585a73;
+  border-radius: 4px;
+}
+
+
+
+:deep(.accordion-title) {
+  padding: 10px;
+  background-color: #585a73;
+  color: #fafafc;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+
+}
+
+
+
+:deep(.accordion-content) {
+  padding: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+
+
+:deep(.accordion-content.active) {
+
+  padding: 10px;
+  min-height: 10px;
+  max-height: 1000px;
+
+  transition: max-height 0.3s ease-in;
+
 }
 </style>

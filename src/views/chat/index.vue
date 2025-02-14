@@ -2,7 +2,8 @@
 	<el-card class="chat_card" body-style="padding: 0px;">
 		<el-container>
 			<el-aside width="300px" class="chat_card_aside" v-if="chatHistoryDisplay">
-				<HistoryAside ref="historyRef" @click:history="item => selectHistoryItem(item)" @refresh:history="refreshHistory"/>
+				<HistoryAside ref="historyRef" @click:history="item => selectHistoryItem(item)"
+					@refresh:history="refreshHistory" />
 			</el-aside>
 
 			<el-main class="chat_card_main">
@@ -17,7 +18,7 @@
 							模型名称: <span style="color: #00BFFF;">{{ curModel }}</span>
 						</el-col>
 						<el-col :span="8" style="display: flex;justify-content: end;">
-							<span style="color: #a6a6a6;">本次对话累计消耗了 {{curAgent.token_count }} tokens</span>	
+							<span style="color: #a6a6a6;">本次对话累计消耗了 {{ curAgent.token_count }} tokens</span>
 						</el-col>
 					</el-row>
 					<el-row style="padding: 0px 20px;">
@@ -39,7 +40,8 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"  @click="editQuestion(historyItem.content)"></svg-icon>
+													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"
+														@click="editQuestion(historyItem.content)"></svg-icon>
 													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
@@ -79,7 +81,8 @@
 											<el-button @mouseover="questionEdit = true"
 												@mouseleave="questionEdit = false">
 												<template #icon>
-													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit" @click="editQuestion(data.userCt)"></svg-icon>
+													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"
+														@click="editQuestion(data.userCt)"></svg-icon>
 													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
@@ -115,9 +118,11 @@
 				</div>
 
 				<!--尾部-->
-				<Footler ref="footlerRef" :ElNotificationErr="ElNotificationErr" :historyId="curHistoryId" :agentId="curAgent.agent_id"
-					@update:cur-model-key="curModelKeyFn" @update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
-					@update:selectAgent="selectAgent"  @update:clear-history-all="clearHistoryAll"  @update:refreshHistory="refreshHistoryFor"  :sendContent="sendContent" />
+				<Footler ref="footlerRef" :ElNotificationErr="ElNotificationErr" :historyId="curHistoryId"
+					:agentId="curAgent.agent_id" @update:cur-model-key="curModelKeyFn"
+					@update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
+					@update:selectAgent="selectAgent" @update:clear-history-all="clearHistoryAll"
+					@update:refreshHistory="refreshHistoryFor" :sendContent="sendContent" />
 			</el-main>
 		</el-container>
 	</el-card>
@@ -125,11 +130,11 @@
 
 <script setup lang="ts">
 import { reactive, ref, onMounted, watch, nextTick } from 'vue'
-import { ElNotification, ElScrollbar, ElMessage,ElMessageBox } from 'element-plus'
+import { ElNotification, ElScrollbar, ElMessage, ElMessageBox } from 'element-plus'
 import TextComponent from '@/components/Message/Text.vue'
 import HistoryAside from '@/views/chat/historyAside.vue'
 import Footler from '@/views/chat/footler.vue'
-import { useGetHistoryDetailApi,useHistoryTokensApi } from '@/api/chat'
+import { useGetHistoryDetailApi, useHistoryTokensApi } from '@/api/chat'
 import { useModelDetailApi } from '@/api/model'
 
 
@@ -162,14 +167,14 @@ const questionEdit = ref(false)
 const curModel = ref('')
 
 // 当前智能体
-const initCurAgent ={
+const initCurAgent = {
 	agent_id: '',
 	agent_title: '',
 	token_count: 0,
-	user_icon:'icon-user',
-	assistant_icon:'icon-user'
+	user_icon: 'icon-user',
+	assistant_icon: 'icon-user'
 }
-const curAgent = reactive({...initCurAgent})
+const curAgent = reactive({ ...initCurAgent })
 // 重置
 const resetCurAgent = () => {
 	Object.assign(curAgent, initCurAgent)
@@ -219,15 +224,15 @@ const selectAgent = (historyId: any) => {
 	// 刷新聊天记录
 	curHistoryId.value = historyId
 	historyRef.value.refreshAndSelectFirstHistory(true)
-}                                                                                                                                                                           
+}
 
 // 选择的聊天记录
-const selectHistoryItem = (data:any) => {
+const selectHistoryItem = (data: any) => {
 	// 清空数据
 	const historyId = data.historyId
 	const isClearChat = data.isClearChat
 	curHistoryId.value = historyId
-	
+
 	// 获取聊天记录详情
 	useGetHistoryDetailApi({ "id": historyId }).then(res => {
 		data = res.data
@@ -237,22 +242,22 @@ const selectHistoryItem = (data:any) => {
 		curAgent.agent_id = data.agent_id
 		curModel.value = agentData.model_name
 		curAgent.agent_title = agentData.title
-		curAgent.user_icon = agentData.user_icon? agentData.user_icon:'icon-user'
-		curAgent.assistant_icon = agentData.assistant_icon?agentData.assistant_icon:'icon-user'
+		curAgent.user_icon = agentData.user_icon ? agentData.user_icon : 'icon-user'
+		curAgent.assistant_icon = agentData.assistant_icon ? agentData.assistant_icon : 'icon-user'
 		// 更新聊天记录数量
-		historyRef.value.setHistoryCount(historyId,data.count)
-		if(isClearChat){
+		historyRef.value.setHistoryCount(historyId, data.count)
+		if (isClearChat) {
 			//表明是直接点击的聊天记录
 			chat_msg.chatBotDatas = []
 			chat_msg.history = data.content
 			// 把模型名称传过去
 			footlerRef.value.init(agentData.model_key)
-		}else{
+		} else {
 			//表明是发送的消息，不是点击的聊天记录
 			// 填充数据
 			chat_msg.history = []
 		}
-		
+
 	})
 }
 
@@ -260,21 +265,27 @@ const selectHistoryItem = (data:any) => {
 const updateChatBotDatas = (data: any) => {
 	// 使用深拷贝
 	data = JSON.parse(JSON.stringify(data))
+	const streamLoading = data.streamLoading
 	chat_msg.chatBotDatas[chat_msg.chatBotDatas.length - 1] = data
 	if (curHistoryId.value == '') {
 		// 刷新历史列表,不清空chat
 		historyRef.value.refreshAndSelectFirstHistory(false)
-	}else{
-		const historyId = curHistoryId.value
-		// 刷新token和对话
-		useHistoryTokensApi({id:historyId}).then(res =>{
-			data = res.data
-			const count = data.count
-			curAgent.token_count= data.all_token_counts
-			historyRef.value.setHistoryCount(historyId,count)
-		})
+	} else {
+		if (!streamLoading) {
+			debugger
+			// 等stram流加载完了再统计token和对话
+			const historyId = curHistoryId.value
+			// 刷新token和对话
+			useHistoryTokensApi({ id: historyId }).then(res => {
+				data = res.data
+				const count = data.count
+				curAgent.token_count = data.all_token_counts
+				historyRef.value.setHistoryCount(historyId, count)
+			})
+		}
+
 	}
-	
+
 }
 // 首先发送
 const updateChatBotDatasUser = (data: any) => {
@@ -284,9 +295,9 @@ const updateChatBotDatasUser = (data: any) => {
 }
 
 // 初始化所有页面
-const refreshHistory =(isAlert:boolean)=>{
-	if(curHistoryId.value == ''){
-		if(isAlert){
+const refreshHistory = (isAlert: boolean) => {
+	if (curHistoryId.value == '') {
+		if (isAlert) {
 			ElMessage.success('已经是最新对话')
 		}
 	}
@@ -298,15 +309,15 @@ const refreshHistory =(isAlert:boolean)=>{
 	footlerRef.value.init()
 }
 
-const init=() => {
+const init = () => {
 	// 初始化数据
 	chat_msg.chatBotDatas = []
 	chat_msg.history = []
-	curHistoryId.value=''
+	curHistoryId.value = ''
 	resetCurAgent()
 }
 
-const editQuestion=(data:string) =>{
+const editQuestion = (data: string) => {
 	// 重新发送内容
 	ElMessageBox.prompt('请输入发送的内容', '发送', {
 		confirmButtonText: '确定',
@@ -316,9 +327,9 @@ const editQuestion=(data:string) =>{
 		inputValue: data,
 		inputType: 'textarea',
 	})
-	.then(({ value }) => {
-		sendContent.value = value
-	})
+		.then(({ value }) => {
+			sendContent.value = value
+		})
 }
 
 // 清除所有对话记录
@@ -327,24 +338,24 @@ const clearHistoryAll = () => {
 }
 
 // 刷新指定聊天记录
-const refreshHistoryFor = (history_id:string) =>{
-	const data={
-		"historyId":history_id,
-		"isClearChat":true
-	
+const refreshHistoryFor = (history_id: string) => {
+	const data = {
+		"historyId": history_id,
+		"isClearChat": true
+
 	}
 	selectHistoryItem(data)
 }
 
-const curModelKeyFn = (modelKey:string) => {
-	if (modelKey){
+const curModelKeyFn = (modelKey: string) => {
+	if (modelKey) {
 		// 查询模型详情
-		useModelDetailApi({ "model_key": modelKey }).then(res =>{
+		useModelDetailApi({ "model_key": modelKey }).then(res => {
 			const datas = res.data
-			if(datas && datas.length > 0){
+			if (datas && datas.length > 0) {
 				curModel.value = datas[0]?.model_name
 			}
-			
+
 		})
 	}
 }
@@ -583,8 +594,8 @@ onMounted(() => {
 
 .question_item>.question_item_container {
 	display: flex;
-    justify-content: flex-end;
-    flex-direction: column;
+	justify-content: flex-end;
+	flex-direction: column;
 }
 
 .question_item_avatar {
@@ -616,7 +627,8 @@ onMounted(() => {
 }
 
 .preserve-format {
-    white-space: pre-wrap; /* 保留空格和换行符 */
+	white-space: pre-wrap;
+	/* 保留空格和换行符 */
 }
 
 // .markdown-body {
