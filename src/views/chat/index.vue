@@ -272,7 +272,6 @@ const updateChatBotDatas = (data: any) => {
 		historyRef.value.refreshAndSelectFirstHistory(false)
 	} else {
 		if (!streamLoading) {
-			debugger
 			// 等stram流加载完了再统计token和对话
 			const historyId = curHistoryId.value
 			// 刷新token和对话

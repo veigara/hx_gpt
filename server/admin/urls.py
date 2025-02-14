@@ -19,10 +19,13 @@ from chat_app import views
 from chat_app.web import chat_web, model_web, config_web, knowledge_web
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
+from django.views.generic import RedirectView
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("hello", views.hello, name="hello"),
+    path("favicon.ico", RedirectView.as_view(url="/static/favicon.ico")),
     path("chat", chat_web.chat_with_model, name="chat_with_model"),
     # 获取所有的大模型
     path("models", chat_web.get_all_models, name="get_all_models"),

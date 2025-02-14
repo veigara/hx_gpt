@@ -270,7 +270,7 @@ const sendBotMsgClick = (event: any) => {
                     }
 				},
 				onmessage: (e) => {
-					const datas = e.data.replace('[TEXT]', '').replace('[/TEXT]', '').replace(/<br>/g, '\n\n')// 转换换行符为HTML
+					const datas = e.data.replace('[TEXT]', '').replace('[/TEXT]', '').replace(/<br>/g, '\n')// 转换换行符为HTML
 					chatData.assistantCt += datas
 					chatData.isLoading = false
 					emit('update:chatBotDatAssert', chatData)
