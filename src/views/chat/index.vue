@@ -67,9 +67,12 @@
 									<div class="question_item_container">
 										<!--问题头像-->
 										<div class="question_item_avatar">
-											<el-button>
+											<el-button @mouseover="downChatFile = true"
+												@mouseleave="downChatFile = false">
 												<template #icon>
-													<svg-icon :size="'25'" :icon="curAgent.user_icon"></svg-icon>
+													<svg-icon :size="'20'" icon="icon-down_file" v-if="downChatFile"
+														@click="downChatFileFn(historyItem)"></svg-icon>
+													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -78,7 +81,7 @@
 											<!--展示文件内容--->
 											<div class="question_item_file_contain">
 												<div class="question_item_file_icon"><svg-icon :size="'40'"
-														icon="icon-file"></svg-icon></div>
+														icon="icon-file" title="下载"></svg-icon></div>
 												<div class="question_item_file_content">{{ historyItem?.file }}</div>
 											</div>
 										</div>
@@ -230,7 +233,7 @@ import { ElNotification, ElScrollbar, ElMessage, ElMessageBox } from 'element-pl
 import TextComponent from '@/components/Message/Text.vue'
 import HistoryAside from '@/views/chat/historyAside.vue'
 import Footler from '@/views/chat/footler.vue'
-import { useGetHistoryDetailApi, useHistoryTokensApi } from '@/api/chat'
+import { useGetHistoryDetailApi, useHistoryTokensApi, useDownChatFileApi } from '@/api/chat'
 import { useModelDetailApi } from '@/api/model'
 
 
@@ -461,6 +464,31 @@ const curModelKeyFn = (modelKey: string) => {
 		})
 	}
 }
+
+// 下载文件
+const downChatFile = ref(false)
+const downChatFileFn = (file: any) => {
+	const file_path = file.file_path
+	const file_name = file.file
+	if (!file_path) {
+		return ElNotification({
+			title: '温馨提示',
+			message: '下载失败，文件路径不存在',
+			type: 'error'
+		})
+	}
+	const a = document.createElement('a')
+	a.href = useDownChatFileApi(file_name,file_path)
+	document.body.appendChild(a)
+	a.click()
+	ElNotification({
+		title: '温馨提示',
+		message: '下载成功',
+		type: 'success'
+	})
+
+}
+
 onMounted(() => {
 	init()
 })
@@ -775,8 +803,8 @@ onMounted(() => {
 }
 
 :deep(.file-load-icon) {
-  width: 100px !important;
-  height: 60px !important;
+	width: 100px !important;
+	height: 60px !important;
 }
 
 .file-loading-container {
@@ -795,14 +823,15 @@ onMounted(() => {
 }
 
 @keyframes file-moveRight {
-  0% {
-    transform: translateX(0);
-  }
+	0% {
+		transform: translateX(0);
+	}
 
-  100% {
-    transform: translateX(50vw);
-  }
+	100% {
+		transform: translateX(50vw);
+	}
 }
+
 // .markdown-body {
 // 	box-sizing: border-box;
 // 	min-width: 200px;

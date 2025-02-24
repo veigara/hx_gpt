@@ -455,7 +455,8 @@ def down_chat_file(request):
     """下载文件"""
     try:
         file_path = request.GET.get("file_path")
-        response = CHAT_DOWN_FILE(file_path)
+        file_name = request.GET.get("file_name")
+        response = CHAT_DOWN_FILE(file_name, file_path)
         return response
     except AgentException as e:
         return JsonResponse(AgentResponse.fail(fail_msg=e.message))

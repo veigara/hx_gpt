@@ -64,3 +64,10 @@ export const useHistoryTokensApi = (params: any) => {
 export const useParseChatFileApi = (params: any) => {
 	return service.post('/chat/parse_file',params)
 }
+
+
+export const useDownChatFileApi = (file_name: string,file_path: string) => {
+	// 组装下载的httptp请求
+	const baseURL =  import.meta.env.VITE_API_URL as any
+	return `${baseURL}/chat/down_file?file_path=${file_path}&file_name=${file_name}`
+}
