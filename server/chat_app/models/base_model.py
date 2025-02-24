@@ -122,13 +122,18 @@ class BaseLLMModel:
 
                 # 添加文件名称到历史中，并保存
                 if is_once == False:
+                    file_text = f"<file_content>根据您上传的文件 {file_name}，解析得到的文本内容如下：\n{text}</file_content>"
+
                     update_history(
                         self.user_name,
                         history_id,
-                        [construct_file(file_name, file_path)],
+                        [
+                            construct_file(file_name, file_path),
+                            construct_assistant(file_text),
+                        ],
                     )
-                    # 将解析的内容添加到历史中
-                    self.set_history(construct_user(f"附加的文本内容:{text}"))
+                    self.set_history(construct_file(file_name, file_path))
+                    self.set_history(construct_assistant(file_text))
                     user_content = construct_user(inputs)
                 else:
                     # 单次
@@ -226,7 +231,7 @@ class BaseLLMModel:
         if history_data is not None:
             agent_data = history_data.get("agent_data", {})
             all_token_counts = history_data["all_token_counts"]
-            content_data = history_data.get("content", [])
+            content_data = self.exclude_file_type(history_data.get("content", []))
             if agent_data:
                 max_tokens = agent_data.get("max_tokens", 0)
                 agent_count = agent_data.get("count", 0)
@@ -260,3 +265,8 @@ class BaseLLMModel:
             return content_data
 
         return [inputs]
+
+    # 排除类型为file的函数
+    def exclude_file_type(self, content_data: list) -> list:
+        # 排除type为file的数据
+        return [item for item in content_data if item.get("role") is not None]

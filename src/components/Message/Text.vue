@@ -48,6 +48,9 @@ const text = computed(() => {
     // return mdi.render(escapedText)
     const escapedText = value.replace(/<think>/g, '<div class="accordion"><div class="accordion-title" onclick="toggleAccordion()">深度思考</div><div class="accordion-content active"><p>').replace(/<\/think>/g, '</p></div></div>')
     return mdi.render(escapedText)
+  }else if(value.includes('<file_content>') || value.includes('</file_content>')){
+    const escapedText = value.replace(/<file_content>/g, '<div class="accordion"><div class="accordion-title" onclick="toggleAccordion()">文件内容</div><div class="accordion-content"><p>').replace(/<\/file_content>/g, '</p></div></div>')
+    return mdi.render(escapedText)
   }
   // 对数学公式进行处理，自动添加 $$ 符号
   const escapedText = escapeBrackets(escapeDollarNumber(value))
@@ -301,8 +304,8 @@ pre {
 
 
 :deep(.accordion-content) {
-  padding: 0;
-  max-height: 10px;
+  padding: 10px;
+  max-height: 30px;
   overflow: auto;
   transition: max-height 0.3s ease-out;
 }
@@ -310,12 +313,30 @@ pre {
 
 
 :deep(.accordion-content.active) {
-
-  padding: 10px;
+  margin-right: 2px;
   min-height: 10px;
   max-height: 1000px;
 
   transition: max-height 0.3s ease-in;
+ // scrollbar-width: thin; /* Firefox 兼容 */
 
+}
+
+:deep(.accordion-content.active)::-webkit-scrollbar {
+  width: 4px;
+}
+
+:deep(.accordion-content.active)::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background:transparent;
+  height: 3px !important;
+}
+
+:deep(.accordion-content.active):hover::-webkit-scrollbar-thumb {
+  background: hsla(0, 0%, 53%, .4);
+}
+
+:deep(.accordion-content.active):hover::-webkit-scrollbar-track {
+  background: hsla(0, 0%, 53%, .1);
 }
 </style>
