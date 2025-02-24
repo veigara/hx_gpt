@@ -47,8 +47,40 @@
 											</el-button>
 										</div>
 										<!--问题内容-->
-										<div class="question_item_content">
+										<div v-if="historyItem.content?.length"
+											v-for="(item, index) in historyItem.content" :key="index">
+											<div class="question_item_file" v-if="item.type === 'image_url'">
+												<div class="question_item_file_contain">
+													<el-image style="width: 100px; height: 100px"
+														:src="item.image_url.url" :zoom-rate="1.2" :max-scale="7"
+														:min-scale="0.2" :preview-src-list="[item.image_url.url]"
+														show-progress :initial-index="4" fit="cover" />
+												</div>
+											</div>
+										</div>
+										<div v-else class="question_item_content">
 											<div class="preserve-format">{{ historyItem.content }}</div>
+										</div>
+									</div>
+								</div>
+								<div class="question_item" v-if="historyItem?.type == 'file'">
+									<div class="question_item_container">
+										<!--问题头像-->
+										<div class="question_item_avatar">
+											<el-button>
+												<template #icon>
+													<svg-icon :size="'25'" :icon="curAgent.user_icon"></svg-icon>
+												</template>
+											</el-button>
+										</div>
+										<!--问题内容-->
+										<div class="question_item_file">
+											<!--展示文件内容--->
+											<div class="question_item_file_contain">
+												<div class="question_item_file_icon"><svg-icon :size="'40'"
+														icon="icon-file"></svg-icon></div>
+												<div class="question_item_file_content">{{ historyItem?.file }}</div>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -73,46 +105,109 @@
 								</div>
 							</div>
 							<div v-for="data in chat_msg.chatBotDatas">
-								<!---问题--->
-								<div class="question_item">
-									<div class="question_item_container">
-										<!--问题头像-->
-										<div class="question_item_avatar">
-											<el-button @mouseover="questionEdit = true"
-												@mouseleave="questionEdit = false">
-												<template #icon>
-													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"
-														@click="editQuestion(data.userCt)"></svg-icon>
-													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
-												</template>
-											</el-button>
-										</div>
-										<!--问题内容-->
-										<div class="question_item_content">
-											<div class="preserve-format">{{ data.userCt }}</div>
+								<div v-if="data.fileData">
+									<div v-if="data?.fileData.showParse">
+										<!---展示文件解析-->
+										<div class="ans_item">
+											<div class="ans_item_avatar">
+												<!--回答头像-->
+												<div>
+													<el-button>
+														<template #icon>
+															<svg-icon :size="'25'"
+																:icon="curAgent.assistant_icon"></svg-icon>
+														</template>
+													</el-button>
+												</div>
+											</div>
+											<!--回答内容-->
+											<div class="ans_item_content">
+												<!----解析文件--->
+												<div v-if="data?.fileData.parseLoading">
+													<div> 文件解析中。。。。</div>
+													<div class="file-loading-container">
+														<div class="file-load-moving">
+															<svg-icon className="file-load-icon"
+																icon="icon-loading"></svg-icon>
+														</div>
+													</div>
+
+												</div>
+												<div
+													v-if="!data?.fileData.parseLoading && !data?.fileData.parseErrMsg && data?.fileData.parseErrMsg != ''">
+													<div>文档解析完成• ·̫ •</div>
+												</div>
+												<div v-if="!data?.fileData.parseLoading && data?.fileData.parseErrMsg">
+													<div>{{ data?.fileData.parseErrMsg }}</div>
+												</div>
+											</div>
 										</div>
 									</div>
 								</div>
-								<!---回答--->
-								<div class="ans_item">
-									<div class="ans_item_avatar">
-										<!--回答头像-->
-										<div>
-											<el-button>
-												<template #icon>
-													<svg-icon :size="'25'" :icon="curAgent.assistant_icon"></svg-icon>
-												</template>
-											</el-button>
+								<div v-else>
+									<!---问题--->
+									<div class="question_item" v-if="data?.type != 'file'">
+										<div class="question_item_container">
+											<!--问题头像-->
+											<div class="question_item_avatar">
+												<el-button @mouseover="questionEdit = true"
+													@mouseleave="questionEdit = false">
+													<template #icon>
+														<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"
+															@click="editQuestion(data.userCt)"></svg-icon>
+														<svg-icon :size="'25'" :icon="curAgent.user_icon"
+															v-else></svg-icon>
+													</template>
+												</el-button>
+											</div>
+											<!--问题内容-->
+											<div class="question_item_content">
+												<div class="preserve-format">{{ data.userCt }}</div>
+											</div>
 										</div>
 									</div>
-									<!--回答内容-->
-									<div class="ans_item_content">
-										<TextComponent ref="textRef" :text="data.assistantCt"
-											:loading="data.isLoading" />
+									<div class="question_item" v-if="data?.type == 'file'">
+										<div class="question_item_container">
+											<!--问题头像-->
+											<div class="question_item_avatar">
+												<el-button>
+													<template #icon>
+														<svg-icon :size="'25'" :icon="curAgent.user_icon"></svg-icon>
+													</template>
+												</el-button>
+											</div>
+											<!--问题内容-->
+											<div class="question_item_file">
+												<!--展示文件内容--->
+												<div class="question_item_file_contain">
+													<div class="question_item_file_icon"><svg-icon :size="'40'"
+															icon="icon-file"></svg-icon></div>
+													<div class="question_item_file_content">{{ data?.file }}</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!---回答--->
+									<div class="ans_item" v-if="data?.type != 'file'">
+										<div class="ans_item_avatar">
+											<!--回答头像-->
+											<div>
+												<el-button>
+													<template #icon>
+														<svg-icon :size="'25'"
+															:icon="curAgent.assistant_icon"></svg-icon>
+													</template>
+												</el-button>
+											</div>
+										</div>
+										<!--回答内容-->
+										<div class="ans_item_content">
+											<TextComponent ref="textRef" :text="data.assistantCt"
+												:loading="data.isLoading" />
+										</div>
 									</div>
 								</div>
 							</div>
-
 						</div>
 					</el-scrollbar>
 				</div>
@@ -122,7 +217,8 @@
 					:agentId="curAgent.agent_id" @update:cur-model-key="curModelKeyFn"
 					@update:chatBotDataUser="updateChatBotDatasUser" @update:chatBotDatAssert="updateChatBotDatas"
 					@update:selectAgent="selectAgent" @update:clear-history-all="clearHistoryAll"
-					@update:refreshHistory="refreshHistoryFor" :sendContent="sendContent" />
+					@update:chat-file-data="updateChatFileData" @update:refreshHistory="refreshHistoryFor"
+					:sendContent="sendContent" />
 			</el-main>
 		</el-container>
 	</el-card>
@@ -291,6 +387,13 @@ const updateChatBotDatasUser = (data: any) => {
 	// 使用深拷贝
 	data = JSON.parse(JSON.stringify(data))
 	chat_msg.chatBotDatas.push(data)
+}
+
+// 更新发送文件
+const updateChatFileData = (data: any) => {
+	// 使用深拷贝
+	data = JSON.parse(JSON.stringify(data))
+	chat_msg.chatBotDatas[chat_msg.chatBotDatas.length - 1] = data
 }
 
 // 初始化所有页面
@@ -625,11 +728,81 @@ onMounted(() => {
 	transition: all ease 0.3s;
 }
 
+.question_item_file {
+	background: rgb(246, 247, 251);
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	position: relative;
+	box-sizing: border-box;
+	max-width: 100%;
+	margin-top: 10px;
+	border-radius: 10px;
+	padding: 10px;
+	font-size: 14px;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	user-select: text;
+	word-break: break-word;
+	transition: all ease 0.3s;
+}
+
 .preserve-format {
 	white-space: pre-wrap;
 	/* 保留空格和换行符 */
 }
 
+.question_item_file_contain {
+	width: 100px;
+	min-height: 100px;
+	display: flex;
+	flex-direction: column;
+
+	.question_item_file_icon {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.question_item_file_content {
+		text-align: center
+	}
+}
+
+:deep(.file-load-icon) {
+  width: 100px !important;
+  height: 60px !important;
+}
+
+.file-loading-container {
+	position: relative;
+	width: 100%;
+	height: 40px;
+}
+
+.file-load-moving {
+	position: absolute;
+	width: 100px;
+	/* 根据实际需求调整 */
+	height: 60px;
+	/* 根据实际需求调整 */
+	animation: file-moveRight 5s linear infinite;
+}
+
+@keyframes file-moveRight {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(50vw);
+  }
+}
 // .markdown-body {
 // 	box-sizing: border-box;
 // 	min-width: 200px;

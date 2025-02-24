@@ -220,3 +220,11 @@ docker-compose up -d
 ```
 打开浏览器访问 http://127.0.0.1:8000
 其他配置见[源码安装部署/开发部署](README.md#源码安装部署开发部署)
+
+### 4.常见问题
+
+1、对应windows系统，由于路径问题需要安装额外依赖包，才能使用图片、文档解析
+```
+pip install "unstructured[docx]"  # 安装Word文档支持
+pip install "unstructured[all-docs]"  # 安装所有文档类型支持
+```

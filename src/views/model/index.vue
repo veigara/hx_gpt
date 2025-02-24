@@ -32,7 +32,7 @@
 						<div class="model_title">{{ item.model_key }}</div>
 						<div class="model_info">模型类别: {{ item.model_type }}</div>
 						<div class="model_info" v-if="item.max_content_len">最大上下文长度: {{ item.max_content_len }} tokens</div>
-                        <div class="model_info" v-if="item.multimodal"><span style="color:blue;">多态</span></div>
+                        <div class="model_info" v-if="item.multimodal"><span style="color:blue;">视觉模型:能处理图像输入</span></div>
                         <div class="model_info">描述：{{ item.description }}</div>
                     </div>
 				</div>

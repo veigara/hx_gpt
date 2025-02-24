@@ -16,7 +16,10 @@ CONFIG_DIR = "chat_app/config.json"
 SYS_USER_NAME = "system"
 # 知识库上传文件地址
 KNOWLEDGE_UPLOAD_FILE_DIR = "knowledge/upload_file"
-
+# 对话上传文件地址
+CHAT_UPLOAD_FILE_DIR = "chat/upload_file"
+# 对话解析文件地址
+CHAT_PARSE_FILE_DIR = "chat/parse_file"
 
 # 错误信息
 STANDARD_ERROR_MSG = "☹️发生了错误："  # 错误信息的标准前缀

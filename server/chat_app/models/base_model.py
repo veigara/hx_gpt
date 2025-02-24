@@ -10,6 +10,7 @@ from ..config import get_default_model_params
 from ..service.agent import *
 from ..service.history import *
 from ..service.history import count_user_history_token as COUNT_USER_HISTORY_TOKEN
+from ..service.knowledge_stores import parse_file as PARSE_FILE
 
 logger = logging.getLogger("chat_app")
 
@@ -34,6 +35,8 @@ class BaseLLMModel:
         self.api_host = config["api_host"]
         self.stream = config["stream"]
         self.model_key = config["model_key"]
+        # 视觉模型
+        self.model_multimodal = config["multimodal"]
         self.user_name = user_name
         self.agent_id = agent_id
         self.history_id = history_id
@@ -54,15 +57,87 @@ class BaseLLMModel:
             self.agent_history_data = [*agent_data.get("content", [])]
             self.history_content = history_data.get("content", [])
 
-    def stream_next_chatbot(self, inputs, history_id) -> str:
+    def stream_next_chatbot(
+        self, inputs, history_id, file_path=None, file_name=None, parse_file_id=None
+    ) -> str:
         """发送一个回答"""
         logger.info(f"用户输入为：{inputs}")
-        user_content = construct_user(inputs)
+
+        user_content = self.parse_document(
+            inputs=inputs,
+            history_id=history_id,
+            is_once=False,
+            file_path=file_path,
+            file_name=file_name,
+            parse_file_id=parse_file_id,
+        )
         self.set_history(user_content)
         self.inputs = user_content
+
         stream_iter = self.get_answer_stream_iter(history_id, user_content)
 
         return stream_iter
+
+    def parse_document(
+        self,
+        inputs,
+        history_id,
+        is_once=False,
+        file_path=None,
+        file_name=None,
+        parse_file_id=None,
+    ) -> dict:
+        """解析文档/图片
+        @param inputs: 用户输入
+        @param history_id: 历史记录id
+        @param is_once: 是否单次
+        @param file_path: 文件路径
+        @param file_name: 文件名称
+        @param parse_file_id: 解析文件id
+        @return 返回当前组装对话
+        """
+        if file_path is not None and file_path != "":
+            # 判断是不是图片
+            imag_flag = is_file_image(file_path)
+            orc_flag = True
+            if imag_flag == True:
+                if self.model_multimodal == True:
+                    # 是视觉模型模型,支持图片
+                    if imag_flag == True:
+                        orc_flag = False
+                        user_content = construct_user_image(file_path, inputs)
+            # 使用orc解析
+            if orc_flag == True:
+                if parse_file_id is None:
+                    raise AgentException("解析文件不存在,请重新上传文件")
+                # 读取解析文件
+                user_dir = os.path.join(CHAT_PARSE_FILE_DIR, self.user_name)
+                target_path = os.path.join(user_dir, parse_file_id)
+                try:
+                    with open(target_path, "r", encoding="utf-8") as f:
+                        text = f.read()
+                except Exception as e:
+                    logger.error(f"读取解析文件失败,{e}")
+                    raise AgentException(f"读取解析文件失败,{e}")
+
+                # 添加文件名称到历史中，并保存
+                if is_once == False:
+                    update_history(
+                        self.user_name,
+                        history_id,
+                        [construct_file(file_name, file_path)],
+                    )
+                    # 将解析的内容添加到历史中
+                    self.set_history(construct_user(f"附加的文本内容:{text}"))
+                    user_content = construct_user(inputs)
+                else:
+                    # 单次
+                    user_content = construct_user(f"附加的文本内容:{text}\n{inputs}")
+
+        else:
+            user_content = construct_user(inputs)
+
+        return user_content
 
     def update_history_record(self, history_id, user_content, full_content):
         """修改历史记录"""
@@ -78,11 +153,20 @@ class BaseLLMModel:
         """没有上下文"""
         return "未实现功能"
 
-    def get_answer_chatbot_at_once(self, inputs):
+    def get_answer_chatbot_at_once(
+        self, inputs, file_path=None, file_name=None, parse_file_id=None
+    ):
         """没有上下文，只回答一次"""
         """发送一个回答"""
         logger.info(f"用户输入为：{inputs}")
-        user_content = construct_user(inputs)
+        user_content = self.parse_document(
+            inputs=inputs,
+            history_id=None,
+            is_once=True,
+            file_path=file_path,
+            file_name=file_name,
+            parse_file_id=parse_file_id,
+        )
         # 将当前内容保存
         self.input_txt = user_content
         stream_iter = self.get_answer_at_once()
@@ -99,6 +183,7 @@ class BaseLLMModel:
         elif isinstance(history, dict):
             history_data.append(history)
         self.history_content = history_data
+        self.history_data["content"] = history_data
 
     def get_history(self):
         return self.history_content

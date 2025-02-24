@@ -74,7 +74,7 @@ CREATE TABLE `ai_model`  (
   `model_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '模型显示名称',
   `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '描述',
   `model_type` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '模型类型',
-  `multimodal` tinyint(1) NULL DEFAULT NULL COMMENT '是否是多态',
+  `multimodal` tinyint(1) NULL DEFAULT NULL COMMENT '是否是视觉模型',
   `max_content_len` bigint(0) NULL DEFAULT NULL COMMENT '模型支持的最大上下文长度',
   `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',

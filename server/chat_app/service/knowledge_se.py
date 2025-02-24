@@ -196,6 +196,8 @@ def down_file(id) -> FileResponse:
                     "filename*=UTF-8''{}".format(escape_uri_path(file_name))
                 )
                 return response
+            else:
+                raise AgentException("文件路径不存在")
     except Exception as e:
         logger.error("文件下载时发生错误", e)
         raise AgentException("文件下载失败")

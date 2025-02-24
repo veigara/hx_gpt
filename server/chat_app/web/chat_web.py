@@ -19,6 +19,11 @@ from ..service.knowledge_se import (
     knowledge_retrieve as KNOWLEDGE_RETRIEVE,
 )
 from ..service.ai_model import get_all_models as GET_ALL_MODELS
+from ..service.chat_file import (
+    upload_file as CHAT_UPLOAD_FILE,
+    down_file as CHAT_DOWN_FILE,
+    parse_file_to_text as CHAT_PARSE_FILE,
+)
 
 logger = logging.getLogger("chat_app")
 
@@ -34,6 +39,12 @@ def chat_with_model(request):
         model_key = payload.get("model_key")
         history_id = payload.get("history_id")
         agent_id = payload.get("agent_id")
+        # 文件地址
+        file_path = payload.get("file_path")
+        # 文件名称
+        file_name = payload.get("file_name")
+        # 解析文件名称
+        parse_file_id = payload.get("parse_file_id")
         # 知识库
         know_id = payload.get("know_id")
         # 连续对话
@@ -81,9 +92,13 @@ def chat_with_model(request):
 
             if convOff:
                 # 连续对话
-                response = model.stream_next_chatbot(input_text, history_id)
+                response = model.stream_next_chatbot(
+                    input_text, history_id, file_path, file_name, parse_file_id
+                )
             else:
-                response = model.get_answer_chatbot_at_once(input_text)
+                response = model.get_answer_chatbot_at_once(
+                    input_text, file_path, file_name, parse_file_id
+                )
 
             return response
     except requests.exceptions.ConnectTimeout:
@@ -363,7 +378,7 @@ def clear_history_context(request):
         payload = json.loads(request.body.decode("utf-8"))
         id = payload.get("id")
         user_name = get_user_name(request)
-        if id is None:
+        if id is None or id == "":
             return AgentResponse.fail(
                 fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
             )
@@ -407,6 +422,80 @@ def get_cur_history_counts(request):
         return JsonResponse(
             AgentResponse.fail(
                 fail_msg=f"{STANDARD_ERROR_MSG}获取当前聊天记录的token失败"
+            )
+        )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def upload_file(request):
+    try:
+        user_name = get_user_name(request)
+        uploaded_file = request.FILES["file"]
+
+        files = CHAT_UPLOAD_FILE(user_name, uploaded_file)
+        return JsonResponse(
+            AgentResponse.success(
+                data={
+                    "status": "success",
+                    "file_path": files["file_path"],
+                    "file_name": files["file_name"],
+                }
+            )
+        )
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}上传文件失败")
+        )
+
+
+@require_http_methods(["GET"])
+def down_chat_file(request):
+    """下载文件"""
+    try:
+        file_path = request.GET.get("file_path")
+        response = CHAT_DOWN_FILE(file_path)
+        return response
+    except AgentException as e:
+        return JsonResponse(AgentResponse.fail(fail_msg=e.message))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}下载聊天文件失败")
+        )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def parse_chat_file(request):
+    """解析文件"""
+    try:
+        user_name = get_user_name(request)
+        payload = json.loads(request.body.decode("utf-8"))
+        file_path = payload.get("file_path")
+        file_name = payload.get("file_name")
+        model_key = payload.get("model_key")
+        if file_path is None:
+            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件路径不能为空")
+        if file_name is None:
+            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件名称不能为空")
+        if model_key is None:
+            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}模型名称不能为空")
+        res = CHAT_PARSE_FILE(
+            user_name=user_name,
+            file_path=file_path,
+            file_name=file_name,
+            model_key=model_key,
+        )
+        return JsonResponse(AgentResponse.success(data=res))
+    except AgentException as e:
+        return JsonResponse(AgentResponse.fail(fail_msg=e.message))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(
+                fail_msg=f"{STANDARD_ERROR_MSG}解析聊天文件失败,原因：{str(e.message)}"
             )
         )
 

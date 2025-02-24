@@ -111,6 +111,24 @@ urlpatterns = [
         knowledge_web.down_knowledge_file,
         name="down_knowledge_file",
     ),
+    # 上传聊天文件
+    path(
+        "chat/upload",
+        chat_web.upload_file,
+        name="chat/upload_file",
+    ),
+    # 下载聊天文件
+    path(
+        "chat/down_file",
+        chat_web.down_chat_file,
+        name="chat/down_chat_file",
+    ),
+    # 解析聊天文件
+    path(
+        "chat/parse_file",
+        chat_web.parse_chat_file,
+        name="chat/parse_chat_file",
+    ),
     # vue页面
     path("", TemplateView.as_view(template_name="index.html"), name="index"),
     re_path(r"^.*/$", TemplateView.as_view(template_name="index.html")),

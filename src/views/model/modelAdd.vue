@@ -16,7 +16,7 @@
 						</el-option>
 					</el-select>
 				</el-form-item>
-				<el-form-item label="多态" prop="multimodal">
+				<el-form-item label="视觉模型" prop="multimodal">
 					<el-select v-model="dataForm.multimodal" :teleported="false" placeholder="请选择" style="width: 100%">
 						<el-option v-for="item in multimodalList" :key="item.value" :label="item.label"
 							:value="item.value">

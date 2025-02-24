@@ -36,6 +36,7 @@ logger = logging.getLogger("chat_app")
 
 def parse_file(file_path, file_type, file_config: Dict, title) -> List[Document]:
     """把文件解析成Document对象"""
+    file_path = file_path.replace("\\", "/")
     kb_file = KnowDocumentFile(
         title=title,
         file_path=file_path,

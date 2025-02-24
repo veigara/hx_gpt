@@ -146,10 +146,23 @@ def count_user_history_token(contents) -> int:
     """统计聊天记录的token数
     params: contents: [{"role": "user", "content": "示例：我很开心，因为今天出去玩了"}, {"role": "assistant", "content": "用文言文表达输入的内容"}]
     """
+    total = 0
     if contents is None:
-        return 0
-    user_contents = [content["content"] for content in contents]
-    return sum(count_token(content) for content in user_contents)
+        return total
+    user_contents = [content.get("content") for content in contents]
+
+    for content in user_contents:
+        if content is None:
+            continue
+        if isinstance(content, list):
+            # 判断是数组
+            for item in content:
+                if item.get("type") == "text":
+                    total += count_token(item["text"])
+        else:
+            total += count_token(content)
+
+    return total
 
 
 def update_history_content(user_name, id, content) -> None:

@@ -52,7 +52,7 @@ service.interceptors.response.use(
 				type: 'error',
 				duration: 9500
 			})
-			return Promise.reject(new Error(response.statusText || 'Error'))
+			return Promise.reject(new Error(JSON.stringify(res.msg) || 'Error'))
 		}
 
 		// 响应成功

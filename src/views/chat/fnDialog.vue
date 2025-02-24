@@ -32,6 +32,13 @@ const init = () => {
 
 // 清空上下文
 const clearContxt = () => {
+	if(!props.historyId || props.historyId ==''){
+		return ElNotification({
+			title: '失败',
+			message: '请选择要清空的聊天记录',
+			type: 'error'
+		})
+	}
 	useClearHistoryContextApi({
 		id: props.historyId
 	}).then(res => {

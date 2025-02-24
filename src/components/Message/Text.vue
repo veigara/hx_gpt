@@ -302,8 +302,8 @@ pre {
 
 :deep(.accordion-content) {
   padding: 0;
-  max-height: 0;
-  overflow: hidden;
+  max-height: 10px;
+  overflow: auto;
   transition: max-height 0.3s ease-out;
 }
 

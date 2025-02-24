@@ -60,3 +60,7 @@ export const useClearHistoryAllApi = () => {
 export const useHistoryTokensApi = (params: any) => {
 	return service.get('/get_count_tokens',{params})
 }
+
+export const useParseChatFileApi = (params: any) => {
+	return service.post('/chat/parse_file',params)
+}
