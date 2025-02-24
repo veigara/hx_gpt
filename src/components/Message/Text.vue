@@ -44,8 +44,6 @@ const text = computed(() => {
   const value = props.text ?? ''
   // 针对deepseek,有<think>标签时，需要特殊处理
   if (value.includes('<think>') || value.includes('</think>')) {
-    // const escapedText = value.replace(/<think>/g, '<h4>深度思考</h4>').replace(/<\/think>/g, '')
-    // return mdi.render(escapedText)
     const escapedText = value.replace(/<think>/g, '<div class="accordion"><div class="accordion-title" onclick="toggleAccordion()">深度思考</div><div class="accordion-content active"><p>').replace(/<\/think>/g, '</p></div></div>')
     return mdi.render(escapedText)
   }else if(value.includes('<file_content>') || value.includes('</file_content>')){
