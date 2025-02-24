@@ -47,7 +47,7 @@
 											</el-button>
 										</div>
 										<!--问题内容-->
-										<div v-if="historyItem.content?.length"
+										<div v-if="Array.isArray(historyItem.content)"
 											v-for="(item, index) in historyItem.content" :key="index">
 											<div class="question_item_file" v-if="item.type === 'image_url'">
 												<div class="question_item_file_contain">
