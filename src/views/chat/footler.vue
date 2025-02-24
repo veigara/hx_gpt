@@ -75,6 +75,8 @@
 							:on-preview="handlePictureCardPreview" accept=".png,.jpg,.jpeg"
 							:before-upload="handleImageBeforeUpload"
 							:on-success="handleUploadSuccess"
+							:on-change="handleUploadChange"
+							:on-error="handleUploadError"
 							>
 							<el-icon>
 								<Plus />
@@ -260,6 +262,14 @@ const sendKeyClick = (event: any) => {
 let abortController = null
 // 发送按钮
 const sendBotMsgClick = async(event: any) => {
+	if(uploadFileStatus.value == true){
+		ElNotification({
+			title: '提示',
+			message: '文件正在上传中,请稍后',
+			type: 'warning'
+		})
+		return
+	}
 	// 隐藏上传框
 	uploadShow.value = false
 	uploadImageShow.value = false
@@ -446,7 +456,7 @@ const handleImageBeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
 		ElMessage.error('只允许上传一个图片')
 		return false
 	}
-
+	uploadFileStatus.value = true
 	return true
 }
 
@@ -459,7 +469,7 @@ const handleFileBeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
 		ElMessage.error('只允许上传一个文件')
 		return false
 	}
-
+	uploadFileStatus.value = true
 	return true
 }
 
@@ -483,7 +493,15 @@ const handleUploadSuccess:UploadProps['onSuccess'] = (
 	}
 	emit('update:chatBotDataUser', msg)
   }
+  uploadFileStatus.value = false
 }
+
+
+const handleUploadError: UploadProps['onError'] = (error, uploadFile, uploadFiles) => {
+	console.log('文件上传失败', error)
+	uploadFileStatus.value = false
+}
+
 // 上传
 const uploadShow = ref(false)
 // 上传图片
@@ -498,6 +516,8 @@ const uploadFilePath = ref('')
 const uploadFileName = ref('')
 // 解析文件名称
 const parseFileName = ref()
+// 文件上传状态
+const uploadFileStatus = ref(false)
 
 // 重置文件状态
 const resetUpload = () => {
@@ -508,6 +528,7 @@ const resetUpload = () => {
 	uploadFileName.value = ''
 	fileList.value = []
 	parseFileName.value = undefined
+	uploadFileStatus.value = false
 }
 
 const uploadImageClick = () => {
