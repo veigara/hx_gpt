@@ -289,7 +289,6 @@ const sendBotMsgClick = async(event: any) => {
 	}
 
 	if(uploadFilePath.value && uploadFileName.value !=''){
-		chatBotMst.value = ''
 		const res = await parseChatFile()
 		if(!res){
 			return
@@ -586,6 +585,7 @@ const parseChatFile =async ()=>{
 		console.error('请求失败:', error);
 		fileMsg.fileData.parseErrMsg = error.message
 	}
+	fileList.value = []
 	fileMsg.fileData.parseLoading = false
 	chatData.isLoading = false
 	emit('update:chatFileData', fileMsg)

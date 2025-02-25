@@ -11,7 +11,7 @@ from langchain_community.document_loaders import JSONLoader, TextLoader
 from langchain.docstore.document import Document
 from langchain.text_splitter import MarkdownHeaderTextSplitter, TextSplitter
 
-from ..base_module.base_response import AgentResponse
+from ..base_module.agent_exception import AgentException
 from .knowledge_redis import add_redis_store
 
 logger = logging.getLogger("chat_app")
@@ -275,10 +275,10 @@ class KnowDocumentFile:
         self.file_config = file_config if file_config is not None else {}
         # 检查文件类型是否在支持的类型列表中
         if self.file_type not in SUPPORTED_TYPE:
-            raise AgentResponse(f"暂未支持的文件格式 {title}{file_type}")
+            raise AgentException(f"暂未支持的文件格式 {title}{file_type}")
         # 验证文件路径是否存在
         if not self.file_exist():
-            raise AgentResponse(f"文件路径 {file_path} 不存在")
+            raise AgentException(f"文件路径 {file_path} 不存在")
         self.docs = None
         self.splited_docs = None
 
@@ -421,7 +421,7 @@ class KnowDocumentFile:
                     self.splited_docs = self.docs2texts(docs=docs, text_splitter=None)
                 except Exception as e:
                     logging.error(f"Error processing file: {e}")
-                    raise AgentResponse("从文件中提取文档失败")
+                    raise AgentException("从文件中提取文档失败")
 
         return self.splited_docs
 
