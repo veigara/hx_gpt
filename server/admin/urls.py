@@ -129,6 +129,16 @@ urlpatterns = [
         chat_web.parse_chat_file,
         name="chat/parse_chat_file",
     ),
+    # 修改聊天记录文件
+    path(
+        "chat/update_history", chat_web.update_chat_history, name="update_chat_history"
+    ),
+    # 新建分支聊天
+    path(
+        "chat/snip_history_build",
+        chat_web.snip_chat_history_build,
+        name="snip_chat_history_build",
+    ),
     # vue页面
     path("", TemplateView.as_view(template_name="index.html"), name="index"),
     re_path(r"^.*/$", TemplateView.as_view(template_name="index.html")),

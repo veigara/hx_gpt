@@ -177,8 +177,8 @@ def get_history_content(id) -> List:
     return SEARCH_AI_HISTORY_CONTENT(id)
 
 
-def update_history(user_name, history_id, contents) -> None:
-    """修改聊天记录，对话防止超限
+def update_history(user_name, history_id, contents: list) -> None:
+    """修改聊天记录，对话防止超限,在以前的记录省增加
     history_id(str):id 聊天记录id
     content([]):当前对话
     max_content_len(int) 最大上下文
@@ -187,43 +187,15 @@ def update_history(user_name, history_id, contents) -> None:
         history_data = load_history(history_id)
         if history_data is None:
             raise AgentException(f"聊天记录不存在,id={history_id}")
-        agent_data = history_data.get("agent_data", {})
         count = history_data.get("count", 0)
-        agent_count = agent_data.get("count", 0)
         all_token_counts = history_data.get("all_token_counts", 0)
         content_data = history_data.get("content", [])
         history_data["count"] = int(count) + len(contents)
         cur_chat_token = count_user_history_token(contents)
         history_data["all_token_counts"] = int(all_token_counts) + cur_chat_token
         content_data.extend(contents)
-        max_tokens = agent_data.get("max_tokens", 0)
-        max_limit = int(max_tokens)
-        # if (
-        #     max_tokens is not None
-        #     and history_data["all_token_counts"] > max_limit
-        #     and max_limit > 0
-        #     and max_limit > max_tokens
-        # ):
-        #     logger.warning("聊天记录对话超过最大限制，自动截断开始。。。。")
-        #     agent_content_data = content_data[:agent_count]
-        #     chat_content_data = content_data[agent_count + 1 :]
-        #     # 智能体的token和当前对话token
-        #     cur_token = count_user_history_token(agent_content_data) + cur_chat_token
 
-        #     real_chat_data = []
-        #     for history in chat_content_data[::-1]:
-        #         token = count_user_history_token([history])
-        #         if cur_token + token < max_limit:
-        #             # 倒叙添加
-        #             real_chat_data.insert(0, history)
-        #         else:
-        #             break
-        #     content_data = agent_content_data.extend(real_chat_data)
-        #     history_data["content"] = content_data
-        #     history_data["count"] = len(content_data)
-        #     history_data["all_token_counts"] = count_user_history_token(content_data)
-
-        # 保存并修改缓存
+        # 保存
         update_history_all(user_name, history_data)
 
     except Exception as e:
@@ -265,3 +237,48 @@ def clear_context(user_name, history_id) -> None:
 def get_count_tokens(history_id) -> dict:
     """获取当前聊天记录的tokens和count"""
     return SERARCH_AI_HISTORY_TOKENS(history_id)
+
+
+def update_history_id(user_name, history_id, contents: list) -> None:
+    """
+    根据id更新聊天记录，直接覆盖原内容，并重新计算token和对话数量
+    @param user_name: 用户名
+    @param history_id: 聊天记录id
+    @param contents: 替换的对话内容
+    @return: None
+    """
+    history_data = load_history(history_id)
+    if history_data is None:
+        raise AgentException(f"聊天记录不存在,id={history_id}")
+    # 对话条数
+    history_data["count"] = len(contents)
+    # 对话token
+    history_data["all_token_counts"] = count_user_history_token(contents)
+    # 将原来历史记录替换
+    history_data["content"] = contents
+
+    update_history_all(user_name, history_data)
+
+
+def snip_history_build(user_name, history_id, contents: list) -> dict:
+    """
+    以这个新的消息内容为基准，按照以前的参数新建一个聊天记录
+    @param user_name: 用户名
+    @param history_id: 聊天记录id
+    @param contents: 对话内容
+    @return: None
+    """
+    history_data = load_history(history_id)
+    if history_data is None:
+        raise AgentException(f"聊天记录不存在,id={history_id}")
+    # 对话条数
+    history_data["count"] = len(contents)
+    # 对话token
+    history_data["all_token_counts"] = count_user_history_token(contents)
+    # 将原来历史记录替换
+    history_data["content"] = contents
+    title = history_data.get("title")
+    history_data["title"] = f"{title}-Branched"
+    history_data["id"] = None
+
+    return save_history(user_name, history_data)

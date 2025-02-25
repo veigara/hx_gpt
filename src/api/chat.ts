@@ -71,3 +71,12 @@ export const useDownChatFileApi = (file_name: string,file_path: string) => {
 	const baseURL =  import.meta.env.VITE_API_URL as any
 	return `${baseURL}/chat/down_file?file_path=${file_path}&file_name=${file_name}`
 }
+
+export const useUpdateHistoryApi = (params: any) => {
+	return service.post('/chat/update_history',params)
+}
+
+
+export const useSnipHistoryBuildApi = (params: any) => {
+	return service.post('/chat/snip_history_build',params)
+}

@@ -1,5 +1,5 @@
 <template>
-	<el-row :gutter="2">
+	<el-row :gutter="1">
 		<el-col :span="20">
 			<el-input v-model="searchTxt" placeholder="搜索聊天记录" style="border-radius: 20px;"
 				@input="debouncedSearchTitle">
@@ -8,13 +8,20 @@
 				</template>
 			</el-input>
 		</el-col>
-		<el-col :span="3">
+		<el-col :span="2">
 			<div class="add-chat" title="新建对话" @click="addChat">
 				<el-icon :size="20">
 					<Plus />
 				</el-icon>
 			</div>
 		</el-col>
+		<el-col :span="2">
+			<div class="add-chat" title="刷新" @click="refreshChat">
+				<el-icon :size="20">
+					<Refresh />
+				</el-icon>
+			</div>
+		</el-col>		
 	</el-row>
 	<div style="overflow: hidden;margin-top:20px">
 		<el-scrollbar :max-height="computedHistoryMaxHeight">
@@ -37,6 +44,10 @@
 							<div class="history-menu-item" @click="topHistory(item)">
 								<span><svg-icon icon="icon-add-top" /></span>置顶此对话
 							</div>
+							
+							<div class="history-menu-item">
+								<span><svg-icon icon="icon-agent" /></span>转为智能体
+							</div>
 							<div class="history-menu-item" @click="delHistory(item)">
 								<span><svg-icon icon="icon-delete" /></span>删除此对话
 							</div>
@@ -56,7 +67,7 @@
 import { nextTick, reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useGetHistorysApi, useRenameHistoryApi, useDelHistoryApi, useTopHistoryApi } from '@/api/chat'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus,Refresh } from '@element-plus/icons-vue'
 import { debounce } from 'lodash';
 
 const historys = ref<any>([])
@@ -215,6 +226,12 @@ const topHistory = (item: any) => {
 		getUserHistory()
 		ElMessage.success('置顶成功')
 	})
+}
+
+// 刷新对话
+const refreshChat = () => {
+	// 页面上全部初始化,显示提示信息
+	emits('refresh:history', true)
 }
 </script>
 

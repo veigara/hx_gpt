@@ -75,7 +75,6 @@
 							:on-preview="handlePictureCardPreview" accept=".png,.jpg,.jpeg"
 							:before-upload="handleImageBeforeUpload"
 							:on-success="handleUploadSuccess"
-							:on-change="handleUploadChange"
 							:on-error="handleUploadError"
 							>
 							<el-icon>
@@ -249,12 +248,12 @@ const sendKeyClick = (event: any) => {
 		//shift+enter 不触发此事件
 		return
 	}
-	if (event.keyCode == 13) {
+	if (event.key === 'Enter') {
 		// enter
 		sendBotMsgClick(event)
 	}
 	// /键
-	if (event.keyCode == 191) {
+	if (event.key === '/') {
 		fnDialogRef.value.init()
 	}
 }

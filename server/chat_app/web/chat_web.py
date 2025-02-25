@@ -501,6 +501,82 @@ def parse_chat_file(request):
         )
 
 
+@csrf_exempt
+@require_http_methods(["POST"])
+def update_chat_history(request):
+    """
+    修改历史记录
+    """
+    try:
+        user_name = get_user_name(request)
+        payload = json.loads(request.body.decode("utf-8"))
+        history_id = payload.get("history_id")
+        contents_str = payload.get("contents_str")
+        if user_name is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}用户名称不能为空")
+            )
+
+        if history_id is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
+            )
+
+        if contents_str is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天内容字不能为空")
+            )
+        # 将json字符串转成list
+        contents = json.loads(contents_str)
+
+        update_history_id(user_name, history_id, contents)
+
+        return JsonResponse(AgentResponse.success(data={}))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}修改聊天记录失败")
+        )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def snip_chat_history_build(request) -> dict:
+    """
+    新建分支聊天
+    """
+    try:
+        user_name = get_user_name(request)
+        payload = json.loads(request.body.decode("utf-8"))
+        history_id = payload.get("history_id")
+        contents_str = payload.get("contents_str")
+        if user_name is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}用户名称不能为空")
+            )
+
+        if history_id is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
+            )
+
+        if contents_str is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天内容字不能为空")
+            )
+        # 将json字符串转成list
+        contents = json.loads(contents_str)
+
+        res = snip_history_build(user_name, history_id, contents)
+
+        return JsonResponse(AgentResponse.success(data=res))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}新建分支聊天失败")
+        )
+
+
 class ModelData:
     def __init__(self, label, model_name, description, model_type):
         self.label = label

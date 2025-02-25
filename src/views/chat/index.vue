@@ -31,18 +31,15 @@
 				<div style="height: calc(100vh - 270px);">
 					<el-scrollbar max-height="100%" style="width: 100%;" ref="scrollbarRef">
 						<div style="max-width: 896px;min-width:320px; margin: 16px auto;">
-							<div v-for="historyItem in chat_msg.history">
+							<div v-for="(historyItem, index) in chat_msg.history">
 								<!---问题--->
 								<div class="question_item" v-if="historyItem.role == 'user'">
 									<div class="question_item_container">
 										<!--问题头像-->
 										<div class="question_item_avatar">
-											<el-button @mouseover="questionEdit = true"
-												@mouseleave="questionEdit = false">
+											<el-button>
 												<template #icon>
-													<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"
-														@click="editQuestion(historyItem.content)"></svg-icon>
-													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
+													<svg-icon :size="'25'" :icon="curAgent.user_icon" />
 												</template>
 											</el-button>
 										</div>
@@ -62,17 +59,45 @@
 											<div class="preserve-format">{{ historyItem.content }}</div>
 										</div>
 									</div>
+									<!--悬浮的div-->
+									<div class="feature_tool">
+
+										<div class="feature_tool_item" @click="snipHistory(index)">
+											<el-tooltip effect="dark" content="在此消息后分支聊天" placement="top">
+												<svg-icon :size="'20'" icon="icon-lianjie"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div class="feature_tool_item" @click="copyMessage(historyItem.content)">
+											<el-tooltip effect="dark" content="复制消息" placement="top">
+												<svg-icon :size="'20'" icon="icon-chat_copy"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div v-if="!Array.isArray(historyItem.content)" class="feature_tool_item"
+											@click="editMessage(historyItem.content, index)">
+											<el-tooltip effect="dark" content="编辑消息" placement="top">
+												<svg-icon :size="'20'" icon="icon-edit_save"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div v-if="!Array.isArray(historyItem.content)" class="feature_tool_item"
+											@click="editQuestion(historyItem.content)">
+											<el-tooltip effect="dark" content="重新编辑" placement="top">
+												<svg-icon :size="'20'" icon="icon-edit"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div class="feature_tool_item" @click="delCurMessage(index)">
+											<el-tooltip effect="dark" content="删除消息" placement="top">
+												<svg-icon :size="'20'" icon="icon-shanchu"></svg-icon>
+											</el-tooltip>
+										</div>
+									</div>
 								</div>
 								<div class="question_item" v-if="historyItem?.type == 'file'">
 									<div class="question_item_container">
 										<!--问题头像-->
 										<div class="question_item_avatar">
-											<el-button @mouseover="downChatFile = true"
-												@mouseleave="downChatFile = false">
+											<el-button>
 												<template #icon>
-													<svg-icon :size="'20'" icon="icon-down_file" v-if="downChatFile"
-														@click="downChatFileFn(historyItem)"></svg-icon>
-													<svg-icon :size="'25'" :icon="curAgent.user_icon" v-else></svg-icon>
+													<svg-icon :size="'25'" :icon="curAgent.user_icon"></svg-icon>
 												</template>
 											</el-button>
 										</div>
@@ -81,9 +106,25 @@
 											<!--展示文件内容--->
 											<div class="question_item_file_contain">
 												<div class="question_item_file_icon"><svg-icon :size="'40'"
-														icon="icon-file" title="下载"></svg-icon></div>
-												<div class="question_item_file_content">{{ historyItem?.file }}</div>
+														icon="icon-file"></svg-icon>
+												</div>
+												<div class="question_item_file_content">
+													<div>{{ historyItem?.file }}</div>
+												</div>
 											</div>
+										</div>
+									</div>
+									<!--悬浮的div-->
+									<div class="feature_tool">
+										<div class="feature_tool_item" @click="downChatFileFn(historyItem)">
+											<el-tooltip effect="dark" content="下载" placement="top">
+												<svg-icon :size="'20'" icon="icon-down_file"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div class="feature_tool_item" @click="delCurMessage(index)">
+											<el-tooltip effect="dark" content="删除" placement="top">
+												<svg-icon :size="'20'" icon="icon-shanchu"></svg-icon>
+											</el-tooltip>
 										</div>
 									</div>
 								</div>
@@ -104,6 +145,29 @@
 									<div class="ans_item_content">
 										<TextComponent ref="textRef" :text="historyItem.content" :loading="false"
 											:asRawText="false" />
+									</div>
+									<!--悬浮的div-->
+									<div class="feature_tool">
+										<div class="feature_tool_item" @click="snipHistory(index)">
+											<el-tooltip effect="dark" content="在此消息后分支聊天" placement="top">
+												<svg-icon :size="'20'" icon="icon-lianjie"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div class="feature_tool_item" @click="copyMessage(historyItem.content)">
+											<el-tooltip effect="dark" content="复制消息" placement="top">
+												<svg-icon :size="'20'" icon="icon-chat_copy"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div class="feature_tool_item" @click="editMessage(historyItem.content, index)">
+											<el-tooltip effect="dark" content="编辑消息" placement="top">
+												<svg-icon :size="'20'" icon="icon-edit_save"></svg-icon>
+											</el-tooltip>
+										</div>
+										<div class="feature_tool_item" @click="delCurMessage(index)">
+											<el-tooltip effect="dark" content="删除消息" placement="top">
+												<svg-icon :size="'20'" icon="icon-shanchu"></svg-icon>
+											</el-tooltip>
+										</div>
 									</div>
 								</div>
 							</div>
@@ -153,19 +217,26 @@
 										<div class="question_item_container">
 											<!--问题头像-->
 											<div class="question_item_avatar">
-												<el-button @mouseover="questionEdit = true"
-													@mouseleave="questionEdit = false">
-													<template #icon>
-														<svg-icon :size="'20'" icon="icon-edit" v-if="questionEdit"
-															@click="editQuestion(data.userCt)"></svg-icon>
-														<svg-icon :size="'25'" :icon="curAgent.user_icon"
-															v-else></svg-icon>
-													</template>
+												<el-button>
+													<svg-icon :size="'25'" :icon="curAgent.user_icon" />
 												</el-button>
 											</div>
 											<!--问题内容-->
 											<div class="question_item_content">
 												<div class="preserve-format">{{ data.userCt }}</div>
+											</div>
+										</div>
+										<!--悬浮的div-->
+										<div class="feature_tool">
+											<div class="feature_tool_item" @click="copyMessage(data.userCt)">
+												<el-tooltip effect="dark" content="复制消息" placement="top">
+													<svg-icon :size="'20'" icon="icon-chat_copy"></svg-icon>
+												</el-tooltip>
+											</div>
+											<div class="feature_tool_item" @click="editQuestion(data.userCt)">
+												<el-tooltip effect="dark" content="重新编辑" placement="top">
+													<svg-icon :size="'20'" icon="icon-edit"></svg-icon>
+												</el-tooltip>
 											</div>
 										</div>
 									</div>
@@ -189,6 +260,14 @@
 												</div>
 											</div>
 										</div>
+										<!--悬浮的div-->
+										<div class="feature_tool">
+											<div class="feature_tool_item" @click="downChatFileFn(data)">
+												<el-tooltip effect="dark" content="下载" placement="top">
+													<svg-icon :size="'20'" icon="icon-down_file"></svg-icon>
+												</el-tooltip>
+											</div>
+										</div>
 									</div>
 									<!---回答--->
 									<div class="ans_item" v-if="data?.type != 'file'">
@@ -207,6 +286,14 @@
 										<div class="ans_item_content">
 											<TextComponent ref="textRef" :text="data.assistantCt"
 												:loading="data.isLoading" />
+										</div>
+										<!--悬浮的div-->
+										<div class="feature_tool">
+											<div class="feature_tool_item" @click="copyMessage(data.assistantCt)">
+												<el-tooltip effect="dark" content="复制消息" placement="top">
+													<svg-icon :size="'20'" icon="icon-chat_copy"></svg-icon>
+												</el-tooltip>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -233,9 +320,9 @@ import { ElNotification, ElScrollbar, ElMessage, ElMessageBox } from 'element-pl
 import TextComponent from '@/components/Message/Text.vue'
 import HistoryAside from '@/views/chat/historyAside.vue'
 import Footler from '@/views/chat/footler.vue'
-import { useGetHistoryDetailApi, useHistoryTokensApi, useDownChatFileApi } from '@/api/chat'
+import { useGetHistoryDetailApi, useHistoryTokensApi, useDownChatFileApi, useUpdateHistoryApi, useSnipHistoryBuildApi } from '@/api/chat'
 import { useModelDetailApi } from '@/api/model'
-
+import { copyToClip } from '@/utils/copy'
 
 
 const curHistoryId = ref('')
@@ -257,10 +344,6 @@ const chat_msg = reactive({
 	history: [],
 	chatBotDatas: []
 })
-
-
-// 问题头像
-const questionEdit = ref(false)
 
 // 当前模型
 const curModel = ref('')
@@ -424,8 +507,8 @@ const init = () => {
 
 const editQuestion = (data: string) => {
 	// 重新发送内容
-	ElMessageBox.prompt('请输入发送的内容', '发送', {
-		confirmButtonText: '确定',
+	ElMessageBox.prompt('请输入发送的内容', '重新发送', {
+		confirmButtonText: '发送',
 		cancelButtonText: '取消',
 		inputPattern: /.+?/,
 		inputErrorMessage: '内容不能为空',
@@ -465,8 +548,6 @@ const curModelKeyFn = (modelKey: string) => {
 	}
 }
 
-// 下载文件
-const downChatFile = ref(false)
 const downChatFileFn = (file: any) => {
 	const file_path = file.file_path
 	const file_name = file.file
@@ -478,7 +559,7 @@ const downChatFileFn = (file: any) => {
 		})
 	}
 	const a = document.createElement('a')
-	a.href = useDownChatFileApi(file_name,file_path)
+	a.href = useDownChatFileApi(file_name, file_path)
 	document.body.appendChild(a)
 	a.click()
 	ElNotification({
@@ -487,6 +568,137 @@ const downChatFileFn = (file: any) => {
 		type: 'success'
 	})
 
+}
+
+// 复制消息
+const copyMessage = (data: string) => {
+	copyToClip(data).then(() => {
+		ElNotification({
+			title: '成功',
+			message: '复制成功',
+			type: 'success'
+		})
+	})
+}
+
+// 编辑消息
+const editMessage = (historyContent: string, index: number) => {
+	const roleItem = chat_msg.history[index]
+	const historyId = curHistoryId.value
+	// 重新发送内容
+	ElMessageBox.prompt('请输入修改的内容', '保存', {
+		confirmButtonText: '保存',
+		cancelButtonText: '取消',
+		inputPattern: /.+?/,
+		inputErrorMessage: '内容不能为空',
+		inputValue: historyContent,
+		inputType: 'textarea',
+	})
+		.then(({ value }) => {
+			roleItem.content = value
+			const params = {
+				"history_id": historyId,
+				"contents_str": JSON.stringify(chat_msg.history),
+			}
+			useUpdateHistoryApi(params).then(res => {
+				ElNotification({
+					title: '成功',
+					message: '操作成功',
+					type: 'success'
+				})
+				// 刷新token和对话
+				useHistoryTokensApi({ id: historyId }).then(res => {
+					const data = res.data
+					const count = data.count
+					curAgent.token_count = data.all_token_counts
+					historyRef.value.setHistoryCount(historyId, count)
+				})
+
+			}).catch((error) => {
+				ElNotification({
+					title: '操作失败',
+					message: error.message,
+					type: 'error'
+				})
+				// 还原原始数据
+				roleItem.content = historyContent
+			})
+		})
+
+}
+
+// 删除消息
+const delCurMessage = (index: number) => {
+	ElMessageBox.confirm(
+		'是否确认删除该对话？',
+		'警告',
+		{
+			confirmButtonText: '确定',
+			cancelButtonText: '取消',
+			type: 'warning',
+		}
+	)
+		.then(() => {
+			// 删除
+			chat_msg.history.splice(index, 1)
+			const historyId = curHistoryId.value
+			const params = {
+				"history_id": historyId,
+				"contents_str": JSON.stringify(chat_msg.history),
+			}
+			useUpdateHistoryApi(params).then(res => {
+				ElNotification({
+					title: '成功',
+					message: '操作成功',
+					type: 'success'
+				})
+				// 刷新token和对话
+				useHistoryTokensApi({ id: historyId }).then(res => {
+					const data = res.data
+					const count = data.count
+					curAgent.token_count = data.all_token_counts
+					historyRef.value.setHistoryCount(historyId, count)
+				})
+
+			}).catch((error) => {
+				ElNotification({
+					title: '操作失败',
+					message: error.message,
+					type: 'error'
+				})
+			})
+		})
+
+
+
+}
+
+// 新分支聊天
+const snipHistory = (index: number) => {
+	// 截取从0到index的数组
+	const slicedHistory = chat_msg.history.slice(0, index + 1);
+	const historyId = curHistoryId.value
+	const params = {
+		"history_id": historyId,
+		"contents_str": JSON.stringify(slicedHistory),
+	}
+	useSnipHistoryBuildApi(params).then(res => {
+		ElNotification({
+			title: '成功',
+			message: '操作成功',
+			type: 'success'
+		})
+		// 刷新左侧记录并点击第一个
+		// 刷新聊天记录
+	curHistoryId.value = res.data.id
+	historyRef.value.refreshAndSelectFirstHistory(true)
+	}).catch((error) => {
+		ElNotification({
+			title: '操作失败',
+			message: error.message,
+			type: 'error'
+		})
+	})
 }
 
 onMounted(() => {
@@ -684,6 +896,8 @@ onMounted(() => {
 	flex-direction: column;
 	align-items: flex-start;
 	margin-top: 10px;
+
+	position: relative;
 }
 
 .ans_item_avatar :deep(.el-button) {
@@ -719,7 +933,43 @@ onMounted(() => {
 	display: flex;
 	flex-direction: row-reverse;
 	margin-top: 10px;
+	position: relative;
+}
 
+.feature_tool {
+	display: none;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	height: 40px;
+	padding: 10px;
+	min-width: 100px;
+	bottom: -20px;
+	right: 10px;
+	background-color: rgba(250, 251, 255, 0.9);
+	padding: 5px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+
+	.feature_tool_item {
+		margin-right: 10px;
+		cursor: pointer;
+	}
+
+	.feature_tool_item &:last-child {
+		padding: 0;
+	}
+}
+
+.question_item:hover,
+.ans_item:hover {
+	background-color: rgba(237, 239, 245, .45);
+}
+
+.question_item:hover .feature_tool,
+.ans_item:hover .feature_tool {
+	display: flex;
 }
 
 .question_item>.question_item_container {
