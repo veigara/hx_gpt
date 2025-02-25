@@ -709,7 +709,7 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .chat_card_aside {
-	padding: 24px 10px 8px 10px;
+	padding: 24px 5px 8px 10px;
 	border-right: 1px solid rgba(237, 239, 245, .45);
 	min-height: calc(100vh - 19px);
 	background-color: #fff;

@@ -42,3 +42,5 @@ package-lock.json
 /server/agentmodels
 /server/knowledge
 /server/web
+/server/chat
+

@@ -1,5 +1,6 @@
 <template>
-	<el-row :gutter="1">
+	<div style="overflow: hidden;">
+		<el-row :gutter="1">
 		<el-col :span="20">
 			<el-input v-model="searchTxt" placeholder="搜索聊天记录" style="border-radius: 20px;"
 				@input="debouncedSearchTitle">
@@ -23,8 +24,8 @@
 			</div>
 		</el-col>
 	</el-row>
-	<div style="overflow: hidden;margin-top:20px">
-		<el-scrollbar :max-height="computedHistoryMaxHeight">
+	<el-scrollbar :max-height="computedHistoryMaxHeight">
+		<div style="margin-top:20px">
 			<ul>
 				<li :class="{ 'history_listItem': true, 'history_listItem_active': item.active == true }"
 					v-for="item in historys" :key="item.id" @click="selectHistoryItem(item)">
@@ -61,8 +62,10 @@
 					</el-popover>
 				</li>
 			</ul>
-		</el-scrollbar>
+		</div>
+	</el-scrollbar>
 	</div>
+	
 </template>
 
 <script setup lang="ts">
@@ -140,7 +143,7 @@ const selectHistoryItem = (item: any) => {
 const computedHistoryMaxHeight = computed(() => {
 	//const headerHeight = parseFloat(themeHeaderHeight.value);
 	//return `calc(100vh - 19px - 90px - ${headerHeight}px)`;
-	return `calc(100vh - 19px - 90px )`;
+	return `calc(100vh - 19px - 70px )`;
 });
 
 // 打开聊天记录的菜单
