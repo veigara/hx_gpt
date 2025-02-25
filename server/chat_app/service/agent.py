@@ -16,7 +16,7 @@ logger = logging.getLogger("chat_app")
 
 
 def save_agent(user_name, agent_data: dict) -> None:
-    """保存智能体文件"""
+    """保存角色体文件"""
     if agent_data is not None:
         datas = SAVE_AI_AGENT(**buildSaveParams(user_name, agent_data))
         return datas
@@ -25,11 +25,11 @@ def save_agent(user_name, agent_data: dict) -> None:
 
 
 def update_agent(user_name, agent_data: dict) -> None:
-    """修改智能体文件"""
+    """修改角色体文件"""
     if agent_data is not None:
         res = UPDATE_AI_AGENT(**buildUpdateParams(user_name, agent_data))
         if res < 1:
-            raise AgentException("修改智能体失败")
+            raise AgentException("修改角色体失败")
 
     return None
 
@@ -70,7 +70,7 @@ def buildUpdateParams(user_name, agent_data):
 
 
 def load_agent(user_name, id) -> str:
-    """从文件目录中获取智能体文件的内容"""
+    """从文件目录中获取角色体文件的内容"""
     data = SEARCH_AI_AGENT_ID(id)
 
     return data
@@ -78,16 +78,16 @@ def load_agent(user_name, id) -> str:
 
 def get_user_all_agents(user_name, keyword=None):
     """
-    获取当前用户所有智能体文件
+    获取当前用户所有角色体文件
 
-    根据用户名称和关键词获取用户的所有智能体文件列表如果关键词不为空，则使用关键词过滤智能体列表
+    根据用户名称和关键词获取用户的所有角色体文件列表如果关键词不为空，则使用关键词过滤角色体列表
 
     参数:
     user_name (str): 用户名称
-    keyword (str): 用于搜索智能体标题的关键词
+    keyword (str): 用于搜索角色体标题的关键词
 
     返回:
-    list: 包含智能体信息的字典列表，每个字典包含智能体的标题和ID
+    list: 包含角色体信息的字典列表，每个字典包含角色体的标题和ID
     """
     try:
         agent_list = SEARCH_AI_AGENT(user_name, title=keyword)
@@ -101,13 +101,13 @@ def get_user_all_agents(user_name, keyword=None):
     except Exception as e:
         # 抛出异常
         logger.error(print_err(e))
-        raise AgentException(f"{STANDARD_ERROR_MSG}:获取当前用户所有智能体失败")
+        raise AgentException(f"{STANDARD_ERROR_MSG}:获取当前用户所有角色体失败")
 
 
 # def set_user_agent(user_name, jsonData) -> None:
 #     """设置全局模型
 #     user_name (str): 当前用户名称
-#     jsonData (json): 智能体数据
+#     jsonData (json): 角色体数据
 #     """
 #     # 查询id相关详情
 #     if jsonData is None:
@@ -133,7 +133,7 @@ def get_user_all_agents(user_name, keyword=None):
 
 
 # def set_user_agent_all(user_name, jsonData) -> None:
-#     """将用户智能体加载进内存中"""
+#     """将用户角色体加载进内存中"""
 #     # 查询id相关详情
 #     _user_agent_instance[user_name] = jsonData
 
@@ -147,14 +147,14 @@ def get_user_all_agents(user_name, keyword=None):
 
 
 def del_agent(user_name, id) -> None:
-    """删除智能体文件"""
+    """删除角色体文件"""
     res = DELETE_AI_AGENT(id)
     if res < 1:
-        raise AgentException("删除智能体失败")
+        raise AgentException("删除角色体失败")
 
 
 def get_default_agent_data(user_name):
-    """获取默认的智能体数据"""
+    """获取默认的角色体数据"""
     datas = SEARCH_SYSTEM_AGENT()
     if len(datas) > 0:
         return datas[0]

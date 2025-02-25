@@ -19,7 +19,7 @@ def save_ai_agent(
     assistant_icon,
     user_name,
 ):
-    """保存智能体基本信息"""
+    """保存角色体基本信息"""
     data = AiAgent(
         title=title,
         content=content,
@@ -51,7 +51,7 @@ def update_ai_agent(
     assistant_icon,
     user_name,
 ):
-    """更新智能体基本信息"""
+    """更新角色体基本信息"""
     res = AiAgent.objects.filter(id=id).update(
         title=title,
         content=content,
@@ -71,11 +71,11 @@ def update_ai_agent(
 
 
 def search_ai_agent(user_name: str, title: str = None) -> List[Dict[str, Any]]:
-    """根据智能体名称搜索智能体基本信息
+    """根据角色体名称搜索角色体基本信息
 
     Args:
         user_name (str): 用户名
-        title (str): 智能体名称
+        title (str): 角色体名称
 
     Returns:
         List[Dict[str, Any]]: 搜索结果
@@ -125,7 +125,7 @@ def delete_ai_agent(id) -> int:
 
 
 def search_system_agent() -> dict:
-    """获取系统智能体"""
+    """获取系统角色体"""
     results = AiAgent.objects.filter(user_name=SYS_USER_NAME).order_by("create_time")
     # 添加字段后，自动转为dict
     datas = list(results)

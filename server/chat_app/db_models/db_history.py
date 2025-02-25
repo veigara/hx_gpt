@@ -6,7 +6,7 @@ class AiHistory(models.Model):
     # 数据库可变类型
     title = models.CharField("聊天记录名称", max_length=200)
     content = models.TextField("聊天记录内容(json字符串)")
-    agent_id = models.CharField("智能体id", max_length=200)
+    agent_id = models.CharField("角色体id", max_length=200)
     all_token_counts = models.BigIntegerField("当前记录token数")
     count = models.IntegerField("当前对话数")
     create_time = models.DateTimeField("创建时间", auto_now_add=True)

@@ -23,7 +23,7 @@
 					</el-row>
 					<el-row style="padding: 0px 20px;">
 						<el-col :span="16">
-							智能体: <span style="color: #00BFFF;">{{ curAgent.agent_title }}</span>
+							角色体: <span style="color: #00BFFF;">{{ curAgent.agent_title }}</span>
 						</el-col>
 					</el-row>
 				</div>
@@ -348,7 +348,7 @@ const chat_msg = reactive({
 // 当前模型
 const curModel = ref('')
 
-// 当前智能体
+// 当前角色体
 const initCurAgent = {
 	agent_id: '',
 	agent_title: '',
@@ -401,7 +401,7 @@ watch([scrollbarRef, chat_msg], ([newScrollVal, newChatVal], [oldScrollVal, oldC
 	}
 })
 
-// 选择智能体
+// 选择角色体
 const selectAgent = (historyId: any) => {
 	// 刷新聊天记录
 	curHistoryId.value = historyId

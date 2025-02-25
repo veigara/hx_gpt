@@ -196,7 +196,7 @@ class BaseLLMModel:
         return self.history_content
 
     def get_agent_current_input(self):
-        """上下文只有智能体和当前对话的"""
+        """上下文只有角色体和当前对话的"""
         if self.agent_history_data is None:
             self.agent_history_data = []
         messages = [*self.agent_history_data, self.input_txt]
@@ -250,7 +250,7 @@ class BaseLLMModel:
                     logger.warning("聊天记录对话超过最大限制，自动截断开始。。。。")
                     agent_content_data = content_data[:agent_count]
                     chat_content_data = content_data[agent_count + 1 :]
-                    # 智能体的token和当前对话token
+                    # 角色体的token和当前对话token
                     cur_token = (
                         COUNT_USER_HISTORY_TOKEN(agent_content_data) + cur_chat_token
                     )

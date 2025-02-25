@@ -4,8 +4,8 @@ from django.db import models
 class AiAgent(models.Model):
     # 模型中不需要指定id
     # 数据库可变类型
-    title = models.CharField("智能体名称", max_length=200)
-    content = models.TextField("智能体内容(json字符串)", max_length=200)
+    title = models.CharField("角色体名称", max_length=200)
+    content = models.TextField("角色体内容(json字符串)", max_length=200)
     model_key = models.CharField("模型名称", max_length=200)
     temperature = models.CharField("随机性", max_length=200)
     top_p = models.CharField("核采样", max_length=200)
@@ -24,5 +24,5 @@ class AiAgent(models.Model):
 
     class Meta:
         db_table = "ai_agent"
-        verbose_name = "智能体"
+        verbose_name = "角色体"
         verbose_name_plural = verbose_name

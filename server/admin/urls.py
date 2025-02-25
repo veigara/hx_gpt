@@ -29,15 +29,15 @@ urlpatterns = [
     path("chat", chat_web.chat_with_model, name="chat_with_model"),
     # 获取所有的大模型
     path("models", chat_web.get_all_models, name="get_all_models"),
-    # 保存智能体文件
+    # 保存角色体文件
     path("save_agent_file", chat_web.save_agent_file, name="save_agent_file"),
-    # 查询当前用户所有智能体文件
+    # 查询当前用户所有角色体文件
     path("get_user_agent", chat_web.get_user_agent, name="get_user_agent"),
-    # 查询当前用户的智能体文件详情
+    # 查询当前用户的角色体文件详情
     path("get_agent_detail", chat_web.get_agent_detail, name="get_agent_detail"),
-    # 删除智能体
+    # 删除角色体
     path("del_agent", chat_web.get_del_agent, name="get_del_agent"),
-    # 选择智能体
+    # 选择角色体
     path("select_agent", chat_web.select_agent, name="select_agent"),
     # 获取聊天记录
     path("get_historys", chat_web.get_historys, name="get_historys"),
@@ -139,7 +139,7 @@ urlpatterns = [
         chat_web.snip_chat_history_build,
         name="snip_chat_history_build",
     ),
-    # 转为智能体
+    # 转为角色体
     path(
         "chat/build_hisorty_to_agent",
         chat_web.build_chat_hisorty_to_agent,

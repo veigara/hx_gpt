@@ -1,12 +1,12 @@
 <template>
-	<el-dialog v-model="visible" title="智能体" :close-on-click-modal="false">
+	<el-dialog v-model="visible" title="角色体" :close-on-click-modal="false">
 		<template #header>
-			<div class="header-title">智能体</div>
+			<div class="header-title">角色体</div>
 			<div>{{ agentList.length }}个预设定义</div>
 		</template>
 		<el-row :gutter="20">
 			<el-col :span="16">
-				<el-input v-model="search" placeholder="搜索智能体" @input="debouncedSearchTitle"></el-input>
+				<el-input v-model="search" placeholder="搜索角色体" @input="debouncedSearchTitle"></el-input>
 			</el-col>
 			<el-col :span="8">
 				<el-button :icon="Search" circle @click="debouncedSearchTitle" />
@@ -91,7 +91,7 @@ const agentList = ref([])
 
 const emit = defineEmits(['submit'])
 
-// 获取当前用户所有智能体
+// 获取当前用户所有角色体
 const getAllAgent = (title:string) => {
 	const params = title || title !='' ? { keyword: title } : {};
 	useUserAgentApi(params).then(res => {
@@ -128,7 +128,7 @@ const clearAgentAdd = () => {
 	agentAddRef.value.init(data, true)
 }
 /**
- * 查看智能体详情
+ * 查看角色体详情
  * @param item 
  */
 const handview = (item: agentModel) => {
@@ -140,7 +140,7 @@ const handview = (item: agentModel) => {
 }
 
 /**
- * 搜索智能体
+ * 搜索角色体
  */
 const searchTitle = () => {
 	getAllAgent(search.value)
@@ -152,7 +152,7 @@ const debouncedSearchTitle = debounce(searchTitle, 300);
 // 删除
 const delview = (item: agentModel) => {
 	ElMessageBox.confirm(
-		'是否确认删除该智能体？',
+		'是否确认删除该角色体？',
 		'警告',
 		{
 			confirmButtonText: '确定',
@@ -169,11 +169,11 @@ const delview = (item: agentModel) => {
 		})
 }
 
-// 选择智能体
+// 选择角色体
 const selectview = (item: agentModel) => {
 	useSelectAgentApi({ "id": item.id, "fileUserName": item.user_name }).then(res => {
 		const historyId = res
-		// 关闭智能体
+		// 关闭角色体
 		visible.value = false
 		// 提交选择
 		emit('submit', historyId)

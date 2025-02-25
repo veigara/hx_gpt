@@ -61,13 +61,13 @@ def del_history(user_name, id) -> None:
 
 
 def cretate_new_history(user_name, model_name, input_str) -> str:
-    """创建新的聊天记录,没有智能体
+    """创建新的聊天记录,没有角色体
     params:input_str 用户输入
     return:history_id 聊天记录id
     """
     agent_data = get_default_agent_data(user_name)
     if agent_data is None:
-        raise Exception("系统没有智能体,请先设置智能体")
+        raise Exception("系统没有角色体,请先设置角色体")
     agent_data["history_title"] = input_str[:20]
     agent_data["model_name"] = model_name
 
@@ -116,7 +116,7 @@ def buildUpdateParams(user_name, history_data):
 
 
 def save_history_agent(user_name, agentData) -> str:
-    """从智能体中创建聊天记录"""
+    """从角色体中创建聊天记录"""
     agent_title = agentData.get("title", "新的聊天")
     history_title = agentData.get("history_title")
     title = (
@@ -287,9 +287,9 @@ def snip_history_build(user_name, history_id, contents: list) -> dict:
 
 def build_hisorty_to_agent(user_name, agent_title, history_id):
     """
-    将当前历史记录转为智能体
+    将当前历史记录转为角色体
     @user_name: 用户名
-    @agent_title: 智能体标题
+    @agent_title: 角色体标题
     @history_id: 历史记录ID
     """
     history_data = load_history(history_id)
@@ -316,5 +316,5 @@ def build_hisorty_to_agent(user_name, agent_title, history_id):
 
 
 def get_historys_by_agent_id(agent_id) -> list:
-    """根据智能体id获取所有聊天记录"""
+    """根据角色体id获取所有聊天记录"""
     return SEARCH_AI_HISTORY_AGENT_ID(agent_id=agent_id)

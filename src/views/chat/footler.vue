@@ -27,9 +27,9 @@
 					<knowledge-select v-model="knowledge" style="width: 120px" />
 				</el-popover>
 			</div>
-			<!--智能体-->
+			<!--角色体-->
 			<div class="chat_main_plane_space">
-				<el-button title="智能体" round @click="showAgentVisible">
+				<el-button title="角色体" round @click="showAgentVisible">
 					<template #icon>
 						<svg-icon icon="icon-agent"></svg-icon>
 					</template>
@@ -204,7 +204,7 @@ const chatData = reactive({
 })
 // 对话输入框的数据
 const chatBotMst = ref('')
-// 智能体显示弹窗
+// 角色体显示弹窗
 const agentVisible = ref(false)
 const agentRef = ref()
 
@@ -395,12 +395,12 @@ const abortRequest = () => {
 	}
 }
 
-// 展示智能体弹窗
+// 展示角色体弹窗
 const showAgentVisible = () => {
 	agentRef.value.init()
 }
 
-// 向父组件传递选择的智能体
+// 向父组件传递选择的角色体
 const useSelectAgentApi = (historyId: string) => {
 	emit('update:selectAgent', historyId)
 }
@@ -412,7 +412,7 @@ const init = (modelKey: string) => {
 	chatData.isLoading = false
 	// 对话输入框的数据
 	chatBotMst.value = ''
-	// 智能体显示弹窗
+	// 角色体显示弹窗
 	agentVisible.value = false
 	curModel.value = modelKey
 	if (!modelKey) {

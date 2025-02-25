@@ -1,5 +1,5 @@
 <template>
-	<el-dialog v-model="visible" :title="!dataForm.id ? '新增智能体' : editFlag ? '修改智能体' : '查看智能体'" :close-on-click-modal="false"
+	<el-dialog v-model="visible" :title="!dataForm.id ? '新增角色体' : editFlag ? '修改角色体' : '查看角色体'" :close-on-click-modal="false"
 		append-to-body>
 		<el-form ref="dataFormRef" :model="dataForm" label-width="40%" label-position="left" :rules="rules"
 			:disabled="!editFlag">
@@ -30,8 +30,8 @@
 				</el-row>
 			</div>
 			<div class="agengt-config">
-				<el-form-item label="智能体名称" prop="title">
-					<el-input v-model="dataForm.title" placeholder="智能体名称"></el-input>
+				<el-form-item label="角色体名称" prop="title">
+					<el-input v-model="dataForm.title" placeholder="角色体名称"></el-input>
 				</el-form-item>
 				<el-form-item label="用户图标" prop="user_icon">
 					<icon-select v-model="dataForm.user_icon" suffx=""/>
@@ -204,7 +204,7 @@ const addAgentContent = () => {
 }
 
 const rules = reactive({
-	title: [{ required: true, message: '智能体名称不能为空', trigger: 'blur' }],
+	title: [{ required: true, message: '角色体名称不能为空', trigger: 'blur' }],
 	max_tokens: [{ required: true, message: '请选择最大上下文长度', trigger: 'change' }],
 	model_key: [
 		{
@@ -215,14 +215,14 @@ const rules = reactive({
 	]
 })
 
-// 保存智能体
+// 保存角色体
 const saveAgent = () => {
 	dataFormRef.value.validate(valid => {
 		if (valid) {
 			useSaveAgentFileApi({ agent_data: JSON.stringify(dataForm) }).then(res => {
 				ElNotification({
 					title: '温馨提示',
-					message: '保存智能体成功',
+					message: '保存角色体成功',
 					type: 'success'
 				})
 				// 关闭弹窗

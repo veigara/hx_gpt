@@ -49,7 +49,7 @@
 							</div>
 
 							<div class="history-menu-item" @click="covertAgent(item)">
-								<span><svg-icon icon="icon-agent" /></span>转为智能体
+								<span><svg-icon icon="icon-agent" /></span>转为角色体
 							</div>
 							<div class="history-menu-item" @click="delHistory(item)">
 								<span><svg-icon icon="icon-delete" /></span>删除此对话
@@ -239,9 +239,9 @@ const refreshChat = () => {
 	emits('refresh:history', true)
 }
 
-// 转为智能体
+// 转为角色体
 const covertAgent = (data: JSON) => {
-	ElMessageBox.prompt('请输入智能体的标题', '转为智能体', {
+	ElMessageBox.prompt('请输入角色体的标题', '转为角色体', {
 		confirmButtonText: '发送',
 		cancelButtonText: '取消',
 		inputPattern: /.+?/,

@@ -63,7 +63,7 @@ def chat_with_model(request):
                 error_stream(fail_msg), status=500, content_type="application/json"
             )
         if history_id is None or history_id == "":
-            # 没有选择智能体，要创建一个默认的
+            # 没有选择角色体，要创建一个默认的
             history_id = cretate_new_history(user_name, model_key, input_text)
             agent_data = get_default_agent_data(user_name)
             agent_id = agent_data.get("id")
@@ -147,7 +147,7 @@ def get_all_models(request):
         )
 
 
-# 保存智能体文件
+# 保存角色体文件
 @csrf_exempt
 @require_http_methods(["POST"])
 def save_agent_file(request):
@@ -165,11 +165,11 @@ def save_agent_file(request):
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}保存智能体文件失败")
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}保存角色体文件失败")
         )
 
 
-# 获取所有的智能体
+# 获取所有的角色体
 @require_http_methods(["GET"])
 def get_user_agent(request):
     try:
@@ -181,11 +181,11 @@ def get_user_agent(request):
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的智能体失败")
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的角色体失败")
         )
 
 
-# 获取智能体详情
+# 获取角色体详情
 @require_http_methods(["GET"])
 def get_agent_detail(request):
     try:
@@ -194,18 +194,18 @@ def get_agent_detail(request):
         user_name = get_user_name(request)
         if id is None:
             return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体id不能为空")
             )
         detail = load_agent(user_name, id)
         return JsonResponse(AgentResponse.success(data=detail))
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的智能体失败")
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的角色体失败")
         )
 
 
-# 删除智能体
+# 删除角色体
 @csrf_exempt
 @require_http_methods(["DELETE"])
 def get_del_agent(request):
@@ -214,9 +214,9 @@ def get_del_agent(request):
         user_name = get_user_name(request)
         if id is None:
             return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体id不能为空")
             )
-        # 查询智能体关联的历史记录
+        # 查询角色体关联的历史记录
         historys = get_historys_by_agent_id(id)
         if len(historys) > 0:
             titles = [item.get("title") for item in historys]
@@ -231,15 +231,15 @@ def get_del_agent(request):
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除智能体失败")
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除角色体失败")
         )
 
 
 @require_http_methods(["GET"])
 def select_agent(request) -> str:
-    """选择智能体
-     params:id 智能体id
-     params:fileUserName 智能体文件用户
+    """选择角色体
+     params:id 角色体id
+     params:fileUserName 角色体文件用户
     return: 聊天记录id
     """
     try:
@@ -247,12 +247,12 @@ def select_agent(request) -> str:
         user_name = get_user_name(request)
         if id is None:
             return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体id不能为空")
             )
         agent_data = load_agent(user_name, id)
         if agent_data is None:
             return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体内容不能为空")
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体内容不能为空")
             )
         # 创建聊天记录
         history_id = save_history_agent(user_name, agent_data)
@@ -262,7 +262,7 @@ def select_agent(request) -> str:
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除智能体失败")
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除角色体失败")
         )
 
 
@@ -603,7 +603,7 @@ def snip_chat_history_build(request) -> dict:
 @require_http_methods(["POST"])
 def build_chat_hisorty_to_agent(request):
     """
-    将当前历史记录转为智能体
+    将当前历史记录转为角色体
     """
     try:
         user_name = get_user_name(request)
@@ -631,7 +631,7 @@ def build_chat_hisorty_to_agent(request):
     except Exception as e:
         logger.error(print_err(e))
         return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}转为智能体失败")
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}转为角色体失败")
         )
 
 
