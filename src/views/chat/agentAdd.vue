@@ -64,7 +64,7 @@
 						<el-slider v-model="dataForm.top_p" show-input show-stops :max="1.0" :min="0" :step="0.1" />
 					</div>
 				</el-form-item>
-				<el-form-item prop="max_tokens">
+				<!-- <el-form-item prop="max_tokens">
 					<template #label>
 						<div style="display: flex; flex-direction: column">
 							<div>单次回复限制(max_tokens)</div>
@@ -74,7 +74,7 @@
 					<div style="width: 100%">
 						<el-slider v-model="dataForm.max_tokens" show-input :max="maxTokens" :min="100" :step="1" />
 					</div>
-				</el-form-item>
+				</el-form-item> -->
 				<el-form-item prop="presence_penalty">
 					<template #label>
 						<div style="display: flex; flex-direction: column">

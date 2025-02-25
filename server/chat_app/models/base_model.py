@@ -37,6 +37,8 @@ class BaseLLMModel:
         self.model_key = config["model_key"]
         # 视觉模型
         self.model_multimodal = config["multimodal"]
+        # 模型最大token
+        self.model_max_token = config["max_content_len"]
         self.user_name = user_name
         self.agent_id = agent_id
         self.history_id = history_id
@@ -233,7 +235,14 @@ class BaseLLMModel:
             all_token_counts = history_data["all_token_counts"]
             content_data = self.exclude_file_type(history_data.get("content", []))
             if agent_data:
-                max_tokens = agent_data.get("max_tokens", 0)
+                # 最大token改为读取模型配置
+                # max_tokens = agent_data.get("max_tokens", 0)
+                max_tokens = self.model_max_token
+                # 默认token
+                defalut_tokens = 6000
+                if max_tokens == 0:
+                    max_tokens = defalut_tokens
+                logger.debug(f"模型最大token为：{max_tokens}")
                 agent_count = agent_data.get("count", 0)
                 max_limit = int(max_tokens)
                 cur_chat_token = COUNT_USER_HISTORY_TOKEN([inputs])
