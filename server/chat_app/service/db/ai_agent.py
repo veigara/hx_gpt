@@ -107,8 +107,12 @@ def search_ai_agent(user_name: str, title: str = None) -> List[Dict[str, Any]]:
 
 def search_ai_agent_id(id) -> dict:
     """根据主键搜索"""
-    data = AiAgent.objects.get(id=id)
-    return to_dict(data)
+    try:
+        data = AiAgent.objects.get(id=id)
+        return to_dict(data)
+    except AiAgent.DoesNotExist:
+        # 没有查到记录时,默认为空字典
+        return {}
 
 
 def delete_ai_agent(id) -> int:

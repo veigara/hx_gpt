@@ -93,7 +93,7 @@ const emit = defineEmits(['submit'])
 
 // 获取当前用户所有智能体
 const getAllAgent = (title:string) => {
-	const params = title ? { keyword: title } : {};
+	const params = title || title !='' ? { keyword: title } : {};
 	useUserAgentApi(params).then(res => {
 		agentList.value = res.data
 	})
@@ -103,6 +103,7 @@ const getAllAgent = (title:string) => {
 const init = () => {
 	visible.value = true
 	search.value = ''
+	getAllAgent('')
 }
 
 const handleAdd = () => {
@@ -185,7 +186,7 @@ defineExpose({
 })
 
 onMounted(() => {
-	getAllAgent(undefined)
+	getAllAgent('')
 })
 </script>
 

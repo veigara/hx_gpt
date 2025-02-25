@@ -139,6 +139,12 @@ urlpatterns = [
         chat_web.snip_chat_history_build,
         name="snip_chat_history_build",
     ),
+    # 转为智能体
+    path(
+        "chat/build_hisorty_to_agent",
+        chat_web.build_chat_hisorty_to_agent,
+        name="build_chat_hisorty_to_agent",
+    ),
     # vue页面
     path("", TemplateView.as_view(template_name="index.html"), name="index"),
     re_path(r"^.*/$", TemplateView.as_view(template_name="index.html")),

@@ -21,20 +21,16 @@
 					<Refresh />
 				</el-icon>
 			</div>
-		</el-col>		
+		</el-col>
 	</el-row>
 	<div style="overflow: hidden;margin-top:20px">
 		<el-scrollbar :max-height="computedHistoryMaxHeight">
 			<ul>
 				<li :class="{ 'history_listItem': true, 'history_listItem_active': item.active == true }"
 					v-for="item in historys" :key="item.id" @click="selectHistoryItem(item)">
-					<div style="width: 100%;padding: 0px 10px 0px 0px;">						
-						<el-tooltip
-							effect="dark"
-							:content="item.title"
-							placement="right"
-						>
-						<div><span class="history_listItem_content">{{ item.title }}</span></div>
+					<div style="width: 100%;padding: 0px 10px 0px 0px;">
+						<el-tooltip effect="dark" :content="item.title" placement="right">
+							<div><span class="history_listItem_content">{{ item.title }}</span></div>
 						</el-tooltip>
 						<div style="display: flex;justify-content: space-between;font-size: 12px;color: #a6a6a6;">
 							<div class="history_listItem_time">共{{ item.count }}条对话</div>
@@ -50,8 +46,8 @@
 							<div class="history-menu-item" @click="topHistory(item)">
 								<span><svg-icon icon="icon-add-top" /></span>置顶此对话
 							</div>
-							
-							<div class="history-menu-item">
+
+							<div class="history-menu-item" @click="covertAgent(item)">
 								<span><svg-icon icon="icon-agent" /></span>转为智能体
 							</div>
 							<div class="history-menu-item" @click="delHistory(item)">
@@ -71,9 +67,9 @@
 
 <script setup lang="ts">
 import { nextTick, reactive, ref, computed, onMounted, onUnmounted } from 'vue'
-import { useGetHistorysApi, useRenameHistoryApi, useDelHistoryApi, useTopHistoryApi } from '@/api/chat'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus,Refresh } from '@element-plus/icons-vue'
+import { useGetHistorysApi, useRenameHistoryApi, useDelHistoryApi, useTopHistoryApi, useHistoryToAgentApi } from '@/api/chat'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { Plus, Refresh } from '@element-plus/icons-vue'
 import { debounce } from 'lodash';
 
 const historys = ref<any>([])
@@ -116,7 +112,7 @@ const clearAll = () => {
 }
 
 // 设置聊天记录条数
-const setHistoryCount=(historyId:string,num: number) =>{
+const setHistoryCount = (historyId: string, num: number) => {
 	historys.value.find(item => item.id == historyId).count = num
 }
 
@@ -238,6 +234,35 @@ const topHistory = (item: any) => {
 const refreshChat = () => {
 	// 页面上全部初始化,显示提示信息
 	emits('refresh:history', true)
+}
+
+// 转为智能体
+const covertAgent = (data: JSON) => {
+	ElMessageBox.prompt('请输入智能体的标题', '转为智能体', {
+		confirmButtonText: '发送',
+		cancelButtonText: '取消',
+		inputPattern: /.+?/,
+		inputErrorMessage: '内容不能为空',
+		inputType: 'textarea',
+	})
+		.then(({ value }) => {
+			const params = { "agent_title": value, "history_id": data.id }
+			useHistoryToAgentApi(params).then(res => {
+				ElNotification({
+					title: '成功',
+					message: '操作成功',
+					type: 'success'
+				})
+			}).catch((error) => {
+				ElNotification({
+					title: '操作失败',
+					message: error.message,
+					type: 'error'
+				})
+			})
+		})
+
+
 }
 </script>
 

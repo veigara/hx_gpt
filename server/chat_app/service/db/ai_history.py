@@ -144,6 +144,16 @@ def serarch_ai_history_tokens(id) -> dict:
     return data
 
 
+def search_ai_history_agent_id(agent_id: str) -> dict:
+    """根据智能体id搜索"""
+    filters = {"agent_id": agent_id}
+    datas = AiHistory.objects.order_by("-create_time").filter(**filters)
+    if len(datas) == 0:
+        return []
+
+    return [to_dict(item) for item in datas]
+
+
 def to_dict(data: AiHistory) -> dict:
     if data is None:
         return {}

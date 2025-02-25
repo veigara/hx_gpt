@@ -80,3 +80,8 @@ export const useUpdateHistoryApi = (params: any) => {
 export const useSnipHistoryBuildApi = (params: any) => {
 	return service.post('/chat/snip_history_build',params)
 }
+
+
+export const useHistoryToAgentApi = (params: any) => {
+	return service.post('/chat/build_hisorty_to_agent',params)
+}

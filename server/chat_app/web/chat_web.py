@@ -193,7 +193,9 @@ def get_agent_detail(request):
         # 用户
         user_name = get_user_name(request)
         if id is None:
-            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+            )
         detail = load_agent(user_name, id)
         return JsonResponse(AgentResponse.success(data=detail))
     except Exception as e:
@@ -211,7 +213,19 @@ def get_del_agent(request):
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+            )
+        # 查询智能体关联的历史记录
+        historys = get_historys_by_agent_id(id)
+        if len(historys) > 0:
+            titles = [item.get("title") for item in historys]
+            del_titles = ",".join(titles)
+            return JsonResponse(
+                AgentResponse.fail(
+                    fail_msg=f"{STANDARD_ERROR_MSG}删除失败,请先删除一下聊天记录:【{del_titles}】"
+                )
+            )
         del_agent(user_name, id)
         return JsonResponse(AgentResponse.success(data=True))
     except Exception as e:
@@ -232,11 +246,13 @@ def select_agent(request) -> str:
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体id不能为空")
+            )
         agent_data = load_agent(user_name, id)
         if agent_data is None:
-            return AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}智能体内容不能为空"
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}智能体内容不能为空")
             )
         # 创建聊天记录
         history_id = save_history_agent(user_name, agent_data)
@@ -279,8 +295,8 @@ def get_history_detail(request):
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
             )
         data = load_history(id)
         return JsonResponse(AgentResponse.success(data=data))
@@ -302,8 +318,8 @@ def del_user_history(request):
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
             )
         del_history(user_name, id)
         return JsonResponse(AgentResponse.success(data=True))
@@ -328,12 +344,12 @@ def rename_user_history(request):
         new_title = payload.get("new_title")
         user_name = get_user_name(request)
         if id is None:
-            return AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
             )
         if new_title is None:
-            return AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}重命名标题不能为空"
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名标题不能为空")
             )
         rename_history(user_name, id, new_title)
         return JsonResponse(AgentResponse.success(data=True))
@@ -355,8 +371,8 @@ def top_user_history(request):
         payload = json.loads(request.body.decode("utf-8"))
         id = payload.get("id")
         if id is None:
-            return AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
             )
         top_history(id)
         return JsonResponse(AgentResponse.success(data=True))
@@ -379,8 +395,8 @@ def clear_history_context(request):
         id = payload.get("id")
         user_name = get_user_name(request)
         if id is None or id == "":
-            return AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空"
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
             )
         clear_context(user_name, id)
         return JsonResponse(AgentResponse.success(data=True))
@@ -478,11 +494,17 @@ def parse_chat_file(request):
         file_name = payload.get("file_name")
         model_key = payload.get("model_key")
         if file_path is None:
-            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件路径不能为空")
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件路径不能为空")
+            )
         if file_name is None:
-            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件名称不能为空")
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件名称不能为空")
+            )
         if model_key is None:
-            return AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}模型名称不能为空")
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}模型名称不能为空")
+            )
         res = CHAT_PARSE_FILE(
             user_name=user_name,
             file_path=file_path,
@@ -574,6 +596,42 @@ def snip_chat_history_build(request) -> dict:
         logger.error(print_err(e))
         return JsonResponse(
             AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}新建分支聊天失败")
+        )
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def build_chat_hisorty_to_agent(request):
+    """
+    将当前历史记录转为智能体
+    """
+    try:
+        user_name = get_user_name(request)
+        payload = json.loads(request.body.decode("utf-8"))
+        history_id = payload.get("history_id")
+        agent_title = payload.get("agent_title")
+        if user_name is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}用户名称不能为空")
+            )
+
+        if history_id is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
+            )
+
+        if agent_title is None:
+            return JsonResponse(
+                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}标题内容不能为空")
+            )
+
+        build_hisorty_to_agent(user_name, agent_title, history_id)
+
+        return JsonResponse(AgentResponse.success(data={}))
+    except Exception as e:
+        logger.error(print_err(e))
+        return JsonResponse(
+            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}转为智能体失败")
         )
 
 

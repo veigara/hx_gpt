@@ -19,6 +19,7 @@ from .db.ai_history import (
     search_ai_history_content as SEARCH_AI_HISTORY_CONTENT,
     update_ai_history as UPDATE_AI_HISTORY,
     serarch_ai_history_tokens as SERARCH_AI_HISTORY_TOKENS,
+    search_ai_history_agent_id as SEARCH_AI_HISTORY_AGENT_ID,
 )
 
 logger = logging.getLogger("chat_app")
@@ -282,3 +283,38 @@ def snip_history_build(user_name, history_id, contents: list) -> dict:
     history_data["id"] = None
 
     return save_history(user_name, history_data)
+
+
+def build_hisorty_to_agent(user_name, agent_title, history_id):
+    """
+    将当前历史记录转为智能体
+    @user_name: 用户名
+    @agent_title: 智能体标题
+    @history_id: 历史记录ID
+    """
+    history_data = load_history(history_id)
+    if history_data is None:
+        raise AgentException(f"聊天记录不存在,id={history_id}")
+    agent_data = history_data.get("agent_data", "{}")
+    content_data = history_data.get("content", [])
+    # 排除非role标签
+    content_data = [item for item in content_data if item.get("role") is not None]
+    new_agent_data = {
+        "title": agent_title,
+        "content": content_data,
+        "model_key": agent_data.get("model_key"),
+        "temperature": agent_data.get("temperature"),
+        "top_p": agent_data.get("top_p"),
+        "max_tokens": agent_data.get("max_tokens"),
+        "presence_penalty": agent_data.get("presence_penalty"),
+        "frequency_penalty": agent_data.get("frequency_penalty"),
+        "user_icon": agent_data.get("user_icon"),
+        "assistant_icon": agent_data.get("assistant_icon"),
+        "user_name": user_name,
+    }
+    save_agent(user_name, new_agent_data)
+
+
+def get_historys_by_agent_id(agent_id) -> list:
+    """根据智能体id获取所有聊天记录"""
+    return SEARCH_AI_HISTORY_AGENT_ID(agent_id=agent_id)
