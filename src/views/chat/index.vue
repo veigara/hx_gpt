@@ -130,7 +130,7 @@
 								</div>
 								<!---回答--->
 								<div class="ans_item"
-									v-if="historyItem.role == 'assistant' || historyItem.role == 'system'">
+									v-if="historyItem.role == 'assistant' || (historyItem.role == 'system' && systemOutput)">
 									<div class="ans_item_avatar">
 										<!--回答头像-->
 										<div>
@@ -327,6 +327,9 @@ import { copyToClip } from '@/utils/copy'
 
 const curHistoryId = ref('')
 const historyRef = ref()
+
+// 隐藏system显示
+const systemOutput = ref(true)
 
 const ElNotificationErr = (err: any) => {
 	ElNotification({
