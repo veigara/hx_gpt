@@ -329,7 +329,7 @@ const curHistoryId = ref('')
 const historyRef = ref()
 
 // 隐藏system显示
-const systemOutput = ref(true)
+const systemOutput = ref(false)
 
 const ElNotificationErr = (err: any) => {
 	ElNotification({
