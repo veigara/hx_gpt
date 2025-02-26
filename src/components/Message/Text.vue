@@ -53,7 +53,6 @@ const text = computed(() => {
   // 对数学公式进行处理，自动添加 $$ 符号
   const escapedText = escapeBrackets(escapeDollarNumber(value))
   return mdi.render(escapedText)
-  return value
 })
 
 function highlightBlock(str: string, lang?: string) {

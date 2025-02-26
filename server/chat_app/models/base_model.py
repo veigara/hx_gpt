@@ -124,7 +124,7 @@ class BaseLLMModel:
 
                 # 添加文件名称到历史中，并保存
                 if is_once == False:
-                    file_text = f"<file_content>根据您上传的文件 {file_name}，解析得到的文本内容如下：\n{text}</file_content>"
+                    file_text = f"<file_content>根据您上传的文件 {file_name}，解析得到的文本内容如下：\n{text}\n</file_content>"
 
                     update_history(
                         self.user_name,
