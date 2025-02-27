@@ -124,9 +124,13 @@
 				<div class="chat_textarea">
 					<!-- <el-scrollbar :max-height="100" style="width: 100%"> -->
 					<div class="chat_textarea_wrap">
-						<el-input v-model="chatBotMst" :autosize="{ minRows: 1 }" type="textarea"
+						<el-input v-if="!isMobile()" v-model="chatBotMst" :autosize="{ minRows: 1 }" type="textarea"
 							class="chat_textarea_input" placeholder="Enter 发送，Shift + Enter 换行，/ 触发命令"
 							@keyup="sendKeyClick">
+						</el-input>
+						<el-input v-else v-model="chatBotMst" :autosize="{ minRows: 1 }" type="textarea"
+							class="chat_textarea_input" placeholder="输入消息/clearMenu,然后点击发送清除触发命令"
+							>
 						</el-input>
 					</div>
 					<!-- </el-scrollbar> -->
@@ -170,8 +174,7 @@ import knowledgeSelect from '@/components/knowledge-select/index.vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import { file } from '@babel/types'
-import { fa } from 'element-plus/es/locale'
+import { isMobile } from '@/utils/tool'
 
 interface Props {
 	// 错误弹框
@@ -261,6 +264,18 @@ const sendKeyClick = (event: any) => {
 let abortController = null
 // 发送按钮
 const sendBotMsgClick = async(event: any) => {
+	if(isMobile()){
+		// 手机端整合了快捷键的判断
+		const input = chatBotMst.value.trim()
+		if(input.trim() == '/clearMenu'){
+			// 打开快捷键
+			fnDialogRef.value.init()
+			chatBotMst.value = ''
+			return;
+		}
+	}
+
+
 	if(uploadFileStatus.value == true){
 		ElNotification({
 			title: '提示',

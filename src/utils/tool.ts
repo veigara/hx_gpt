@@ -1,4 +1,5 @@
 import type { App, Plugin } from 'vue'
+import MobileDetect from 'mobile-detect'
 // 全局组件安装
 export const withInstall = <T>(component: T, alias?: string) => {
 	const comp = component as any
@@ -20,4 +21,10 @@ export const getIconList = (suffx:string): string[] => {
 		rs.push(list[i].id)
 	}
 	return rs
+}
+
+// 是否是移动端
+export const isMobile = (): boolean => {
+	const md = new MobileDetect(window.navigator.userAgent)
+	return md.mobile() ? true : false
 }

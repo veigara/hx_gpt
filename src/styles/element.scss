@@ -100,3 +100,8 @@
 	border-bottom: 1px solid rgb(0, 0, 0, 0.1) !important;
 }
 
+@media (max-width: 768px) {
+  .el-dialog {
+    width: 95%;
+  }
+}

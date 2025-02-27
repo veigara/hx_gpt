@@ -19,6 +19,7 @@
     "highlight.js": "^11.10.0",
     "markdown-it": "^14.1.0",
     "mermaid-it-markdown": "^1.0.8",
+    "mobile-detect": "^1.4.5",
     "qs": "6.10.3",
     "sortablejs": "^1.15.0",
     "vue": "3.4.38",

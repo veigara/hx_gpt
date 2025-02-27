@@ -31,6 +31,16 @@ export const menuRoutes: RouteRecordRaw[] = [
 ]
 
 export const constantRoutes: RouteRecordRaw[] = [
+	 // 手机页面
+	 {
+		path: '/chat_mobile',
+		name: 'ChatMobile',
+		component: () => import('../views/chat/index.vue'),
+		meta: {
+		  title: '对话',
+		  hidden: true  // 添加隐藏标识
+		}
+	  },
 	{
 		path: '/redirect',
 		component: () => import('../layout/index.vue'),

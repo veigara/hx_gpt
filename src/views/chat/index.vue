@@ -1,23 +1,23 @@
 <template>
 	<el-card class="chat_card" body-style="padding: 0px;">
 		<el-container>
-			<el-aside width="300px" class="chat_card_aside" v-if="chatHistoryDisplay">
+			<el-aside width="300px" class="chat_card_aside" v-show="chatHistoryDisplay">
 				<HistoryAside ref="historyRef" @click:history="item => selectHistoryItem(item)"
 					@refresh:history="refreshHistory" />
 			</el-aside>
 
 			<el-main class="chat_card_main">
 				<div class="chat_history_expend" @click="chatHistoryDisplay = !chatHistoryDisplay">
-					<svg-icon icon="icon-arrow-expand" v-if="!chatHistoryDisplay"></svg-icon>
-					<svg-icon icon="icon-arrow-fold" v-if="chatHistoryDisplay"></svg-icon>
+					<svg-icon icon="icon-arrow-expand" :size="'25'" v-show="!chatHistoryDisplay"></svg-icon>
+					<svg-icon icon="icon-arrow-fold" :size="'25'" v-show="chatHistoryDisplay"></svg-icon>
 				</div>
 				<!--头部-->
-				<div style="height: 40px;border-bottom: 1px solid #ebeef5;">
-					<el-row style="padding: 0px 20px;">
-						<el-col :span="16">
+				<div style="min-height: 40px;border-bottom: 1px solid #ebeef5;">
+					<el-row style="padding: 0px 20px;" justify="space-between">
+						<el-col :xs="14" :sm="16" :md="16" :lg="16" :xl="16">
 							模型名称: <span style="color: #00BFFF;">{{ curModel }}</span>
 						</el-col>
-						<el-col :span="8" style="display: flex;justify-content: end;">
+						<el-col :xs="10" :sm="8" :md="8" :lg="8" :xl="8" style="display: flex;justify-content: end;">
 							<span style="color: #a6a6a6;">本次对话累计消耗了 {{ curAgent.token_count }} tokens</span>
 						</el-col>
 					</el-row>
@@ -28,7 +28,7 @@
 					</el-row>
 				</div>
 				<!--内容-->
-				<div style="height: calc(100vh - 270px);">
+				<div class="chat_main_content">
 					<el-scrollbar max-height="100%" style="width: 100%;" ref="scrollbarRef">
 						<div style="max-width: 896px;min-width:320px; margin: 16px auto;">
 							<div v-for="(historyItem, index) in chat_msg.history">
@@ -323,7 +323,7 @@ import Footler from '@/views/chat/footler.vue'
 import { useGetHistoryDetailApi, useHistoryTokensApi, useDownChatFileApi, useUpdateHistoryApi, useSnipHistoryBuildApi } from '@/api/chat'
 import { useModelDetailApi } from '@/api/model'
 import { copyToClip } from '@/utils/copy'
-
+import { isMobile } from '@/utils/tool'
 
 const curHistoryId = ref('')
 const historyRef = ref()
@@ -339,8 +339,8 @@ const ElNotificationErr = (err: any) => {
 	})
 }
 
-// 关闭聊天记录siber
-const chatHistoryDisplay = ref(true)
+// 关闭聊天记录siber,是移动端的话就默认不展开
+const chatHistoryDisplay = ref(!isMobile())
 
 
 const chat_msg = reactive({
@@ -408,7 +408,7 @@ watch([scrollbarRef, chat_msg], ([newScrollVal, newChatVal], [oldScrollVal, oldC
 const selectAgent = (historyId: any) => {
 	// 刷新聊天记录
 	curHistoryId.value = historyId
-	historyRef.value.refreshAndSelectFirstHistory(true)
+	historyRef.value?.refreshAndSelectFirstHistory(true)
 }
 
 // 选择的聊天记录
@@ -454,7 +454,7 @@ const updateChatBotDatas = (data: any) => {
 	chat_msg.chatBotDatas[chat_msg.chatBotDatas.length - 1] = data
 	if (curHistoryId.value == '') {
 		// 刷新历史列表,不清空chat
-		historyRef.value.refreshAndSelectFirstHistory(false)
+		historyRef.value?.refreshAndSelectFirstHistory(false)
 	} else {
 		if (!streamLoading) {
 			// 等stram流加载完了再统计token和对话
@@ -1085,16 +1085,18 @@ onMounted(() => {
 	}
 }
 
-// .markdown-body {
-// 	box-sizing: border-box;
-// 	min-width: 200px;
-// 	max-width: 980px;
-// 	margin: 0 auto;
-// 	padding: 45px;
-// }
+.chat_main_content{
+	height: calc(100vh - 270px);
+}
 
-// @media (max-width: 767px) {
-// 	.markdown-body {
-// 		padding: 15px;
-// 	}
-// }</style>
+// 匹配移动端
+@media (max-width: 768px) {
+	.chat_main_content {
+		padding: 15px;
+	}
+}
+
+
+
+
+</style>

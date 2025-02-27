@@ -4,18 +4,21 @@
 			<div class="header-title">角色体</div>
 			<div>{{ agentList.length }}个预设定义</div>
 		</template>
-		<el-row :gutter="20">
-			<el-col :span="16">
+		<el-row :gutter="isMobile()?2:20" justify="space-around">
+			<el-col :xs="14" :sm="16" :md="16" :lg="16" :xl="16">
 				<el-input v-model="search" placeholder="搜索角色体" @input="debouncedSearchTitle"></el-input>
 			</el-col>
-			<el-col :span="8">
-				<el-button :icon="Search" circle @click="debouncedSearchTitle" />
+			<el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
+				<div style="display:flex; flex-wrap: nowrap;">
+					<el-button :icon="Search" circle @click="debouncedSearchTitle" />
 				<el-button title="新建" color="#567bff" @click="handleAdd">
 					<template #icon>
 						<svg-icon icon="icon-add"></svg-icon>
 					</template>
 					新建
 				</el-button>
+				</div>
+				
 			</el-col>
 		</el-row>
 		<div class="agent">
@@ -57,6 +60,7 @@ import { Delete,Search } from '@element-plus/icons-vue'
 import AgentAdd from '@/views/chat/agentAdd.vue'
 import { useUserAgentApi, useAgentDetailApi, useDelAgentApi, useSelectAgentApi } from '@/api/chat'
 import { debounce } from 'lodash';
+import { isMobile } from '@/utils/tool'
 
 const visible = ref(false)
 const agentAddRef = ref()
@@ -210,6 +214,7 @@ onMounted(() => {
 	justify-content: space-between;
 	padding: 20px;
 	border: 1px solid #dedede;
+	flex-wrap: wrap;
 }
 
 .agent_item:not(:last-child) {

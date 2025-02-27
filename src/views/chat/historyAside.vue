@@ -30,9 +30,10 @@
 				<li :class="{ 'history_listItem': true, 'history_listItem_active': item.active == true }"
 					v-for="item in historys" :key="item.id" @click="selectHistoryItem(item)">
 					<div style="width: 100%;padding: 0px 10px 0px 0px;">
-						<el-tooltip effect="dark" :content="item.title" placement="right">
+						<el-tooltip v-if="!isMobile()" effect="dark" :content="item.title" placement="right" >
 							<div><span class="history_listItem_content">{{ item.title }}</span></div>
 						</el-tooltip>
+						<div v-else><span class="history_listItem_content">{{ item.title }}</span></div>
 						<div style="display: flex;justify-content: space-between;font-size: 12px;color: #a6a6a6;">
 							<div class="history_listItem_time">共{{ item.count }}条对话</div>
 							<div class="history_listItem_time">{{ item.create_time }}</div>
@@ -69,11 +70,12 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, reactive, ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useGetHistorysApi, useRenameHistoryApi, useDelHistoryApi, useTopHistoryApi, useHistoryToAgentApi } from '@/api/chat'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { Plus, Refresh } from '@element-plus/icons-vue'
 import { debounce } from 'lodash';
+import { isMobile } from '@/utils/tool'
 
 const historys = ref<any>([])
 // 搜索聊天记录
