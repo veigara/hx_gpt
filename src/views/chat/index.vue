@@ -413,6 +413,10 @@ const selectAgent = (historyId: any) => {
 
 // 选择的聊天记录
 const selectHistoryItem = (data: any) => {
+	// 是移动端的话，隐藏历史记录
+	if (isMobile()) {
+		chatHistoryDisplay.value = false
+	}
 	// 清空数据
 	const historyId = data.historyId
 	const isClearChat = data.isClearChat
