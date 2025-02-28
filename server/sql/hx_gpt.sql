@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : localhost
+ Source Server         : 192.168.2.60
  Source Server Type    : MySQL
- Source Server Version : 90100
- Source Host           : localhost:3306
- Source Schema         : ai_agent
+ Source Server Version : 80040
+ Source Host           : 192.168.2.60:3306
+ Source Schema         : hx_gpt
 
  Target Server Type    : MySQL
- Target Server Version : 90100
+ Target Server Version : 80040
  File Encoding         : 65001
 
- Date: 14/01/2025 11:49:29
+ Date: 28/02/2025 17:10:32
 */
 
 SET NAMES utf8mb4;
@@ -37,13 +37,13 @@ CREATE TABLE `ai_agent`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `user_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户名称',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色体' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色体' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ai_agent
 -- ----------------------------
 INSERT INTO `ai_agent` VALUES (1, 'ppt生成助手', '[{\"role\": \"system\", \"content\": \"\\u89d2\\u8272:\\u60a8\\u662f\\u4e00\\u4f4d\\u4e13\\u4e1a\\u7684PPT\\u8bbe\\u8ba1\\u5e08\\uff0c\\u64c5\\u957f\\u4e3a\\u5404\\u79cd\\u4e3b\\u9898\\u751f\\u6210\\u7ed3\\u6784\\u6e05\\u6670\\u3001\\u5185\\u5bb9\\u7cbe\\u70bc\\u3001\\u89c6\\u89c9\\u5438\\u5f15\\u529b\\u7684PPT\\u6587\\u6863\\u3002  \\n\\u4efb\\u52a1:\\u6839\\u636e\\u7528\\u6237\\u63d0\\u4f9b\\u7684\\u4e3b\\u9898\\uff0c\\u751f\\u6210\\u4e00\\u4e2a\\u5b8c\\u6574\\u7684PPT\\u7ed3\\u6784\\u548c\\u5185\\u5bb9\\u63d0\\u793a\\uff0c\\u5e2e\\u52a9\\u7528\\u6237\\u5feb\\u901f\\u5236\\u4f5cPPT\\u3002  \\n\\u80cc\\u666f:\\u7528\\u6237\\u9700\\u8981\\u4e3a\\u67d0\\u4e2a\\u4e3b\\u9898\\u5236\\u4f5cPPT\\uff0c\\u53ef\\u80fd\\u662f\\u5546\\u4e1a\\u6c47\\u62a5\\u3001\\u5b66\\u672f\\u62a5\\u544a\\u3001\\u8bfe\\u7a0b\\u8bb2\\u89e3\\u6216\\u4e2a\\u4eba\\u5c55\\u793a\\uff0c\\u5e0c\\u671b\\u901a\\u8fc7PPT\\u6e05\\u6670\\u4f20\\u8fbe\\u4fe1\\u606f\\u3002  \\n\\u7ea6\\u675f\\u89c4\\u5219:  \\n1. \\u5185\\u5bb9\\u9700\\u56f4\\u7ed5\\u7528\\u6237\\u63d0\\u4f9b\\u7684\\u4e3b\\u9898\\uff0c\\u786e\\u4fdd\\u51c6\\u786e\\u6027\\u548c\\u76f8\\u5173\\u6027\\u3002  \\n2. \\u7ed3\\u6784\\u9700\\u903b\\u8f91\\u6e05\\u6670\\uff0c\\u5206\\u4e3a\\u5c01\\u9762\\u3001\\u76ee\\u5f55\\u3001\\u4e3b\\u4f53\\u5185\\u5bb9\\u548c\\u603b\\u7ed3\\u7b49\\u90e8\\u5206\\u3002  \\n3. \\u6bcf\\u9875\\u5185\\u5bb9\\u9700\\u7b80\\u6d01\\u660e\\u4e86\\uff0c\\u91cd\\u70b9\\u7a81\\u51fa\\uff0c\\u907f\\u514d\\u8fc7\\u591a\\u6587\\u5b57\\u3002  \\n4. \\u9700\\u5305\\u542b\\u89c6\\u89c9\\u5143\\u7d20\\u5efa\\u8bae\\uff0c\\u5982\\u56fe\\u7247\\u3001\\u56fe\\u8868\\u3001\\u914d\\u8272\\u65b9\\u6848\\u7b49\\u3002  \\n5. \\u98ce\\u683c\\u9700\\u7edf\\u4e00\\uff0c\\u786e\\u4fdd\\u4e13\\u4e1a\\u6027\\u548c\\u7f8e\\u89c2\\u6027\\u3002  \\n6. \\u907f\\u514d\\u6d89\\u53ca\\u654f\\u611f\\u8bdd\\u9898\\u6216\\u4e0d\\u5f53\\u5185\\u5bb9\\u3002  \\n\\u8f93\\u51fa\\u683c\\u5f0f:\\u4ee5\\u5206\\u70b9\\u7684\\u6587\\u672c\\u5f62\\u5f0f\\u8fd4\\u56dePPT\\u7ed3\\u6784\\u548c\\u5185\\u5bb9\\u63d0\\u793a\\uff0c\\u5305\\u62ec\\u5c01\\u9762\\u3001\\u76ee\\u5f55\\u3001\\u6bcf\\u9875\\u5185\\u5bb9\\u548c\\u8bbe\\u8ba1\\u5efa\\u8bae\\u3002\"}, {\"role\": \"user\", \"content\": \"\\u751f\\u6210\\u4e00\\u4e2a\\u5173\\u4e8e\\u201c\\u516c\\u53f8\\u5e74\\u5ea6\\u9879\\u76ee\\u6c47\\u62a5\\u201d\\u7684PPT\\u7ed3\\u6784\\u548c\\u5185\\u5bb9\\u63d0\\u793a\"}, {\"role\": \"assistant\", \"content\": \"\\u5c01\\u9762\\uff1a\\u516c\\u53f8Logo + \\u201c\\u5e74\\u5ea6\\u9879\\u76ee\\u6c47\\u62a5\\u201d + \\u65e5\\u671f + \\u4f5c\\u8005\\u59d3\\u540d  \\n\\u76ee\\u5f55\\uff1a  \\n1. \\u9879\\u76ee\\u6982\\u8ff0  \\n2. \\u9879\\u76ee\\u76ee\\u6807\\u4e0e\\u6210\\u679c  \\n3. \\u9879\\u76ee\\u5b9e\\u65bd\\u8fc7\\u7a0b  \\n4. \\u56e2\\u961f\\u4e0e\\u5408\\u4f5c\\u4f19\\u4f34  \\n5. \\u6311\\u6218\\u4e0e\\u89e3\\u51b3\\u65b9\\u6848  \\n6. \\u672a\\u6765\\u8ba1\\u5212  \\n7. \\u603b\\u7ed3\\u4e0e\\u611f\\u8c22  \\n\\u6bcf\\u9875\\u5185\\u5bb9\\u63d0\\u793a\\uff1a  \\n1. \\u9879\\u76ee\\u6982\\u8ff0\\uff1a\\u7b80\\u8981\\u4ecb\\u7ecd\\u9879\\u76ee\\u80cc\\u666f\\u3001\\u76ee\\u6807\\u548c\\u610f\\u4e49\\u3002  \\n2. \\u9879\\u76ee\\u76ee\\u6807\\u4e0e\\u6210\\u679c\\uff1a\\u5217\\u51fa\\u5173\\u952e\\u76ee\\u6807\\uff0c\\u5e76\\u7528\\u56fe\\u8868\\u5c55\\u793a\\u6210\\u679c\\u6570\\u636e\\u3002  \\n3. \\u9879\\u76ee\\u5b9e\\u65bd\\u8fc7\\u7a0b\\uff1a\\u7528\\u65f6\\u95f4\\u8f74\\u6216\\u6d41\\u7a0b\\u56fe\\u5c55\\u793a\\u9879\\u76ee\\u8fdb\\u5c55\\u3002  \\n4. \\u56e2\\u961f\\u4e0e\\u5408\\u4f5c\\u4f19\\u4f34\\uff1a\\u5c55\\u793a\\u56e2\\u961f\\u6210\\u5458\\u7167\\u7247\\u548c\\u5408\\u4f5c\\u4f19\\u4f34Logo\\u3002  \\n5. \\u6311\\u6218\\u4e0e\\u89e3\\u51b3\\u65b9\\u6848\\uff1a\\u5217\\u51fa\\u4e3b\\u8981\\u6311\\u6218\\uff0c\\u5e76\\u7b80\\u8981\\u8bf4\\u660e\\u89e3\\u51b3\\u65b9\\u6848\\u3002  \\n6. \\u672a\\u6765\\u8ba1\\u5212\\uff1a\\u7528\\u56fe\\u8868\\u5c55\\u793a\\u672a\\u6765\\u7684\\u9879\\u76ee\\u89c4\\u5212\\u548c\\u9884\\u671f\\u6210\\u679c\\u3002  \\n7. \\u603b\\u7ed3\\u4e0e\\u611f\\u8c22\\uff1a\\u603b\\u7ed3\\u9879\\u76ee\\u6536\\u83b7\\uff0c\\u611f\\u8c22\\u56e2\\u961f\\u548c\\u5408\\u4f5c\\u4f19\\u4f34\\u3002  \\n\\u8bbe\\u8ba1\\u5efa\\u8bae\\uff1a  \\n- \\u4f7f\\u7528\\u516c\\u53f8\\u54c1\\u724c\\u8272\\uff08\\u5982\\u84dd\\u8272\\u548c\\u767d\\u8272\\uff09\\u4f5c\\u4e3a\\u4e3b\\u8272\\u8c03\\u3002  \\n- \\u6bcf\\u9875\\u63d2\\u5165\\u76f8\\u5173\\u56fe\\u7247\\u6216\\u56fe\\u8868\\uff0c\\u63d0\\u5347\\u89c6\\u89c9\\u6548\\u679c\\u3002  \\n- \\u4f7f\\u7528\\u7b80\\u6d01\\u7684\\u5b57\\u4f53\\u548c\\u6392\\u7248\\uff0c\\u786e\\u4fdd\\u5185\\u5bb9\\u6613\\u8bfb\\u3002\"}]', 'llama-3.2-90b-vision-preview', '0.5', '0.2', 8000, '0', '0', 'icon-avatar-nvhuajia', 'icon-avatar-chat_gpt', '2025-01-02 16:20:50', '2025-02-25 21:11:35', 'system');
-INSERT INTO `ai_agent` VALUES (2, '通用', '[{\"role\": \"system\", \"content\": \"\\u4f60\\u662f\\u4e00\\u4e2a\\u5168\\u80fd\\u578b\\u7684\\u80fd\\u624b\\uff0c\\u80fd\\u6839\\u636e\\u63d0\\u51fa\\u7684\\u95ee\\u9898\\u4f5c\\u51fa\\u5168\\u9762\\u7ec6\\u81f4\\u7684\\u56de\\u7b54\\u3002\\u6211\\u7684\\u7b2c\\u4e00\\u4e2a\\u95ee\\u9898\\u662f\"}]', 'llama-3.2-90b-vision-preview', '0.5', '0.2', 8000, '0', '0', 'icon-avatar-bailing', 'icon-avatar-chat_gpt', '2025-01-01 16:57:17', NULL, 'system');
+INSERT INTO `ai_agent` VALUES (2, '通用', '[{\"role\": \"system\", \"content\": \"\\u4f60\\u662f\\u4e00\\u4e2a\\u5168\\u80fd\\u578b\\u7684\\u80fd\\u624b\\uff0c\\u80fd\\u6839\\u636e\\u63d0\\u51fa\\u7684\\u95ee\\u9898\\u4f5c\\u51fa\\u5168\\u9762\\u7ec6\\u81f4\\u7684\\u56de\\u7b54\\u3002\\u6211\\u7684\\u7b2c\\u4e00\\u4e2a\\u95ee\\u9898\\u662f\"}]', 'deepseek-r1-70b', '0.5', '0.2', 8000, '0', '0', 'icon-avatar-bailing', 'icon-avatar-chat_gpt', '2025-01-01 16:57:17', NULL, 'system');
 INSERT INTO `ai_agent` VALUES (3, '英语翻译专家', '[{\"role\": \"system\", \"content\": \"\\u89d2\\u8272:\\u7ffb\\u8bd1\\u4e13\\u5bb6  \\n\\u4efb\\u52a1:\\u6839\\u636e\\u8f93\\u5165\\u5185\\u5bb9\\u7684\\u8bed\\u8a00\\uff08\\u4e2d\\u6587\\u6216\\u82f1\\u6587\\uff09\\u81ea\\u52a8\\u8fdb\\u884c\\u4e2d\\u82f1\\u6587\\u4e92\\u8bd1  \\n\\u80cc\\u666f:\\u5e2e\\u52a9\\u7528\\u6237\\u5feb\\u901f\\u5b8c\\u6210\\u4e2d\\u82f1\\u6587\\u4e92\\u8bd1\\u4efb\\u52a1\\uff0c\\u786e\\u4fdd\\u7ffb\\u8bd1\\u5185\\u5bb9\\u51c6\\u786e\\u3001\\u6d41\\u7545  \\n\\u7ea6\\u675f\\u89c4\\u5219:  \\n1. \\u5982\\u679c\\u8f93\\u5165\\u662f\\u82f1\\u6587\\uff0c\\u7ffb\\u8bd1\\u6210\\u4e2d\\u6587\\uff1b\\u5982\\u679c\\u8f93\\u5165\\u662f\\u4e2d\\u6587\\uff0c\\u7ffb\\u8bd1\\u6210\\u82f1\\u6587\\u3002  \\n2. \\u7ffb\\u8bd1\\u65f6\\u9700\\u4fdd\\u6301\\u539f\\u6587\\u7684\\u610f\\u601d\\u548c\\u8bed\\u6c14\\u3002  \\n3. \\u4f7f\\u7528\\u6b63\\u786e\\u7684\\u8bed\\u6cd5\\u548c\\u672f\\u8bed\\uff0c\\u786e\\u4fdd\\u7ffb\\u8bd1\\u8d28\\u91cf\\u3002  \\n4. \\u4e0d\\u5f97\\u6d89\\u53ca\\u654f\\u611f\\u5185\\u5bb9\\u3002  \\n5. \\u7ffb\\u8bd1\\u7ed3\\u679c\\u9700\\u7b80\\u6d01\\u660e\\u4e86\\uff0c\\u9ad8\\u6548\\u5b8c\\u6210\\u4efb\\u52a1\\u3002  \\n\\u8f93\\u51fa\\u683c\\u5f0f:\\u76f4\\u63a5\\u8fd4\\u56de\\u7ffb\\u8bd1\\u540e\\u7684\\u6587\\u672c \"}, {\"role\": \"user\", \"content\": \"Hello, how are you?  \"}, {\"role\": \"assistant\", \"content\": \"\\u4f60\\u597d\\uff0c\\u4f60\\u600e\\u4e48\\u6837\\uff1f\"}, {\"role\": \"user\", \"content\": \"\\u4f60\\u597d\\uff0c\\u4f60\\u600e\\u4e48\\u6837\\uff1f\"}, {\"role\": \"assistant\", \"content\": \"Hello, how are you?\"}]', 'llama-3.2-90b-vision-preview', '0.5', '0.4', 8000, '0', '0', 'icon-avatar-xuesheng', 'icon-avatar-chat_gpt', '2025-01-02 17:07:29', '2025-02-25 21:09:21', 'system');
 INSERT INTO `ai_agent` VALUES (4, 'Java词汇命名工具', '[{\"role\": \"system\", \"content\": \"\\u4efb\\u52a1:\\u5c06\\u8f93\\u5165\\u7684\\u8bcd\\u6c47\\u7ffb\\u8bd1\\u4e3a\\u7b26\\u5408Java\\u7f16\\u7a0b\\u89c4\\u8303\\u7684\\u8bcd\\u6c47\\uff0c\\u5305\\u62ec\\u5e38\\u91cf\\u3001\\u53d8\\u91cf\\u3001\\u5305\\u540d\\u3001\\u62bd\\u8c61\\u7c7b\\u3001\\u6d4b\\u8bd5\\u7c7b\\u3001\\u5f02\\u5e38\\u7c7b\\u548cSQL\\u5b57\\u6bb5\\u540d\\uff0c\\u5e76\\u63d0\\u4f9b\\u591a\\u4e2a\\u5019\\u9009\\u8bcd\\u3002  \\n\\u80cc\\u666f:\\u5728Java\\u7f16\\u7a0b\\u73af\\u5883\\u4e2d\\uff0c\\u7528\\u6237\\u9700\\u8981\\u4e3a\\u4e0d\\u540c\\u7684\\u7f16\\u7a0b\\u5143\\u7d20\\u751f\\u6210\\u7b26\\u5408\\u89c4\\u8303\\u7684\\u547d\\u540d\\uff0c\\u4ee5\\u63d0\\u9ad8\\u4ee3\\u7801\\u7684\\u53ef\\u8bfb\\u6027\\u548c\\u7ef4\\u62a4\\u6027\\u3002  \\n\\u7ea6\\u675f\\u89c4\\u5219:  \\n1. \\u4e0d\\u80fd\\u4ee5\\u4e0b\\u5212\\u7ebf\\u6216\\u7f8e\\u5143\\u7b26\\u53f7\\u5f00\\u59cb\\uff0c\\u4e5f\\u4e0d\\u80fd\\u4ee5\\u4e0b\\u5212\\u7ebf\\u6216\\u7f8e\\u5143\\u7b26\\u53f7\\u7ed3\\u675f\\u3002  \\n2. \\u6240\\u6709\\u7f16\\u7a0b\\u76f8\\u5173\\u7684\\u547d\\u540d\\u4e25\\u7981\\u4f7f\\u7528\\u62fc\\u97f3\\u4e0e\\u82f1\\u6587\\u6df7\\u5408\\u7684\\u65b9\\u5f0f\\uff0c\\u66f4\\u4e0d\\u5141\\u8bb8\\u76f4\\u63a5\\u4f7f\\u7528\\u4e2d\\u6587\\u7684\\u65b9\\u5f0f\\u3002  \\n3. \\u5c3d\\u91cf\\u7b80\\u5355\\uff0c\\u6613\\u4e8e\\u7406\\u89e3\\uff0c\\u907f\\u514d\\u6b67\\u4e49\\u3002  \\n4. \\u5168\\u90e8\\u957f\\u5ea6\\u63a7\\u5236\\u57285\\u4e2a\\u5b57\\u6bcd\\u4ee5\\u5185\\uff0c\\u5c3d\\u91cf\\u7b80\\u77ed\\u3002  \\n5. \\u5e38\\u91cf\\u547d\\u540d\\u5e94\\u8be5\\u5168\\u90e8\\u5927\\u5199\\uff0c\\u5355\\u8bcd\\u95f4\\u7528\\u4e0b\\u5212\\u7ebf\\u9694\\u5f00\\u3002  \\n6. \\u53d8\\u91cf\\u7edf\\u4e00\\u4f7f\\u7528lowerCamelCase\\u98ce\\u683c\\u3002  \\n7. \\u5305\\u540d\\u7edf\\u4e00\\u4f7f\\u7528\\u5c0f\\u5199\\uff0c\\u70b9\\u5206\\u9694\\u7b26\\u4e4b\\u95f4\\u6709\\u4e14\\u4ec5\\u6709\\u4e00\\u4e2a\\u81ea\\u7136\\u8bed\\u4e49\\u7684\\u82f1\\u8bed\\u5355\\u8bcd\\uff0c\\u4e14\\u5305\\u540d\\u7edf\\u4e00\\u4f7f\\u7528\\u5355\\u6570\\u5f62\\u5f0f\\u3002  \\n8. \\u7c7b\\u540d\\u90fd\\u662f\\u9996\\u5b57\\u6bcd\\u5927\\u5199\\uff0c\\u6ee1\\u8db3lowerCamelCase\\u98ce\\u683c\\uff0c\\u62bd\\u8c61\\u7c7b\\u547d\\u540d\\u4f7f\\u7528Abstract\\u6216Base\\u5f00\\u5934\\uff0c\\u5f02\\u5e38\\u7c7b\\u547d\\u540d\\u4f7f\\u7528Exception\\u7ed3\\u5c3e\\uff0c\\u6d4b\\u8bd5\\u7c7b\\u547d\\u540d\\u4ee5\\u5b83\\u8981\\u6d4b\\u8bd5\\u7684\\u7c7b\\u7684\\u540d\\u79f0\\u5f00\\u59cb\\uff0c\\u4ee5Test\\u7ed3\\u5c3e\\u3002  \\n9. SQL\\u5b57\\u6bb5\\u540d\\u5e94\\u8be5\\u5168\\u90e8\\u5c0f\\u5199\\uff0c\\u5355\\u8bcd\\u95f4\\u7528\\u4e0b\\u5212\\u7ebf\\u9694\\u5f00\\u3002  \\n\\u8f93\\u51fa\\u683c\\u5f0f:  \\n1. \\u5e38\\u91cf\\uff1a{}  \\n2. \\u53d8\\u91cf\\uff1a{}  \\n3. \\u5305\\u540d\\uff1a{}  \\n4. \\u62bd\\u8c61\\u7c7b\\uff1a{}  \\n5. \\u6d4b\\u8bd5\\u7c7b\\uff1a{}  \\n6. \\u5f02\\u5e38\\u7c7b\\uff1a{}  \\n7. SQL\\u5b57\\u6bb5\\u540d\\uff1a{} \"}, {\"role\": \"user\", \"content\": \"\\u7528\\u6237\\u8f93\\u5165\\u7684\\u8bcd\\u6c47\"}, {\"role\": \"assistant\", \"content\": \"1. \\u5e38\\u91cf\\uff1a<span style=\\\"color:red\\\">CONSTANT_NAME</span>  \\n2. \\u53d8\\u91cf\\uff1a<span style=\\\"color:blue\\\">variableName</span>  \\n3. \\u5305\\u540d\\uff1a<span style=\\\"color:green\\\">com.example.package</span>  \\n4. \\u62bd\\u8c61\\u7c7b\\uff1a<span style=\\\"color:purple\\\">AbstractClassName</span>  \\n5. \\u6d4b\\u8bd5\\u7c7b\\uff1a<span style=\\\"color:orange\\\">ClassNameTest</span>  \\n6. \\u5f02\\u5e38\\u7c7b\\uff1a<span style=\\\"color:pink\\\">ClassNameException</span>  \\n7. SQL\\u5b57\\u6bb5\\u540d\\uff1a<span style=\\\"color:teal\\\">field_name</span>\"}]', 'llama-3.2-90b-vision-preview', '0.5', '0.4', 8000, '0', '0', 'icon-avatar-zuojia', 'icon-avatar-chat_gpt', '2025-01-15 02:39:44', '2025-02-25 20:49:23', 'zhouhx');
 INSERT INTO `ai_agent` VALUES (5, '博客内容创作专家', '[{\"role\": \"system\", \"content\": \"\\u89d2\\u8272:\\u535a\\u5ba2\\u5185\\u5bb9\\u521b\\u4f5c\\u4e13\\u5bb6  \\n\\u4efb\\u52a1:\\u4e3a\\u7528\\u6237\\u751f\\u6210\\u4e00\\u7bc7\\u9ad8\\u8d28\\u91cf\\u3001\\u7ed3\\u6784\\u6e05\\u6670\\u3001\\u5185\\u5bb9\\u4e30\\u5bcc\\u7684\\u535a\\u5ba2\\u6587\\u7ae0  \\n\\u80cc\\u666f:\\u7528\\u6237\\u9700\\u8981\\u64b0\\u5199\\u4e00\\u7bc7\\u535a\\u5ba2\\u6587\\u7ae0\\uff0c\\u4e3b\\u9898\\u53ef\\u4ee5\\u662f\\u79d1\\u6280\\u3001\\u751f\\u6d3b\\u3001\\u65c5\\u884c\\u3001\\u7f8e\\u98df\\u7b49\\uff0c\\u76ee\\u6807\\u662f\\u5438\\u5f15\\u8bfb\\u8005\\u5e76\\u5f15\\u53d1\\u4e92\\u52a8  \\n\\u7ea6\\u675f\\u89c4\\u5219:  \\n1. \\u6587\\u7ae0\\u9700\\u5305\\u542b\\u5f15\\u8a00\\u3001\\u4e3b\\u4f53\\u548c\\u7ed3\\u8bba\\u90e8\\u5206  \\n2. \\u4f7f\\u7528\\u5c0f\\u6807\\u9898\\u548c\\u5217\\u8868\\u7b49\\u65b9\\u5f0f\\u589e\\u5f3a\\u53ef\\u8bfb\\u6027  \\n3. \\u907f\\u514d\\u6d89\\u53ca\\u654f\\u611f\\u8bdd\\u9898\\uff0c\\u4fdd\\u6301\\u5185\\u5bb9\\u79ef\\u6781\\u5411\\u4e0a  \\n4. \\u5b57\\u6570\\u63a7\\u5236\\u5728500-1000\\u5b57\\u4e4b\\u95f4  \\n5. \\u8bed\\u8a00\\u98ce\\u683c\\u53e3\\u8bed\\u5316\\uff0c\\u6613\\u4e8e\\u7406\\u89e3  \\n\\u8f93\\u51fa\\u683c\\u5f0f:\\u4ee5\\u6587\\u672c\\u5f62\\u5f0f\\u8fd4\\u56de\\uff0c\\u7ed3\\u6784\\u6e05\\u6670\\uff0c\\u6bb5\\u843d\\u5206\\u660e \"}, {\"role\": \"user\", \"content\": \"\\u5982\\u4f55\\u5728\\u5bb6\\u4e2d\\u521b\\u5efa\\u4e00\\u4e2a\\u9ad8\\u6548\\u7684\\u5de5\\u4f5c\\u7a7a\\u95f4 \"}, {\"role\": \"assistant\", \"content\": \"---  \\n### \\u5982\\u4f55\\u5728\\u5bb6\\u4e2d\\u521b\\u5efa\\u4e00\\u4e2a\\u9ad8\\u6548\\u7684\\u5de5\\u4f5c\\u7a7a\\u95f4  \\n#### \\u5f15\\u8a00  \\n\\u968f\\u7740\\u8fdc\\u7a0b\\u529e\\u516c\\u7684\\u666e\\u53ca\\uff0c\\u6253\\u9020\\u4e00\\u4e2a\\u9ad8\\u6548\\u7684\\u5bb6\\u5ead\\u5de5\\u4f5c\\u7a7a\\u95f4\\u53d8\\u5f97\\u8d8a\\u6765\\u8d8a\\u91cd\\u8981\\u3002\\u4e00\\u4e2a\\u5408\\u7406\\u8bbe\\u8ba1\\u7684\\u5de5\\u4f5c\\u73af\\u5883\\u4e0d\\u4ec5\\u80fd\\u63d0\\u5347\\u5de5\\u4f5c\\u6548\\u7387\\uff0c\\u8fd8\\u80fd\\u5e2e\\u52a9\\u4f60\\u66f4\\u597d\\u5730\\u5e73\\u8861\\u5de5\\u4f5c\\u4e0e\\u751f\\u6d3b\\u3002  \\n\\n#### \\u4e3b\\u4f53  \\n1. **\\u9009\\u62e9\\u5408\\u9002\\u7684\\u4f4d\\u7f6e**  \\n   - \\u786e\\u4fdd\\u5de5\\u4f5c\\u533a\\u57df\\u901a\\u98ce\\u826f\\u597d\\u4e14\\u91c7\\u5149\\u5145\\u8db3\\u3002  \\n   - \\u907f\\u514d\\u9009\\u62e9\\u566a\\u97f3\\u8f83\\u5927\\u7684\\u533a\\u57df\\uff0c\\u5982\\u9760\\u8fd1\\u95e8\\u53e3\\u6216\\u53a8\\u623f\\u3002  \\n\\n2. **\\u4f18\\u5316\\u684c\\u6905\\u5e03\\u5c40**  \\n   - \\u4f7f\\u7528\\u7b26\\u5408\\u4eba\\u4f53\\u5de5\\u5b66\\u7684\\u6905\\u5b50\\u548c\\u684c\\u5b50\\uff0c\\u907f\\u514d\\u957f\\u65f6\\u95f4\\u5750\\u59ff\\u4e0d\\u6b63\\u786e\\u5bfc\\u81f4\\u7684\\u5065\\u5eb7\\u95ee\\u9898\\u3002  \\n   - \\u5c06\\u7535\\u8111\\u5c4f\\u5e55\\u653e\\u5728\\u773c\\u5e73\\u4f4d\\u7f6e\\uff0c\\u952e\\u76d8\\u548c\\u9f20\\u6807\\u653e\\u7f6e\\u5728\\u8212\\u9002\\u7684\\u9ad8\\u5ea6\\u3002  \\n\\n3. **\\u51cf\\u5c11\\u5e72\\u6270**  \\n   - \\u5982\\u679c\\u5bb6\\u4e2d\\u6709\\u5176\\u4ed6\\u4eba\\uff0c\\u53ef\\u4ee5\\u4f7f\\u7528\\u9694\\u97f3\\u8bbe\\u5907\\u6216\\u64ad\\u653e\\u80cc\\u666f\\u97f3\\u4e50\\u6765\\u96c6\\u4e2d\\u6ce8\\u610f\\u529b\\u3002  \\n   - \\u5c06\\u624b\\u673a\\u653e\\u5728\\u9759\\u97f3\\u6a21\\u5f0f\\uff0c\\u8bbe\\u7f6e\\u4e13\\u95e8\\u7684\\u5de5\\u4f5c\\u65f6\\u95f4\\u6bb5\\u3002  \\n\\n4. **\\u589e\\u52a0\\u88c5\\u9970\\u5143\\u7d20**  \\n   - \\u5728\\u5de5\\u4f5c\\u533a\\u57df\\u653e\\u7f6e\\u4e00\\u4e9b\\u7eff\\u690d\\uff0c\\u4e0d\\u4ec5\\u80fd\\u51c0\\u5316\\u7a7a\\u6c14\\uff0c\\u8fd8\\u80fd\\u63d0\\u5347\\u5fc3\\u60c5\\u3002  \\n   - \\u5899\\u4e0a\\u53ef\\u4ee5\\u6302\\u4e00\\u4e9b\\u6fc0\\u52b1\\u6027\\u7684\\u753b\\u6846\\u6216\\u6d77\\u62a5\\uff0c\\u6fc0\\u53d1\\u521b\\u9020\\u529b\\u3002  \\n\\n#### \\u7ed3\\u8bba  \\n\\u4e00\\u4e2a\\u9ad8\\u6548\\u7684\\u5bb6\\u5ead\\u5de5\\u4f5c\\u7a7a\\u95f4\\u4e0d\\u4ec5\\u80fd\\u63d0\\u5347\\u4f60\\u7684\\u5de5\\u4f5c\\u6548\\u7387\\uff0c\\u8fd8\\u80fd\\u8ba9\\u4f60\\u5728\\u5bb6\\u4e2d\\u627e\\u5230\\u4e13\\u6ce8\\u548c\\u8212\\u9002\\u7684\\u611f\\u89c9\\u3002\\u901a\\u8fc7\\u5408\\u7406\\u7684\\u5e03\\u5c40\\u548c\\u88c5\\u9970\\uff0c\\u6253\\u9020\\u5c5e\\u4e8e\\u81ea\\u5df1\\u7684\\u7406\\u60f3\\u5de5\\u4f5c\\u73af\\u5883\\uff0c\\u4ece\\u73b0\\u5728\\u5f00\\u59cb\\uff01\"}]', '4.0Ultra', '0.8', '0.6', 6000, '0', '0', 'icon-avatar-baoan', 'icon-avatar-chat_gpt', '2025-01-17 01:39:20', '2025-02-25 21:14:18', 'system');
@@ -71,6 +71,9 @@ CREATE TABLE `ai_history`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 45 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '聊天记录' ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Records of ai_history
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for ai_model
@@ -88,18 +91,291 @@ CREATE TABLE `ai_model`  (
   `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
   `user_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户名称',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '模型基本配置' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '模型基本配置' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ai_model
 -- ----------------------------
-INSERT INTO `ai_model` VALUES (1, 'llama-3.2-90b-vision-preview', 'llama-3.2-90b-vision', '3.2 90b大模型', 'Groq', 0, 131072, '2025-01-02 11:41:42', '2025-01-02 13:41:41', 'zhouhx');
-INSERT INTO `ai_model` VALUES (3, 'llama-3.3-70b-versatile', 'llama-3.3-70b', 'llama-3.3大模型，支持上下文:128k,输出token:32,768', 'Groq', 0, 131072, '2025-01-02 13:47:16', NULL, 'zhouhx');
+INSERT INTO `ai_model` VALUES (1, 'llama-3.2-90b-vision-preview', 'llama-3.2-90b-vision', '3.2 90b大模型', 'Groq', 0, 7000, '2025-01-02 11:41:42', '2025-02-27 19:09:48', 'system');
+INSERT INTO `ai_model` VALUES (3, 'llama-3.3-70b-versatile', 'llama-3.3-70b', '', 'Groq', 0, 6000, '2025-01-02 13:47:16', '2025-02-27 19:09:17', 'system');
 INSERT INTO `ai_model` VALUES (4, 'llama-3.2-1b-instruct', 'llama-3.2-1b', '本地', 'LMStudio', 0, 8160, '2025-01-02 13:47:37', NULL, 'zhouhx');
-INSERT INTO `ai_model` VALUES (5, 'qwen-plus', 'qwen-plus', '通义千问超大规模语言模型的增强版，支持中文英文等不同语言输入。', 'Qwen', 0, 8000, '2025-01-02 13:48:04', NULL, 'zhouhx');
-INSERT INTO `ai_model` VALUES (6, 'qwq-32b', 'qwq-32b', 'QwQ模型是由 Qwen 团队开发的实验性研究模型，专注于增强 AI 推理能力。', 'Qwen', 0, 8000, '2025-01-02 13:49:07', NULL, 'zhouhx');
 INSERT INTO `ai_model` VALUES (7, 'lite', 'Spark Lite', '轻量级大语言模型，低延迟，全免费', 'Spark', 0, 4095, '2025-01-02 13:52:03', NULL, 'zhouhx');
 INSERT INTO `ai_model` VALUES (8, '4.0Ultra', 'Spark 4.0Ultra', '最强大的星火大模型（星火4.0 Turbo），在文本生成、语言理解、知识问答、逻辑推理、数学能力等七大维度全面超越GPT 4-Turbo，优化联网搜索链路，提供更精准回答。', 'Spark', 0, 8000, '2025-01-02 13:53:44', NULL, 'zhouhx');
+INSERT INTO `ai_model` VALUES (10, 'deepseek-r1-distill-llama-70b', 'deepseek-r1-70b', 'deepseek-r1-distill-llama-70b', 'Groq', 0, 6000, '2025-02-27 19:08:38', NULL, 'system');
+INSERT INTO `ai_model` VALUES (11, 'qwen-2.5-coder-32b', 'qwen-2.5-coder-32b', '', 'Groq', 0, 10000, '2025-02-27 19:11:25', NULL, 'system');
+INSERT INTO `ai_model` VALUES (12, 'qwen-2.5-coder-32b', 'qwen-2.5-coder', 'qwen-2.5-coder 32b', 'Groq', 0, 10000, '2025-02-27 19:11:26', '2025-02-27 19:11:41', 'system');
+INSERT INTO `ai_model` VALUES (13, 'qwen-2.5-32b', 'qwen-2.5', '', 'Groq', 0, 10000, '2025-02-27 19:12:11', NULL, 'system');
+INSERT INTO `ai_model` VALUES (14, 'deepseek-r1-distill-qwen-32b', 'deepseek-r1-qwen', 'DeepSeek ,128K, deepseek-r1-distill-qwen-32b', 'Groq', 0, 16384, '2025-02-27 19:14:19', NULL, 'system');
+INSERT INTO `ai_model` VALUES (16, 'deepseek-r1-distill-llama-70b', 'deepseek-r1-distill-llama', 'DeepSeek	128K', 'Groq', 0, 1000, '2025-02-27 19:16:09', NULL, 'system');
+INSERT INTO `ai_model` VALUES (17, 'qwen-omni-turbo-2025-01-19', 'qwen-omni-turbo', '通义千问全模态理解生成大模型，支持文本, 图像，语音，视频输入理解和混合输入理解，具备文本和语音同时流式生成能力，多模态内容理解速度显著提升，提供了4种自然对话音色，此版本为2025年1月19日的快照版本，预计维护至下一个快照发布前的一个月左右。', 'Qwen', 0, 100000, '2025-02-27 19:24:18', NULL, 'zhouhx');
+
+-- ----------------------------
+-- Table structure for auth_group
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_group`;
+CREATE TABLE `auth_group`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `name`(`name`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of auth_group
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for auth_group_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_group_permissions`;
+CREATE TABLE `auth_group_permissions`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `group_id` int(0) NOT NULL,
+  `permission_id` int(0) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `auth_group_permissions_group_id_permission_id_0cd325b0_uniq`(`group_id`, `permission_id`) USING BTREE,
+  INDEX `auth_group_permissio_permission_id_84c5c92e_fk_auth_perm`(`permission_id`) USING BTREE,
+  CONSTRAINT `auth_group_permissio_permission_id_84c5c92e_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `auth_group_permissions_group_id_b120cbf9_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of auth_group_permissions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for auth_permission
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_permission`;
+CREATE TABLE `auth_permission`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `content_type_id` int(0) NOT NULL,
+  `codename` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `auth_permission_content_type_id_codename_01ab375a_uniq`(`content_type_id`, `codename`) USING BTREE,
+  CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 45 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of auth_permission
+-- ----------------------------
+INSERT INTO `auth_permission` VALUES (1, 'Can add log entry', 1, 'add_logentry');
+INSERT INTO `auth_permission` VALUES (2, 'Can change log entry', 1, 'change_logentry');
+INSERT INTO `auth_permission` VALUES (3, 'Can delete log entry', 1, 'delete_logentry');
+INSERT INTO `auth_permission` VALUES (4, 'Can view log entry', 1, 'view_logentry');
+INSERT INTO `auth_permission` VALUES (5, 'Can add permission', 2, 'add_permission');
+INSERT INTO `auth_permission` VALUES (6, 'Can change permission', 2, 'change_permission');
+INSERT INTO `auth_permission` VALUES (7, 'Can delete permission', 2, 'delete_permission');
+INSERT INTO `auth_permission` VALUES (8, 'Can view permission', 2, 'view_permission');
+INSERT INTO `auth_permission` VALUES (9, 'Can add group', 3, 'add_group');
+INSERT INTO `auth_permission` VALUES (10, 'Can change group', 3, 'change_group');
+INSERT INTO `auth_permission` VALUES (11, 'Can delete group', 3, 'delete_group');
+INSERT INTO `auth_permission` VALUES (12, 'Can view group', 3, 'view_group');
+INSERT INTO `auth_permission` VALUES (13, 'Can add user', 4, 'add_user');
+INSERT INTO `auth_permission` VALUES (14, 'Can change user', 4, 'change_user');
+INSERT INTO `auth_permission` VALUES (15, 'Can delete user', 4, 'delete_user');
+INSERT INTO `auth_permission` VALUES (16, 'Can view user', 4, 'view_user');
+INSERT INTO `auth_permission` VALUES (17, 'Can add content type', 5, 'add_contenttype');
+INSERT INTO `auth_permission` VALUES (18, 'Can change content type', 5, 'change_contenttype');
+INSERT INTO `auth_permission` VALUES (19, 'Can delete content type', 5, 'delete_contenttype');
+INSERT INTO `auth_permission` VALUES (20, 'Can view content type', 5, 'view_contenttype');
+INSERT INTO `auth_permission` VALUES (21, 'Can add session', 6, 'add_session');
+INSERT INTO `auth_permission` VALUES (22, 'Can change session', 6, 'change_session');
+INSERT INTO `auth_permission` VALUES (23, 'Can delete session', 6, 'delete_session');
+INSERT INTO `auth_permission` VALUES (24, 'Can view session', 6, 'view_session');
+INSERT INTO `auth_permission` VALUES (25, 'Can add 角色体', 7, 'add_aiagent');
+INSERT INTO `auth_permission` VALUES (26, 'Can change 角色体', 7, 'change_aiagent');
+INSERT INTO `auth_permission` VALUES (27, 'Can delete 角色体', 7, 'delete_aiagent');
+INSERT INTO `auth_permission` VALUES (28, 'Can view 角色体', 7, 'view_aiagent');
+INSERT INTO `auth_permission` VALUES (29, 'Can add 聊天记录', 8, 'add_aihistory');
+INSERT INTO `auth_permission` VALUES (30, 'Can change 聊天记录', 8, 'change_aihistory');
+INSERT INTO `auth_permission` VALUES (31, 'Can delete 聊天记录', 8, 'delete_aihistory');
+INSERT INTO `auth_permission` VALUES (32, 'Can view 聊天记录', 8, 'view_aihistory');
+INSERT INTO `auth_permission` VALUES (33, 'Can add 模型配置', 9, 'add_aimodel');
+INSERT INTO `auth_permission` VALUES (34, 'Can change 模型配置', 9, 'change_aimodel');
+INSERT INTO `auth_permission` VALUES (35, 'Can delete 模型配置', 9, 'delete_aimodel');
+INSERT INTO `auth_permission` VALUES (36, 'Can view 模型配置', 9, 'view_aimodel');
+INSERT INTO `auth_permission` VALUES (37, 'Can add 知识库', 10, 'add_knowledge');
+INSERT INTO `auth_permission` VALUES (38, 'Can change 知识库', 10, 'change_knowledge');
+INSERT INTO `auth_permission` VALUES (39, 'Can delete 知识库', 10, 'delete_knowledge');
+INSERT INTO `auth_permission` VALUES (40, 'Can view 知识库', 10, 'view_knowledge');
+INSERT INTO `auth_permission` VALUES (41, 'Can add 知识库文件', 11, 'add_knowledgefile');
+INSERT INTO `auth_permission` VALUES (42, 'Can change 知识库文件', 11, 'change_knowledgefile');
+INSERT INTO `auth_permission` VALUES (43, 'Can delete 知识库文件', 11, 'delete_knowledgefile');
+INSERT INTO `auth_permission` VALUES (44, 'Can view 知识库文件', 11, 'view_knowledgefile');
+
+-- ----------------------------
+-- Table structure for auth_user
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_user`;
+CREATE TABLE `auth_user`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `password` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `last_login` datetime(6) NULL DEFAULT NULL,
+  `is_superuser` tinyint(1) NOT NULL,
+  `username` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `first_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `last_name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `email` varchar(254) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `is_staff` tinyint(1) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `date_joined` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `username`(`username`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of auth_user
+-- ----------------------------
+INSERT INTO `auth_user` VALUES (1, 'pbkdf2_sha256$870000$mycd51VurRRSNOV7BTJaEU$rLQYJXui56HFIkqcEDCzfPsBxXWwUkfpinhqMkIXHXQ=', '2025-02-28 16:33:30.605593', 1, 'system', '', '', '1126680959@qq.com', 1, 1, '2025-02-28 09:47:49.149176');
+INSERT INTO `auth_user` VALUES (2, 'pbkdf2_sha256$870000$uKicwH7rDTjr4t80viSIwR$x8ZDejEYoiH+9CQeYQy+zhzgGecmv4MNadP3gmMVLUE=', NULL, 0, 'zhouhx', '', '', '', 0, 1, '2025-02-28 09:49:52.569646');
+INSERT INTO `auth_user` VALUES (4, 'pbkdf2_sha256$870000$RuIarY3NfPqNDzH9MfvOYi$cDYavLq2VONSrjEtKQcoc4a7q3zAmUhR+p7mDQkfQEE=', NULL, 0, 'zhou', '', '', '', 0, 1, '2025-02-28 16:46:42.101981');
+INSERT INTO `auth_user` VALUES (8, 'pbkdf2_sha256$870000$Sm5ZiAOiguW4jZipYAhl7P$76LGK5Sq/n7Mvt+rSvpEqDTsM4SoTyBjV6+LF97AZ3o=', NULL, 0, 'zhouhx2', '', '', '', 0, 1, '2025-02-28 16:58:52.694886');
+INSERT INTO `auth_user` VALUES (9, 'pbkdf2_sha256$870000$WsDaz3h4DFKVnzpJctvDF1$Lawwn4W/dhLtt5hWGvgVPZ/Mv3tVU1vVe7k/IsdBu7M=', NULL, 0, 'zhouhx333', '', '', '', 0, 1, '2025-02-28 17:00:14.626717');
+
+-- ----------------------------
+-- Table structure for auth_user_groups
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_user_groups`;
+CREATE TABLE `auth_user_groups`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `user_id` int(0) NOT NULL,
+  `group_id` int(0) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `auth_user_groups_user_id_group_id_94350c0c_uniq`(`user_id`, `group_id`) USING BTREE,
+  INDEX `auth_user_groups_group_id_97559544_fk_auth_group_id`(`group_id`) USING BTREE,
+  CONSTRAINT `auth_user_groups_group_id_97559544_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `auth_user_groups_user_id_6a12ed8b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of auth_user_groups
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for auth_user_user_permissions
+-- ----------------------------
+DROP TABLE IF EXISTS `auth_user_user_permissions`;
+CREATE TABLE `auth_user_user_permissions`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `user_id` int(0) NOT NULL,
+  `permission_id` int(0) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `auth_user_user_permissions_user_id_permission_id_14a6b632_uniq`(`user_id`, `permission_id`) USING BTREE,
+  INDEX `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm`(`permission_id`) USING BTREE,
+  CONSTRAINT `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of auth_user_user_permissions
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for django_admin_log
+-- ----------------------------
+DROP TABLE IF EXISTS `django_admin_log`;
+CREATE TABLE `django_admin_log`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `action_time` datetime(6) NOT NULL,
+  `object_id` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `object_repr` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `action_flag` smallint(0) UNSIGNED NOT NULL,
+  `change_message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `content_type_id` int(0) NULL DEFAULT NULL,
+  `user_id` int(0) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `django_admin_log_content_type_id_c4bce8eb_fk_django_co`(`content_type_id`) USING BTREE,
+  INDEX `django_admin_log_user_id_c564eba6_fk_auth_user_id`(`user_id`) USING BTREE,
+  CONSTRAINT `django_admin_log_content_type_id_c4bce8eb_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `django_admin_log_user_id_c564eba6_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of django_admin_log
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for django_content_type
+-- ----------------------------
+DROP TABLE IF EXISTS `django_content_type`;
+CREATE TABLE `django_content_type`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `app_label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `model` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `django_content_type_app_label_model_76bd3d3b_uniq`(`app_label`, `model`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of django_content_type
+-- ----------------------------
+INSERT INTO `django_content_type` VALUES (1, 'admin', 'logentry');
+INSERT INTO `django_content_type` VALUES (3, 'auth', 'group');
+INSERT INTO `django_content_type` VALUES (2, 'auth', 'permission');
+INSERT INTO `django_content_type` VALUES (4, 'auth', 'user');
+INSERT INTO `django_content_type` VALUES (7, 'chat_app', 'aiagent');
+INSERT INTO `django_content_type` VALUES (8, 'chat_app', 'aihistory');
+INSERT INTO `django_content_type` VALUES (9, 'chat_app', 'aimodel');
+INSERT INTO `django_content_type` VALUES (10, 'chat_app', 'knowledge');
+INSERT INTO `django_content_type` VALUES (11, 'chat_app', 'knowledgefile');
+INSERT INTO `django_content_type` VALUES (5, 'contenttypes', 'contenttype');
+INSERT INTO `django_content_type` VALUES (6, 'sessions', 'session');
+
+-- ----------------------------
+-- Table structure for django_migrations
+-- ----------------------------
+DROP TABLE IF EXISTS `django_migrations`;
+CREATE TABLE `django_migrations`  (
+  `id` int(0) NOT NULL AUTO_INCREMENT,
+  `app` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `applied` datetime(6) NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 20 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of django_migrations
+-- ----------------------------
+INSERT INTO `django_migrations` VALUES (1, 'contenttypes', '0001_initial', '2025-02-28 09:36:25.763319');
+INSERT INTO `django_migrations` VALUES (2, 'auth', '0001_initial', '2025-02-28 09:36:26.721089');
+INSERT INTO `django_migrations` VALUES (3, 'admin', '0001_initial', '2025-02-28 09:36:26.931232');
+INSERT INTO `django_migrations` VALUES (4, 'admin', '0002_logentry_remove_auto_add', '2025-02-28 09:36:26.940136');
+INSERT INTO `django_migrations` VALUES (5, 'admin', '0003_logentry_add_action_flag_choices', '2025-02-28 09:36:26.950815');
+INSERT INTO `django_migrations` VALUES (6, 'contenttypes', '0002_remove_content_type_name', '2025-02-28 09:36:27.045465');
+INSERT INTO `django_migrations` VALUES (7, 'auth', '0002_alter_permission_name_max_length', '2025-02-28 09:36:27.132993');
+INSERT INTO `django_migrations` VALUES (8, 'auth', '0003_alter_user_email_max_length', '2025-02-28 09:36:27.156623');
+INSERT INTO `django_migrations` VALUES (9, 'auth', '0004_alter_user_username_opts', '2025-02-28 09:36:27.167188');
+INSERT INTO `django_migrations` VALUES (10, 'auth', '0005_alter_user_last_login_null', '2025-02-28 09:36:27.240160');
+INSERT INTO `django_migrations` VALUES (11, 'auth', '0006_require_contenttypes_0002', '2025-02-28 09:36:27.246850');
+INSERT INTO `django_migrations` VALUES (12, 'auth', '0007_alter_validators_add_error_messages', '2025-02-28 09:36:27.256944');
+INSERT INTO `django_migrations` VALUES (13, 'auth', '0008_alter_user_username_max_length', '2025-02-28 09:36:27.350702');
+INSERT INTO `django_migrations` VALUES (14, 'auth', '0009_alter_user_last_name_max_length', '2025-02-28 09:36:27.437343');
+INSERT INTO `django_migrations` VALUES (15, 'auth', '0010_alter_group_name_max_length', '2025-02-28 09:36:27.461292');
+INSERT INTO `django_migrations` VALUES (16, 'auth', '0011_update_proxy_permissions', '2025-02-28 09:36:27.478462');
+INSERT INTO `django_migrations` VALUES (17, 'auth', '0012_alter_user_first_name_max_length', '2025-02-28 09:36:27.568303');
+INSERT INTO `django_migrations` VALUES (18, 'chat_app', '0001_initial', '2025-02-28 09:36:27.764035');
+INSERT INTO `django_migrations` VALUES (19, 'sessions', '0001_initial', '2025-02-28 09:36:27.829964');
+
+-- ----------------------------
+-- Table structure for django_session
+-- ----------------------------
+DROP TABLE IF EXISTS `django_session`;
+CREATE TABLE `django_session`  (
+  `session_key` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `session_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `expire_date` datetime(6) NOT NULL,
+  PRIMARY KEY (`session_key`) USING BTREE,
+  INDEX `django_session_expire_date_a5c62663`(`expire_date`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of django_session
+-- ----------------------------
+INSERT INTO `django_session` VALUES ('ttc9p48npflata7bnj7hw0ohbn1q9it4', '.eJxVjDsOwjAQBe_iGlk2_iyipOcM1q53gwPIkeKkirg7jpQC2pl5b1MJ16WktcmcRlZXZdXplxHml9Rd8BPrY9J5qss8kt4Tfdim7xPL-3a0fwcFW-lrz-AjO7AXj2FAAnaBcjQkLoDkYACdB9MRAg5nMkE6AmdjjAYxq88X4zk36Q:1tntSW:PE23UXWI13u7cXxHMj7ce4Yb5_ptyK8eOv22bYKi8Ag', '2025-03-14 14:02:52.315799');
+INSERT INTO `django_session` VALUES ('ub9s1k64rb4h29736o2h356b51u5768l', '.eJxVjDsOwjAQBe_iGlk2_iyipOcM1q53gwPIkeKkirg7jpQC2pl5b1MJ16WktcmcRlZXZdXplxHml9Rd8BPrY9J5qss8kt4Tfdim7xPL-3a0fwcFW-lrz-AjO7AXj2FAAnaBcjQkLoDkYACdB9MRAg5nMkE6AmdjjAYxq88X4zk36Q:1tnvoI:kkrjYpgzxf_Iz5R1a4OkRmPriyZf9MRB2cAlhrhyuHE', '2025-03-14 16:33:30.648339');
+INSERT INTO `django_session` VALUES ('xqu1b4x9q1h1bhtc5yb8z7dyqr19f4xv', '.eJxVjDsOwjAQBe_iGlk2_iyipOcM1q53gwPIkeKkirg7jpQC2pl5b1MJ16WktcmcRlZXZdXplxHml9Rd8BPrY9J5qss8kt4Tfdim7xPL-3a0fwcFW-lrz-AjO7AXj2FAAnaBcjQkLoDkYACdB9MRAg5nMkE6AmdjjAYxq88X4zk36Q:1tnpUF:Ct6E1KJb5ro3gvr-lpMMhiNSFYrLg9F58InXfFNUil8', '2025-03-14 09:48:23.374006');
 
 -- ----------------------------
 -- Table structure for knowledge
@@ -116,6 +392,9 @@ CREATE TABLE `knowledge`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '知识库' ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Records of knowledge
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for knowledge_file
@@ -138,4 +417,3 @@ CREATE TABLE `knowledge_file`  (
   `status` int(0) NULL DEFAULT NULL COMMENT '文件状态(0上传;1解析中2向量中 3完成)',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 53 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '知识库文件' ROW_FORMAT = Dynamic;
-

@@ -61,15 +61,15 @@ const clearForm = () => {
 }
 // 获取配置
 const getConfig = () => {
-    useGetConfigApi().then(data => {
-        form.groq_api_key = data.groq_api_key
-        form.lmstudio_url = data.lmstudio_url
-        form.lmstudio_api_key = data.lmstudio_api_key
-        form.default_model = data.default_model
-        form.qwen_api_key = data.qwen_api_key
-        form.spark_api_key = data.spark_api_key
-        form.redis_url = data.redis_url
-        form.embedding = data.embedding
+    useGetConfigApi().then(res => {
+        form.groq_api_key = res.data.groq_api_key
+        form.lmstudio_url = res.data.lmstudio_url
+        form.lmstudio_api_key = res.data.lmstudio_api_key
+        form.default_model = res.data.default_model
+        form.qwen_api_key = res.data.qwen_api_key
+        form.spark_api_key = res.data.spark_api_key
+        form.redis_url = res.data.redis_url
+        form.embedding = res.data.embedding
     })
 
 }

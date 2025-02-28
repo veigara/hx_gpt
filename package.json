@@ -25,7 +25,9 @@
     "vue": "3.4.38",
     "vue-router": "4.1.5",
     "vxe-table": "^4.3.5",
-    "xe-utils": "^3.5.4"
+    "xe-utils": "^3.5.4",
+    "pinia": "2.0.16",
+    "nprogress": "0.2.0"
   },
   "devDependencies": {
     "@babel/types": "7.17.0",

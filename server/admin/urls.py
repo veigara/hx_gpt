@@ -16,11 +16,11 @@ Including another URLconf
 
 from django.contrib import admin
 from chat_app import views
-from chat_app.web import chat_web, model_web, config_web, knowledge_web
+from chat_app.web import chat_web, model_web, config_web, knowledge_web, login_web
 from django.urls import path, include, re_path
 from django.views.generic import TemplateView
 from django.views.generic import RedirectView
-
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -145,7 +145,22 @@ urlpatterns = [
         chat_web.build_chat_hisorty_to_agent,
         name="build_chat_hisorty_to_agent",
     ),
+    # 登录
+    path(
+        "chat/login",
+        login_web.chat_login,
+        name="chat_login",
+    ),
+    # 注册
+    path(
+        "chat/register",
+        login_web.chat_register,
+        name="chat_register",
+    ),
     # vue页面
     path("", TemplateView.as_view(template_name="index.html"), name="index"),
     re_path(r"^.*/$", TemplateView.as_view(template_name="index.html")),
+    # jwt 认证
+    path("token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
 ]

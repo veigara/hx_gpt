@@ -175,6 +175,7 @@ import type { UploadProps, UploadUserFile } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { isMobile } from '@/utils/tool'
+import store from '@/store'
 
 interface Props {
 	// 错误弹框
@@ -196,6 +197,11 @@ interface chatBot {
 }
 
 const props = defineProps<Props>()
+
+const url = import.meta.env.VITE_API_URL as any
+const userStore = store.userStore
+const user_token = "Bearer "+userStore.token
+
 // 当前模型
 const curModel = ref()
 // 正在进行的对话数据
@@ -341,11 +347,10 @@ const sendBotMsgClick = async(event: any) => {
 		chatData.assistantCt = ''
 		try {
 			chatData.assistantCt = ''
-			const url = import.meta.env.VITE_API_URL as any
-			const user = import.meta.env.VITE_USER_AUTHORIZATION as any
+			
 			await fetchEventSource(url + '/chat', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', 'authorization': user },
+				headers: { 'Content-Type': 'application/json', 'authorization': user_token },
 				body: JSON.stringify(dataForm),
 				signal: abortController.signal, // 绑定中断信号
 				openWhenHidden:true, 
@@ -560,11 +565,9 @@ const uploadFileClick = () => {
 	uploadRoot.querySelector('input[type="file"]').click()
 }
 
-const url = import.meta.env.VITE_API_URL as any
-const user = import.meta.env.VITE_USER_AUTHORIZATION as any
 const uploadHttpUrl = ref(url + "/chat/upload")
 const uploadheaders = ref({
-	'authorization': user
+	'authorization': user_token
 })
 
 // 解析文件

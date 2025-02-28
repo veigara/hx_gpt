@@ -4,7 +4,6 @@ import uuid
 from ..presets import *
 from django.http import FileResponse
 from django.utils.encoding import escape_uri_path
-from ..base_module.agent_exception import AgentException
 from ..config import get_default_model_params
 from ..utils import *
 from ..service.knowledge_stores import parse_file as PARSE_FILE
@@ -47,21 +46,17 @@ def down_file(file_name, file_path) -> FileResponse:
     """下载文件
     @param id: 主键id
     """
-    try:
-        # 读取文件内容
-        if os.path.exists(file_path):
-            response = FileResponse(open(file_path, "rb"))
-            response["Content-Type"] = "application/octet-stream"
-            # 文件名为中文时无法识别，使用escape_uri_path处理
-            response["Content-Disposition"] = (
-                "attachment; " "filename*=UTF-8''{}".format(escape_uri_path(file_name))
-            )
-            return response
-        else:
-            raise AgentException("文件路径不存在")
-    except Exception as e:
-        logger.error("文件下载时发生错误", e)
-        raise AgentException("文件下载失败")
+    # 读取文件内容
+    if os.path.exists(file_path):
+        response = FileResponse(open(file_path, "rb"))
+        response["Content-Type"] = "application/octet-stream"
+        # 文件名为中文时无法识别，使用escape_uri_path处理
+        response["Content-Disposition"] = "attachment; " "filename*=UTF-8''{}".format(
+            escape_uri_path(file_name)
+        )
+        return response
+    else:
+        raise AgentException("INTERNAL_ERROR", "文件路径不存在")
 
 
 def parse_file_to_text(user_name, file_path, file_name, model_key) -> dict:
@@ -106,4 +101,6 @@ def parse_file_to_text(user_name, file_path, file_name, model_key) -> dict:
     except Exception as e:
         # 可根据实际需求添加日志记录
         logger.error("文件解析失败", e)
-        raise AgentException({"parse": False, "error_msg": f"文件解析失败:{str(e)}"})
+        raise AgentException(
+            "INTERNAL_ERROR", {"parse": False, "error_msg": f"文件解析失败:{str(e)}"}
+        )

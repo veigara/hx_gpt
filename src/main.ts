@@ -2,6 +2,8 @@ import { createApp } from 'vue'
 import ElementPlus from 'element-plus'
 import App from './App.vue'
 import { router } from './router'
+import { createPinia } from 'pinia'
+import { registerStore } from './store'
 import 'virtual:svg-icons-register'
 import 'xe-utils'
 import VXETable from 'vxe-table'
@@ -22,6 +24,9 @@ VXETable.setup({
 })
 
 const app = createApp(App)
+app.use(createPinia())
+// 注册 Pinia
+registerStore()
 
 app.use(router)
 app.use(SvgIcon)

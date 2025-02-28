@@ -9,7 +9,6 @@ from typing import List
 from .db.knowledge_file import *
 from .db.knowledge import *
 from ..utils import *
-from ..base_module.agent_exception import AgentException
 from .knowledge_stores import parse_file as PARSE_FILE, add_db_store as ADD_DB_STORE
 from .knowledge_redis import (
     del_keys as REDIS_DEL_KEYS,
@@ -95,7 +94,7 @@ def save_upload_file(
         logger.error(f"上传文件【{title}】失败: {e}")
         if os.path.exists(file_path):
             os.remove(file_path)
-        raise AgentException(f"上传文件【{title}】失败")
+        raise AgentException("INTERNAL_ERROR", f"上传文件【{title}】失败")
 
 
 def parse_file(id, user_name, file_path, file_type, file_config, title):
@@ -114,7 +113,7 @@ def parse_file(id, user_name, file_path, file_type, file_config, title):
         return doc_data
     except Exception as e:
         logger.error(f"解析文件【{title}】失败: {e}")
-        raise AgentException(f"解析文件【{title}】失败")
+        raise AgentException("INTERNAL_ERROR", f"解析文件【{title}】失败")
 
 
 def store_file(id, user_name, index_name, doc_data, title):
@@ -128,7 +127,7 @@ def store_file(id, user_name, index_name, doc_data, title):
         logger.info(f"{user_name}上传文件成功")
     except Exception as e:
         logger.error(f"向量化文件【{title}】失败: {e}")
-        raise AgentException(f"向量化文件【{title}】失败")
+        raise AgentException("INTERNAL_ERROR", f"向量化文件【{title}】失败")
 
 
 def get_file_suffix(original_filename):
@@ -197,10 +196,10 @@ def down_file(id) -> FileResponse:
                 )
                 return response
             else:
-                raise AgentException("文件路径不存在")
+                raise AgentException("INTERNAL_ERROR", "文件路径不存在")
     except Exception as e:
         logger.error("文件下载时发生错误", e)
-        raise AgentException("文件下载失败")
+        raise AgentException("INTERNAL_ERROR", "文件下载失败")
 
 
 def save_knowledge_data(user_name, know_name, index_name, description):
@@ -230,7 +229,7 @@ def update_knowledge_data(id, know_name, index_name, description, user_name):
             if res > 0:
                 return search_knowledge_id(id)
             else:
-                raise AgentException("更新失败")
+                raise AgentException("INTERNAL_ERROR", "更新知识库失败")
     except Exception as e:
         raise e
 
@@ -252,13 +251,13 @@ def delete_knowledge_data(user_name, id) -> bool:
             # 先查询知识库的文件是否都删除
             files = search_knowledge_file(user_name, id, None)
             if len(files) > 0:
-                raise AgentException("请先删除知识库下的文件")
+                raise AgentException("INTERNAL_ERROR", "请先删除知识库下的文件")
             # 删除知识库
             res = delete_knowledge(id)
             if res > 0:
                 return True
             else:
-                raise AgentException("删除知识库失败")
+                raise AgentException("INTERNAL_ERROR", "删除知识库失败")
 
     except Exception as e:
         raise e
@@ -274,7 +273,7 @@ def knowledge_retrieve(know_id, input) -> str:
         # 查询知识库基本信息
         detail = search_knowledge_id(know_id)
         if detail is None:
-            raise AgentException("知识库不存在")
+            raise AgentException("INTERNAL_ERROR", "知识库不存在")
         # 查询知识库文件
         index_name = detail["index_name"]
 
@@ -296,4 +295,4 @@ def knowledge_retrieve(know_id, input) -> str:
         return real_input
     except Exception as e:
         logger.error(f"知识库检索失败: {e}")
-        raise AgentException("知识库检索失败")
+        raise AgentException("INTERNAL_ERROR", "知识库检索失败")

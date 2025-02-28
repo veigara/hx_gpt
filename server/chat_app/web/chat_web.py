@@ -10,7 +10,6 @@ from django.views.decorators.http import require_http_methods
 import logging
 from django.views.decorators.csrf import csrf_exempt
 from ..base_module.base_response import AgentResponse
-from ..base_module.agent_exception import AgentException
 from django.http import StreamingHttpResponse
 import json
 from ..service.agent import *
@@ -24,6 +23,7 @@ from ..service.chat_file import (
     down_file as CHAT_DOWN_FILE,
     parse_file_to_text as CHAT_PARSE_FILE,
 )
+from ..jwt.permissions import check_permission
 
 logger = logging.getLogger("chat_app")
 
@@ -31,6 +31,7 @@ logger = logging.getLogger("chat_app")
 # 发送对话 chat
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def chat_with_model(request):
     try:
         # 从 POST 请求的查询参数中获取 input_text
@@ -128,6 +129,7 @@ def error_stream(fail_msg):
 
 # 获取所有的模型
 @require_http_methods(["GET"])
+@check_permission
 def get_all_models(request):
     try:
         user_name = get_user_name(request)
@@ -138,104 +140,90 @@ def get_all_models(request):
                 if model.get("model_key") == default_model_key:
                     model["default"] = True
 
-        return JsonResponse(AgentResponse.success(data=models))
+        return response_server_success(models)
 
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的模型失败")
-        )
+        return response_server_err(e, msg="获取所有的模型失败")
 
 
 # 保存角色体文件
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def save_agent_file(request):
     payload = json.loads(request.body.decode("utf-8"))
     agent_data = payload.get("agent_data")
     user_name = get_user_name(request)
     try:
+        if not agent_data or not user_name:
+            raise AgentException("PARAM_INVALID", "缺少必要参数")
         json_data = json.loads(agent_data)
         id = json_data.get("id")
         if not id:
             datas = save_agent(user_name, json_data)
         else:
             datas = update_agent(user_name, json_data)
-        return JsonResponse(AgentResponse.success(data=datas))
+        return response_server_success(datas)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}保存角色体文件失败")
-        )
+        return response_server_err(e, msg="保存角色体文件失败")
 
 
 # 获取所有的角色体
 @require_http_methods(["GET"])
+@check_permission
 def get_user_agent(request):
     try:
         user_name = get_user_name(request)
         keyword = request.GET.get("keyword")
         agnets = get_user_all_agents(user_name, keyword)
 
-        return JsonResponse(AgentResponse.success(data=agnets))
+        return response_server_success(agnets)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的角色体失败")
-        )
+        return response_server_err(e, msg="获取所有的角色体失败")
 
 
 # 获取角色体详情
 @require_http_methods(["GET"])
+@check_permission
 def get_agent_detail(request):
     try:
         id = request.GET.get("id")
         # 用户
         user_name = get_user_name(request)
-        if id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体id不能为空")
-            )
+        if not id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         detail = load_agent(user_name, id)
-        return JsonResponse(AgentResponse.success(data=detail))
+        return response_server_success(detail)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取所有的角色体失败")
-        )
+        return response_server_err(e, msg="获取角色体详情失败")
 
 
 # 删除角色体
 @csrf_exempt
 @require_http_methods(["DELETE"])
+@check_permission
 def get_del_agent(request):
     try:
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体id不能为空")
-            )
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         # 查询角色体关联的历史记录
         historys = get_historys_by_agent_id(id)
         if len(historys) > 0:
             titles = [item.get("title") for item in historys]
             del_titles = ",".join(titles)
-            return JsonResponse(
-                AgentResponse.fail(
-                    fail_msg=f"{STANDARD_ERROR_MSG}删除失败,请先删除一下聊天记录:【{del_titles}】"
-                )
+            raise AgentException(
+                "INTERNAL_ERROR", f"删除失败,请先删除一下聊天记录:【{del_titles}】"
             )
         del_agent(user_name, id)
-        return JsonResponse(AgentResponse.success(data=True))
+        return response_server_success(data=True)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除角色体失败")
-        )
+        return response_server_err(e, msg="删除角色体失败")
 
 
 @require_http_methods(["GET"])
+@check_permission
 def select_agent(request) -> str:
     """选择角色体
      params:id 角色体id
@@ -245,28 +233,22 @@ def select_agent(request) -> str:
     try:
         id = request.GET.get("id")
         user_name = get_user_name(request)
-        if id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体id不能为空")
-            )
+        if not id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         agent_data = load_agent(user_name, id)
-        if agent_data is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}角色体内容不能为空")
-            )
+        if not agent_data:
+            raise AgentException("INTERNAL_ERROR", "角色体不存在")
         # 创建聊天记录
         history_id = save_history_agent(user_name, agent_data)
 
-        return JsonResponse(AgentResponse.success(data=history_id))
+        return response_server_success(data=history_id)
 
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除角色体失败")
-        )
+        return response_server_err(e, msg="选择角色体失败")
 
 
 @require_http_methods(["GET"])
+@check_permission
 def get_historys(request):
     """获取用户的聊天记录
     params:keyword 关键字
@@ -276,16 +258,14 @@ def get_historys(request):
         user_name = get_user_name(request)
         keyword = request.GET.get("keyword")
         data = get_user_all_history(user_name, keyword)
-        return JsonResponse(AgentResponse.success(data=data))
+        return response_server_success(data)
 
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取用户的聊天记录失败")
-        )
+        return response_server_err(e, msg="获取用户的聊天记录失败")
 
 
 @require_http_methods(["GET"])
+@check_permission
 def get_history_detail(request):
     """获取聊天记录详情
     params:id 聊天记录id
@@ -294,21 +274,17 @@ def get_history_detail(request):
     try:
         id = request.GET.get("id")
         user_name = get_user_name(request)
-        if id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
+        if not id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         data = load_history(id)
-        return JsonResponse(AgentResponse.success(data=data))
+        return response_server_success(data)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}获取聊天记录详情失败")
-        )
+        return response_server_err(e, msg="获取聊天记录详情失败")
 
 
 @require_http_methods(["DELETE"])
 @csrf_exempt
+@check_permission
 def del_user_history(request):
     """删除聊天记录
     params:id 聊天记录id
@@ -318,20 +294,16 @@ def del_user_history(request):
         id = request.GET.get("id")
         user_name = get_user_name(request)
         if id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         del_history(user_name, id)
-        return JsonResponse(AgentResponse.success(data=True))
+        return response_server_success(True)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}删除聊天记录失败")
-        )
+        return response_server_err(e, msg="删除聊天记录失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def rename_user_history(request):
     """重命名聊天记录
     params:id 聊天记录id
@@ -343,25 +315,19 @@ def rename_user_history(request):
         id = payload.get("id")
         new_title = payload.get("new_title")
         user_name = get_user_name(request)
-        if id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
-        if new_title is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名标题不能为空")
-            )
+        if not id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
+        if not new_title:
+            raise AgentException("PARAM_INVALID", "缺少必要参数标题")
         rename_history(user_name, id, new_title)
-        return JsonResponse(AgentResponse.success(data=True))
+        return response_server_success(True)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名聊天记录失败")
-        )
+        return response_server_err(e, msg="重命名聊天记录失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def top_user_history(request):
     """置顶聊天记录
     params:id 聊天记录id
@@ -370,21 +336,17 @@ def top_user_history(request):
     try:
         payload = json.loads(request.body.decode("utf-8"))
         id = payload.get("id")
-        if id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
+        if not id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         top_history(id)
-        return JsonResponse(AgentResponse.success(data=True))
+        return response_server_success(True)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}重命名聊天记录失败")
-        )
+        return response_server_err(e, msg="置顶聊天记录失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def clear_history_context(request):
     """清空上下文
     params:history_id 聊天记录id
@@ -394,21 +356,17 @@ def clear_history_context(request):
         payload = json.loads(request.body.decode("utf-8"))
         id = payload.get("id")
         user_name = get_user_name(request)
-        if id is None or id == "":
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
+        if not id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         clear_context(user_name, id)
-        return JsonResponse(AgentResponse.success(data=True))
+        return response_server_success(True)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}清空当前聊天记录失败")
-        )
+        return response_server_err(e, msg="清空当前聊天记录失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def clear_history_all(request):
     """清空所有聊天记录
     params:history_id 聊天记录id
@@ -418,73 +376,63 @@ def clear_history_all(request):
         user_name = get_user_name(request)
 
         clear_all_history(user_name)
-        return JsonResponse(AgentResponse.success(data=True))
+        return response_server_success(True)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}清空所有聊天记录失败")
-        )
+        return response_server_err(e, msg="清空所有聊天记录失败")
 
 
 @require_http_methods(["GET"])
+@check_permission
 def get_cur_history_counts(request):
     """获取当前聊天记录的token"""
     try:
         id = request.GET.get("id")
+        if not id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数id")
         data = get_count_tokens(id)
-        return JsonResponse(AgentResponse.success(data=data))
+        return response_server_success(data)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}获取当前聊天记录的token失败"
-            )
-        )
+        return response_server_err(e, msg="获取当前聊天记录的token失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def upload_file(request):
     try:
         user_name = get_user_name(request)
         uploaded_file = request.FILES["file"]
 
         files = CHAT_UPLOAD_FILE(user_name, uploaded_file)
-        return JsonResponse(
-            AgentResponse.success(
-                data={
-                    "status": "success",
-                    "file_path": files["file_path"],
-                    "file_name": files["file_name"],
-                }
-            )
+        return response_server_success(
+            data={
+                "status": "success",
+                "file_path": files["file_path"],
+                "file_name": files["file_name"],
+            }
         )
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}上传文件失败")
-        )
+        return response_server_err(e, msg="上传文件失败")
 
 
 @require_http_methods(["GET"])
+@check_permission
 def down_chat_file(request):
     """下载文件"""
     try:
         file_path = request.GET.get("file_path")
         file_name = request.GET.get("file_name")
+        if not file_path or not file_name:
+            raise AgentException("PARAM_INVALID", "缺少必要参数")
         response = CHAT_DOWN_FILE(file_name, file_path)
         return response
-    except AgentException as e:
-        return JsonResponse(AgentResponse.fail(fail_msg=e.message))
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}下载聊天文件失败")
-        )
+        return response_server_err(e, msg="下载聊天文件失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def parse_chat_file(request):
     """解析文件"""
     try:
@@ -493,38 +441,28 @@ def parse_chat_file(request):
         file_path = payload.get("file_path")
         file_name = payload.get("file_name")
         model_key = payload.get("model_key")
-        if file_path is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件路径不能为空")
-            )
-        if file_name is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}文件名称不能为空")
-            )
-        if model_key is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}模型名称不能为空")
-            )
+        if not file_path:
+            raise AgentException("PARAM_INVALID", "缺少必要参数file_path")
+        if not file_name:
+            raise AgentException("PARAM_INVALID", "缺少必要参数file_name")
+        if not model_key:
+            raise AgentException("PARAM_INVALID", "缺少必要参数model_key")
         res = CHAT_PARSE_FILE(
             user_name=user_name,
             file_path=file_path,
             file_name=file_name,
             model_key=model_key,
         )
-        return JsonResponse(AgentResponse.success(data=res))
+        return response_server_success(res)
     except AgentException as e:
         return JsonResponse(AgentResponse.fail(fail_msg=e.message))
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(
-                fail_msg=f"{STANDARD_ERROR_MSG}解析聊天文件失败,原因：{str(e.message)}"
-            )
-        )
+        return response_server_err(e, msg="解析聊天文件失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def update_chat_history(request):
     """
     修改历史记录
@@ -534,35 +472,25 @@ def update_chat_history(request):
         payload = json.loads(request.body.decode("utf-8"))
         history_id = payload.get("history_id")
         contents_str = payload.get("contents_str")
-        if user_name is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}用户名称不能为空")
-            )
-
-        if history_id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
-
-        if contents_str is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天内容字不能为空")
-            )
+        if not user_name:
+            raise AgentException("PARAM_INVALID", "缺少必要参数user_name")
+        if not history_id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数history_id")
+        if not contents_str:
+            raise AgentException("PARAM_INVALID", "缺少必要参数contents_str")
         # 将json字符串转成list
         contents = json.loads(contents_str)
 
         update_history_id(user_name, history_id, contents)
 
-        return JsonResponse(AgentResponse.success(data={}))
+        return response_server_success({})
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}修改聊天记录失败")
-        )
+        return response_server_err(e, msg="修改聊天记录失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def snip_chat_history_build(request) -> dict:
     """
     新建分支聊天
@@ -572,35 +500,25 @@ def snip_chat_history_build(request) -> dict:
         payload = json.loads(request.body.decode("utf-8"))
         history_id = payload.get("history_id")
         contents_str = payload.get("contents_str")
-        if user_name is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}用户名称不能为空")
-            )
-
-        if history_id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
-
-        if contents_str is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天内容字不能为空")
-            )
+        if not user_name:
+            raise AgentException("PARAM_INVALID", "缺少必要参数user_name")
+        if not history_id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数history_id")
+        if not contents_str:
+            raise AgentException("PARAM_INVALID", "缺少必要参数contents_str")
         # 将json字符串转成list
         contents = json.loads(contents_str)
 
         res = snip_history_build(user_name, history_id, contents)
 
-        return JsonResponse(AgentResponse.success(data=res))
+        return response_server_success(res)
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}新建分支聊天失败")
-        )
+        return response_server_err(e, msg="新建分支聊天失败")
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
+@check_permission
 def build_chat_hisorty_to_agent(request):
     """
     将当前历史记录转为角色体
@@ -610,29 +528,18 @@ def build_chat_hisorty_to_agent(request):
         payload = json.loads(request.body.decode("utf-8"))
         history_id = payload.get("history_id")
         agent_title = payload.get("agent_title")
-        if user_name is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}用户名称不能为空")
-            )
+        if not user_name:
+            raise AgentException("PARAM_INVALID", "缺少必要参数user_name")
 
-        if history_id is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}聊天记录id不能为空")
-            )
+        if not history_id:
+            raise AgentException("PARAM_INVALID", "缺少必要参数history_id")
 
-        if agent_title is None:
-            return JsonResponse(
-                AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}标题内容不能为空")
-            )
-
+        if not agent_title:
+            raise AgentException("PARAM_INVALID", "缺少必要参数agent_title")
         build_hisorty_to_agent(user_name, agent_title, history_id)
-
-        return JsonResponse(AgentResponse.success(data={}))
+        return response_server_success({})
     except Exception as e:
-        logger.error(print_err(e))
-        return JsonResponse(
-            AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}转为角色体失败")
-        )
+        return response_server_err(e, msg="转为角色体失败")
 
 
 class ModelData:

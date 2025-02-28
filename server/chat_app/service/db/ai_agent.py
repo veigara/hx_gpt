@@ -1,7 +1,7 @@
 from ...db_models.db_agent import AiAgent
 from typing import List, Dict, Any
 from datetime import datetime
-from ...presets import *
+from ...presets import SYS_USER_NAME
 from ..ai_model import get_model_detail as GET_MODEL_DETAIL
 import json
 

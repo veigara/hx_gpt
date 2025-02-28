@@ -43,7 +43,11 @@ import { ref, reactive } from 'vue'
 import { useKnowledRetrievetApi } from '@/api/knowledge'
 import { ElNotification } from 'element-plus'
 import { fetchEventSource } from '@microsoft/fetch-event-source'
+import store from '@/store'
 
+const url = import.meta.env.VITE_API_URL as any
+const userStore = store.userStore
+const user_token = "Bearer "+userStore.token
 
 const inintData = () => {
     return {
@@ -76,11 +80,10 @@ const search = () => {
     const fetchStream = async (dataForm: any) => {
 		abortController = new AbortController()
 		try {
-            const url = import.meta.env.VITE_API_URL as any
-            const user = import.meta.env.VITE_USER_AUTHORIZATION as any
+            
 			await fetchEventSource(url+'/knowledge/retrieve', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', 'authorization': user },
+				headers: { 'Content-Type': 'application/json', 'authorization': user_token },
 				body: JSON.stringify(dataForm),
 				signal: abortController.signal, // 绑定中断信号
 				onopen: async (response) => {

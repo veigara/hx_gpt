@@ -11,27 +11,10 @@ from langchain_community.document_loaders import JSONLoader, TextLoader
 from langchain.docstore.document import Document
 from langchain.text_splitter import MarkdownHeaderTextSplitter, TextSplitter
 
-from ..base_module.agent_exception import AgentException
+from ..utils import AgentException
 from .knowledge_redis import add_redis_store
 
 logger = logging.getLogger("chat_app")
-
-
-# def add_stores(file_path, file_type, index_name, file_config: Dict, title) -> Dict:
-#     """把文件添加到向量库"""
-#     kb_file = KnowDocumentFile(
-#         title=title,
-#         file_path=file_path,
-#         file_type=file_type,
-#         file_config=file_config,
-#     )
-#     doc = kb_file.file2text()
-
-#     ids = add_redis_store(index_name, doc)
-#     # 转为字符串
-#     ids = ",".join(ids)
-
-#     return {"document_count": len(doc), "document_ids": ids}
 
 
 def parse_file(file_path, file_type, file_config: Dict, title) -> List[Document]:
@@ -304,10 +287,12 @@ class KnowDocumentFile:
         self.file_config = file_config if file_config is not None else {}
         # 检查文件类型是否在支持的类型列表中
         if self.file_type not in SUPPORTED_TYPE:
-            raise AgentException(f"暂未支持的文件格式 {title}{file_type}")
+            raise AgentException(
+                "INTERNAL_ERROR", f"暂未支持的文件格式 {title}{file_type}"
+            )
         # 验证文件路径是否存在
         if not self.file_exist():
-            raise AgentException(f"文件路径 {file_path} 不存在")
+            raise AgentException("INTERNAL_ERROR", f"文件路径 {file_path} 不存在")
         self.docs = None
         self.splited_docs = None
 
@@ -450,7 +435,7 @@ class KnowDocumentFile:
                     self.splited_docs = self.docs2texts(docs=docs, text_splitter=None)
                 except Exception as e:
                     logging.error(f"Error processing file: {e}")
-                    raise AgentException("从文件中提取文档失败")
+                    raise AgentException("INTERNAL_ERROR", "从文件中提取文档失败")
 
         return self.splited_docs
 

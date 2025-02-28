@@ -4,13 +4,13 @@ from enum import Enum
 from typing import List
 from functools import lru_cache
 from ..presets import *
+from ..utils import AgentException
 from .db.ai_model import (
     search_ai_model as SEARCH_AI_MODEL,
     update_ai_model as UPDATE_AI_MODEL,
     delete_ai_model as DELETE_AI_MODEL,
     save_ai_model as SAVE_AI_MODEL,
 )
-from ..base_module.agent_exception import AgentException
 
 
 def get_model_type() -> list:
@@ -52,7 +52,7 @@ def update_model_detail(user_name, model_detail) -> None:
     """更新模型详情"""
     res = UPDATE_AI_MODEL(**buildUpdateParams(user_name, model_detail))
     if res < 1:
-        raise AgentException("更新模型详情")
+        raise AgentException("INTERNAL_ERROR", "更新模型详情")
     # 清空缓存的结果
     get_model_detail.cache_clear()  # 清除所有缓存
 
@@ -75,7 +75,7 @@ def remove_model(id):
     """删除模型"""
     res = DELETE_AI_MODEL(id)
     if res < 1:
-        raise AgentException("删除模型详情")
+        raise AgentException("INTERNAL_ERROR", "删除模型详情")
 
 
 def get_model_name_list(user_name):
@@ -88,7 +88,7 @@ def save_model(user_name, model_data):
     """保存模型数据"""
     res = SAVE_AI_MODEL(**buildSaveParams(user_name, model_data))
     if not res:
-        raise AgentException("保存模型数据失败")
+        raise AgentException("INTERNAL_ERROR", "保存模型数据失败")
 
 
 def buildSaveParams(user_name, model_detail):

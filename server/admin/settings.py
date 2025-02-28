@@ -39,9 +39,52 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",  # 添加 simplejwt 应用
     "chat_app",
     "corsheaders",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+}
+
+from datetime import timedelta
+
+# JWT 相关设置
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=180),  # 访问令牌的有效时间
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # 刷新令牌的有效时间
+    "ROTATE_REFRESH_TOKENS": False,  # 是否允许刷新令牌循环
+    "BLACKLIST_AFTER_ROTATION": True,  # 刷新令牌后是否加入黑名单
+    "UPDATE_LAST_LOGIN": False,  # 登录时是否更新最后登录时间
+    "ALGORITHM": "HS256",  # 签名算法
+    "SIGNING_KEY": SECRET_KEY,  # 签名密钥
+    "VERIFYING_KEY": None,  # 验证密钥
+    "AUDIENCE": None,  # 观众
+    "ISSUER": None,  # 发行人
+    "JWK_URL": None,  # JWK URL
+    "LEEWAY": 0,  # 宽限期
+    "AUTH_HEADER_TYPES": ("Bearer",),  # 授权头类型
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",  # 授权头名称
+    "USER_ID_FIELD": "id",  # 用户 ID 字段
+    "USER_ID_CLAIM": "user_id",  # 用户 ID 声明
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "AUTH_TOKEN_CLASSES": (
+        "rest_framework_simplejwt.tokens.AccessToken",
+    ),  # 认证令牌类
+    "TOKEN_TYPE_CLAIM": "token_type",  # 令牌类型声明
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",  # 滑动令牌刷新过期声明
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),  # 滑动令牌有效时间
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),  # 滑动令牌刷新有效时间
+}
+
 
 MIDDLEWARE = [
     "log_request_id.middleware.RequestIDMiddleware",
@@ -75,6 +118,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "admin.wsgi.application"
 
+# 显式定义主键字段类型
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

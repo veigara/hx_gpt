@@ -1,5 +1,6 @@
 import axios from 'axios'
 import qs from 'qs'
+import store from '@/store'
 import { ElNotification } from 'element-plus'
 
 // axios实例
@@ -13,12 +14,13 @@ const service = axios.create({
 service.interceptors.request.use(
 	(config: any) => {
 		// 追加时间戳，防止GET请求缓存
+		const userStore = store.userStore
+		if (userStore?.token) {
+			config.headers.Authorization = "Bearer "+userStore.token
+		}
 		if (config.method?.toUpperCase() === 'GET') {
 			config.params = { ...config.params, t: new Date().getTime() }
 		}
-		const user = import.meta.env.VITE_USER_AUTHORIZATION as any	
-		// 添加请求参数
-		config.headers["authorization"]= user
 		if (Object.values(config.headers).includes('application/x-www-form-urlencoded')) {
 			config.data = qs.stringify(config.data)
 		}
@@ -34,6 +36,12 @@ service.interceptors.request.use(
 service.interceptors.response.use(
 	response => {
 		if (response.status !== 200) {
+			if(response.status === 401){
+				// 没有权限，如：未登录、登录过期等，需要跳转到登录页
+				store.userStore?.setToken('')
+				location.reload()
+				return
+			}
 			ElNotification({
 				title: '错误',
 				message: response.statusText,

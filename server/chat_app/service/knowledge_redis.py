@@ -8,7 +8,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.docstore.document import Document
 from langchain_redis import RedisConfig, RedisVectorStore
 from functools import lru_cache
-from ..base_module.agent_exception import AgentException
+from ..utils import AgentException
 from ..config import (
     redis_url as REDIS_URL_CONFIG,
     embedding_address as EMBEDDING_ADDRESS,
@@ -26,7 +26,9 @@ logger = logging.getLogger("chat_app")
 def redis_client():
     REDIS_URL = str(REDIS_URL_CONFIG())
     if not REDIS_URL:
-        raise AgentException("未配置向量数据库地址,请配置向量数据库地址")
+        raise AgentException(
+            "INTERNAL_ERROR", "未配置向量数据库地址,请配置向量数据库地址"
+        )
     try:
         client = redis.from_url(REDIS_URL)
         logger.info(f"connect Redis address: {REDIS_URL}")
@@ -36,18 +38,18 @@ def redis_client():
             )
         else:
             logger.error(f"Redis connect fail at {time.strftime('%Y-%m-%d %H:%M:%S')}")
-            raise AgentException("Redis连接失败")
+            raise AgentException("INTERNAL_ERROR", "Redis连接失败")
     except (redis.ConnectionError, redis.TimeoutError) as e:
         logger.error(
             f"Redis connection error: {e} at {time.strftime('%Y-%m-%d %H:%M:%S')}"
         )
-        raise AgentException("Redis连接失败")
+        raise AgentException("INTERNAL_ERROR", "Redis连接失败")
     except redis.RedisError as e:
         logger.error(f"Redis error: {e} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
-        raise AgentException("Redis连接失败")
+        raise AgentException("INTERNAL_ERROR", "Redis连接失败")
     except Exception as e:
         logger.error(f"Unexpected error: {e} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
-        raise AgentException("Redis连接失败")
+        raise AgentException("INTERNAL_ERROR", "Redis连接失败")
     return client
 
 
@@ -98,7 +100,7 @@ def add_redis_store(
 
     except Exception as e:
         logger.error(f"添加文档到Redis存储失败: {e}")
-        raise AgentException(f"添加文档到Redis存储失败")
+        raise AgentException("INTERNAL_ERROR", "添加文档到Redis存储失败")
 
 
 def del_keys(index_name, keys: list[str]) -> bool:
@@ -134,7 +136,7 @@ def del_keys(index_name, keys: list[str]) -> bool:
 
     except redis.RedisError as e:
         logger.error(f"Redis error occurred: {e}")
-        raise AgentException("删除Redis数据失败")
+        raise AgentException("INTERNAL_ERROR", "删除Redis数据失败")
 
 
 def search_text(index_name: str, query: str, top_k: int = 10):
@@ -155,11 +157,11 @@ def search_text(index_name: str, query: str, top_k: int = 10):
     try:
         # 检查top_k参数是否为大于0的整数
         if not isinstance(top_k, int) or top_k <= 0:
-            raise AgentException("参数 top_k 必须是大于0的整数")
+            raise AgentException("INTERNAL_ERROR", "参数 top_k 必须是大于0的整数")
 
         # 检查query参数是否为非空字符串
         if not isinstance(query, str) or not query.strip():
-            raise AgentException("查询字符串不能为空")
+            raise AgentException("INTERNAL_ERROR", "查询字符串不能为空")
 
         # 创建Redis向量存储对象，并传入嵌入模型和配置
         vector_store = get_redis_store(index_name)
@@ -187,4 +189,4 @@ def search_text(index_name: str, query: str, top_k: int = 10):
         # 记录Redis错误
         logger.error(f"Redis error occurred: {e}")
         # 抛出搜索失败异常
-        raise AgentException("Redis搜索失败")
+        raise AgentException("INTERNAL_ERROR", "Redis搜索失败")

@@ -2,7 +2,6 @@ import json
 from ..presets import *
 import logging
 from ..utils import *
-from ..base_module.agent_exception import AgentException
 from .db.ai_agent import (
     search_ai_agent as SEARCH_AI_AGENT,
     search_ai_agent_id as SEARCH_AI_AGENT_ID,
@@ -29,7 +28,7 @@ def update_agent(user_name, agent_data: dict) -> None:
     if agent_data is not None:
         res = UPDATE_AI_AGENT(**buildUpdateParams(user_name, agent_data))
         if res < 1:
-            raise AgentException("修改角色体失败")
+            raise AgentException("INTERNAL_ERROR", "修改角色体失败")
 
     return None
 
@@ -101,56 +100,14 @@ def get_user_all_agents(user_name, keyword=None):
     except Exception as e:
         # 抛出异常
         logger.error(print_err(e))
-        raise AgentException(f"{STANDARD_ERROR_MSG}:获取当前用户所有角色体失败")
-
-
-# def set_user_agent(user_name, jsonData) -> None:
-#     """设置全局模型
-#     user_name (str): 当前用户名称
-#     jsonData (json): 角色体数据
-#     """
-#     # 查询id相关详情
-#     if jsonData is None:
-#         return
-#     jsonData["content"] = []
-#     jsonData["edit"] = (user_name == jsonData.get("user_name"),)
-#     with _user_agent_lock:
-#         if user_name not in _user_agent_instance:
-#             _user_agent_instance[user_name] = []
-#         agents = _user_agent_instance[user_name]
-
-#         # 遍历 agents 列表，查找并修改具有相同 id 的元素
-#         found = False
-#         for i, existing_agent in enumerate(agents):
-#             if existing_agent and existing_agent["id"] == jsonData["id"]:
-#                 agents[i] = jsonData
-#                 found = True
-#                 break
-
-#         # 如果没有找到具有相同 id 的元素，则追加新元素
-#         if not found:
-#             agents.append(jsonData)
-
-
-# def set_user_agent_all(user_name, jsonData) -> None:
-#     """将用户角色体加载进内存中"""
-#     # 查询id相关详情
-#     _user_agent_instance[user_name] = jsonData
-
-
-# def get_user_agent(user_name) -> list:
-#     """获取全局模型"""
-#     global _user_agent_instance
-#     if user_name not in _user_agent_instance:
-#         return None
-#     return _user_agent_instance[user_name]
+        raise AgentException("INTERNAL_ERROR", "获取当前用户所有角色体失败")
 
 
 def del_agent(user_name, id) -> None:
     """删除角色体文件"""
     res = DELETE_AI_AGENT(id)
     if res < 1:
-        raise AgentException("删除角色体失败")
+        raise AgentException("INTERNAL_ERROR", "删除角色体失败")
 
 
 def get_default_agent_data(user_name):

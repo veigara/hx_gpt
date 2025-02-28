@@ -1,6 +1,7 @@
 from ...db_models.db_model import AiModel
 from typing import List, Dict, Any
 from datetime import datetime
+from ...presets import SYS_USER_NAME
 
 
 def save_ai_model(
@@ -64,9 +65,8 @@ def search_ai_model(
         List[Dict[str, Any]]: 搜索结果
     """
     try:
-        filters = {}
-        if user_name:
-            filters["user_name"] = user_name
+
+        filters = {"user_name__in": [user_name, SYS_USER_NAME]}
 
         if model_name and isinstance(model_name, str):
             filters["model_name__icontains"] = model_name.strip()

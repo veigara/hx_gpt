@@ -6,7 +6,6 @@ from ..presets import *
 from ..utils import *
 from .agent import *
 from ..config import *
-from ..base_module.agent_exception import AgentException
 from .db.ai_history import (
     search_ai_history as SEARCH_AI_HISTORY,
     search_ai_history_id as SEARCH_AI_HISTORY_ID,
@@ -50,14 +49,14 @@ def rename_history(user_name, id, new_title) -> None:
     """重命名聊天记录"""
     res = UPDATE_AI_HISTORY_TITLE(id, new_title, user_name)
     if res < 1:
-        raise AgentException("重命名聊天记录失败")
+        raise AgentException("INTERNAL_ERROR", "重命名聊天记录失败")
 
 
 def del_history(user_name, id) -> None:
     """删除聊天记录"""
     res = DELETE_AI_HISTORY(id)
     if res < 1:
-        raise AgentException("删除聊天记录失败")
+        raise AgentException("INTERNAL_ERROR", "删除聊天记录失败")
 
 
 def cretate_new_history(user_name, model_name, input_str) -> str:
@@ -67,7 +66,7 @@ def cretate_new_history(user_name, model_name, input_str) -> str:
     """
     agent_data = get_default_agent_data(user_name)
     if agent_data is None:
-        raise Exception("系统没有角色体,请先设置角色体")
+        raise AgentException("INTERNAL_ERROR", "系统没有角色体,请先设置角色体")
     agent_data["history_title"] = input_str[:20]
     agent_data["model_name"] = model_name
 
@@ -86,7 +85,7 @@ def save_history(user_name, history_data) -> dict:
 def update_history_all(user_name, history_data) -> int:
     res = UPDATE_AI_HISTORY(**buildUpdateParams(user_name, history_data))
     if res < 1:
-        raise AgentException("更新聊天记录失败")
+        raise AgentException("INTERNAL_ERROR", "更新聊天记录失败")
     return res
 
 
@@ -138,7 +137,7 @@ def save_history_agent(user_name, agentData) -> str:
     res = save_history(user_name, history_data)
     id = res.get("id", None)
     if not id:
-        raise AgentException("创建聊天记录失败")
+        raise AgentException("INTERNAL_ERROR", "缺少必要参数id")
 
     return res.get("id", None)
 
@@ -170,7 +169,7 @@ def update_history_content(user_name, id, content) -> None:
     """更新聊天记录内容"""
     res = UPDATE_AI_HISTORY_CONTENT(id, json.dumps(content), user_name)
     if res < 1:
-        raise AgentException("更新聊天记录失败")
+        raise AgentException("INTERNAL_ERROR", "更新聊天记录失败")
 
 
 def get_history_content(id) -> List:
@@ -184,47 +183,40 @@ def update_history(user_name, history_id, contents: list) -> None:
     content([]):当前对话
     max_content_len(int) 最大上下文
     """
-    try:
-        history_data = load_history(history_id)
-        if history_data is None:
-            raise AgentException(f"聊天记录不存在,id={history_id}")
-        count = history_data.get("count", 0)
-        all_token_counts = history_data.get("all_token_counts", 0)
-        content_data = history_data.get("content", [])
-        history_data["count"] = int(count) + len(contents)
-        cur_chat_token = count_user_history_token(contents)
-        history_data["all_token_counts"] = int(all_token_counts) + cur_chat_token
-        content_data.extend(contents)
+    history_data = load_history(history_id)
+    if history_data is None:
+        raise AgentException("INTERNAL_ERROR", "未找到聊天记录")
+    count = history_data.get("count", 0)
+    all_token_counts = history_data.get("all_token_counts", 0)
+    content_data = history_data.get("content", [])
+    history_data["count"] = int(count) + len(contents)
+    cur_chat_token = count_user_history_token(contents)
+    history_data["all_token_counts"] = int(all_token_counts) + cur_chat_token
+    content_data.extend(contents)
 
-        # 保存
-        update_history_all(user_name, history_data)
-
-    except Exception as e:
-        logger.error(print_err(e))
-        raise AgentException(f"{STANDARD_ERROR_MSG}:修改聊天记录失败")
+    # 保存
+    update_history_all(user_name, history_data)
 
 
 def top_history(history_id) -> None:
     """置顶聊天记录"""
     res = UPDATE_CREATE_TIME(history_id, datetime.datetime.now())
     if res < 1:
-        raise AgentException("置顶聊天记录失败")
+        raise AgentException("INTERNAL_ERROR", "置顶聊天记录失败")
 
 
 def clear_all_history(user_name) -> None:
     """删除所有聊天记录"""
     res = DELETE_AI_HISTORY_ALL(user_name)
     if res < 1:
-        raise AgentException("删除所有聊天记录失败")
+        raise AgentException("INTERNAL_ERROR", "删除所有聊天记录失败")
 
 
 def clear_context(user_name, history_id) -> None:
     """清空上下文"""
     history_data = load_history(history_id)
-    if history_data is None:
-        raise AgentException(f"聊天记录不存在,id={history_id}")
     if not history_data:
-        return
+        raise AgentException("INTERNAL_ERROR", "未找到聊天记录")
     agent_data = history_data.get("agent_data", "{}")
     content_data = agent_data.get("content", [])
     history_data["content"] = content_data
@@ -250,7 +242,7 @@ def update_history_id(user_name, history_id, contents: list) -> None:
     """
     history_data = load_history(history_id)
     if history_data is None:
-        raise AgentException(f"聊天记录不存在,id={history_id}")
+        raise AgentException("INTERNAL_ERROR", "未找到聊天记录")
     # 对话条数
     history_data["count"] = len(contents)
     # 对话token
@@ -271,7 +263,7 @@ def snip_history_build(user_name, history_id, contents: list) -> dict:
     """
     history_data = load_history(history_id)
     if history_data is None:
-        raise AgentException(f"聊天记录不存在,id={history_id}")
+        raise AgentException("INTERNAL_ERROR", "未找到聊天记录")
     # 对话条数
     history_data["count"] = len(contents)
     # 对话token
@@ -294,7 +286,7 @@ def build_hisorty_to_agent(user_name, agent_title, history_id):
     """
     history_data = load_history(history_id)
     if history_data is None:
-        raise AgentException(f"聊天记录不存在,id={history_id}")
+        raise AgentException("INTERNAL_ERROR", "未找到聊天记录")
     agent_data = history_data.get("agent_data", "{}")
     content_data = history_data.get("content", [])
     # 排除非role标签

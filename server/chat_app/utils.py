@@ -1,11 +1,16 @@
 # -*- coding:utf-8 -*-
 import tiktoken
 import traceback
+import logging
 from .presets import *
 import base64
 from urllib.parse import urljoin
 from langchain.docstore.document import Document
 from typing import List
+from django.http import JsonResponse
+from .base_module.base_response import AgentResponse
+
+logger = logging.getLogger("chat_app")
 
 
 def construct_text(role, text):
@@ -56,7 +61,7 @@ def count_token(input_str):
 
 # 从请求头中中获取用户名
 def get_user_name(request) -> str:
-    user_name = request.headers.get("authorization")
+    user_name = request.user.username
     return user_name or ""
 
 
@@ -152,3 +157,83 @@ def covert_document_to_text(documents: List[Document]) -> str:
     for doc in documents:
         texts.append(doc.page_content)
     return "".join(texts)
+
+
+def response_server_err(e: Exception, msg: str) -> JsonResponse:
+    """构建错误信息返回
+    @e: 异常信息
+    @msg: 错误信息
+    """
+    logger.error(print_err(e))
+    return JsonResponse(
+        AgentResponse.fail(fail_msg=f"{STANDARD_ERROR_MSG}{str}"),
+        status=500,
+        json_dumps_params={"ensure_ascii": False},  # 禁用 ASCII 转义
+        content_type="application/json; charset=utf-8",  # 明确指定编码
+    )
+
+
+# 在 base_module/agent_exception.py 中定义错误类型
+class ErrorCode:
+    """错误码与状态码映射类"""
+
+    _ERROR_MAP = {
+        # 错误类型               (状态码, 错误信息)
+        "PARAM_INVALID": (400, "请求参数无效"),
+        "AUTH_FAILED": (401, "认证失败"),
+        "PERMISSION_DENIED": (403, "权限不足"),
+        "RESOURCE_NOT_FOUND": (404, "资源不存在"),
+        "INTERNAL_ERROR": (500, "服务器内部错误"),
+        "THIRD_PARTY_ERROR": (503, "服务暂不可用"),
+    }
+
+    @classmethod
+    def get_status_info(cls, error_code: str) -> tuple:
+        """获取错误码对应的状态信息"""
+        return cls._ERROR_MAP.get(error_code, (500, "未知错误"))
+
+
+# 修改 AgentException 类携带错误码
+class AgentException(Exception):
+    """业务异常基类"""
+
+    def __init__(self, error_code: str, detail: str = ""):
+        self.error_code = error_code
+        self.detail = detail
+        status, message = ErrorCode.get_status_info(error_code)
+        self.status_code = status
+        self.message = f"{message}：{detail}" if detail else message
+        super().__init__(self.message)
+
+
+# 修改 utils.py 中的错误处理函数
+def response_server_err(e: Exception | AgentException, msg: str = "") -> JsonResponse:
+    """统一错误响应处理"""
+    # 记录日志
+    logger.error(f"{msg} 错误详情：{print_err(e)}")
+
+    # 处理自定义异常
+    if isinstance(e, AgentException):
+        status_code = e.status_code
+        error_msg = f"{STANDARD_ERROR_MSG}{e.message}"
+    # 处理系统内置异常
+    else:
+        status_code = 500
+        error_msg = f"{STANDARD_ERROR_MSG}：系统异常:{msg} 错误详情：{str(e)}"
+
+    return JsonResponse(
+        AgentResponse.fail(fail_msg=error_msg),
+        status=status_code,
+        json_dumps_params={"ensure_ascii": False},
+        content_type="application/json; charset=utf-8",
+    )
+
+
+def response_server_success(data: object):
+    """成功响应"""
+    return JsonResponse(
+        AgentResponse.success(data=data),
+        status=200,
+        json_dumps_params={"ensure_ascii": False},
+        content_type="application/json; charset=utf-8",
+    )
