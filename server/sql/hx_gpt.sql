@@ -97,18 +97,15 @@ CREATE TABLE `ai_model`  (
 -- Records of ai_model
 -- ----------------------------
 INSERT INTO `ai_model` VALUES (1, 'llama-3.2-90b-vision-preview', 'llama-3.2-90b-vision', '3.2 90b大模型', 'Groq', 0, 7000, '2025-01-02 11:41:42', '2025-02-27 19:09:48', 'system');
-INSERT INTO `ai_model` VALUES (3, 'llama-3.3-70b-versatile', 'llama-3.3-70b', '', 'Groq', 0, 6000, '2025-01-02 13:47:16', '2025-02-27 19:09:17', 'system');
-INSERT INTO `ai_model` VALUES (4, 'llama-3.2-1b-instruct', 'llama-3.2-1b', '本地', 'LMStudio', 0, 8160, '2025-01-02 13:47:37', NULL, 'zhouhx');
-INSERT INTO `ai_model` VALUES (7, 'lite', 'Spark Lite', '轻量级大语言模型，低延迟，全免费', 'Spark', 0, 4095, '2025-01-02 13:52:03', NULL, 'zhouhx');
-INSERT INTO `ai_model` VALUES (8, '4.0Ultra', 'Spark 4.0Ultra', '最强大的星火大模型（星火4.0 Turbo），在文本生成、语言理解、知识问答、逻辑推理、数学能力等七大维度全面超越GPT 4-Turbo，优化联网搜索链路，提供更精准回答。', 'Spark', 0, 8000, '2025-01-02 13:53:44', NULL, 'zhouhx');
-INSERT INTO `ai_model` VALUES (10, 'deepseek-r1-distill-llama-70b', 'deepseek-r1-70b', 'deepseek-r1-distill-llama-70b', 'Groq', 0, 6000, '2025-02-27 19:08:38', NULL, 'system');
-INSERT INTO `ai_model` VALUES (11, 'qwen-2.5-coder-32b', 'qwen-2.5-coder-32b', '', 'Groq', 0, 10000, '2025-02-27 19:11:25', NULL, 'system');
-INSERT INTO `ai_model` VALUES (12, 'qwen-2.5-coder-32b', 'qwen-2.5-coder', 'qwen-2.5-coder 32b', 'Groq', 0, 10000, '2025-02-27 19:11:26', '2025-02-27 19:11:41', 'system');
-INSERT INTO `ai_model` VALUES (13, 'qwen-2.5-32b', 'qwen-2.5', '', 'Groq', 0, 10000, '2025-02-27 19:12:11', NULL, 'system');
-INSERT INTO `ai_model` VALUES (14, 'deepseek-r1-distill-qwen-32b', 'deepseek-r1-qwen', 'DeepSeek ,128K, deepseek-r1-distill-qwen-32b', 'Groq', 0, 16384, '2025-02-27 19:14:19', NULL, 'system');
-INSERT INTO `ai_model` VALUES (16, 'deepseek-r1-distill-llama-70b', 'deepseek-r1-distill-llama', 'DeepSeek	128K', 'Groq', 0, 1000, '2025-02-27 19:16:09', NULL, 'system');
-INSERT INTO `ai_model` VALUES (17, 'qwen-omni-turbo-2025-01-19', 'qwen-omni-turbo', '通义千问全模态理解生成大模型，支持文本, 图像，语音，视频输入理解和混合输入理解，具备文本和语音同时流式生成能力，多模态内容理解速度显著提升，提供了4种自然对话音色，此版本为2025年1月19日的快照版本，预计维护至下一个快照发布前的一个月左右。', 'Qwen', 0, 100000, '2025-02-27 19:24:18', NULL, 'zhouhx');
-
+INSERT INTO `ai_model` VALUES (2, 'llama-3.3-70b-versatile', 'llama-3.3-70b', '', 'Groq', 0, 6000, '2025-01-02 13:47:16', '2025-02-27 19:09:17', 'system');
+INSERT INTO `ai_model` VALUES (3, 'llama-3.2-1b-instruct', 'llama-3.2-1b', '本地', 'LMStudio', 0, 8160, '2025-01-02 13:47:37', NULL, 'zhouhx');
+INSERT INTO `ai_model` VALUES (4, 'lite', 'Spark Lite', '轻量级大语言模型，低延迟，全免费', 'Spark', 0, 4095, '2025-01-02 13:52:03', NULL, 'zhouhx');
+INSERT INTO `ai_model` VALUES (5, '4.0Ultra', 'Spark 4.0Ultra', '最强大的星火大模型（星火4.0 Turbo），在文本生成、语言理解、知识问答、逻辑推理、数学能力等七大维度全面超越GPT 4-Turbo，优化联网搜索链路，提供更精准回答。', 'Spark', 0, 8000, '2025-01-02 13:53:44', NULL, 'zhouhx');
+INSERT INTO `ai_model` VALUES (6, 'deepseek-r1-distill-llama-70b', 'deepseek-r1-70b', 'deepseek-r1-distill-llama-70b', 'Groq', 0, 6000, '2025-02-27 19:08:38', NULL, 'system');
+INSERT INTO `ai_model` VALUES (7, 'qwen-2.5-coder-32b', 'qwen-2.5-coder', 'qwen-2.5-coder 32b', 'Groq', 0, 10000, '2025-02-27 19:11:26', '2025-02-27 19:11:41', 'system');
+INSERT INTO `ai_model` VALUES (8, 'qwen-2.5-32b', 'qwen-2.5', 'qwen-2.5-32b', 'Groq', 0, 10000, '2025-02-27 19:12:11', NULL, 'system');
+INSERT INTO `ai_model` VALUES (9, 'deepseek-r1-distill-qwen-32b', 'deepseek-r1-qwen', 'DeepSeek ,128K, deepseek-r1-distill-qwen-32b', 'Groq', 0, 16384, '2025-02-27 19:14:19', NULL, 'system');
+INSERT INTO `ai_model` VALUES (10, 'qwen-omni-turbo-2025-01-19', 'qwen-omni-turbo', '通义千问全模态理解生成大模型，支持文本, 图像，语音，视频输入理解和混合输入理解，具备文本和语音同时流式生成能力，多模态内容理解速度显著提升，提供了4种自然对话音色，此版本为2025年1月19日的快照版本，预计维护至下一个快照发布前的一个月左右。', 'Qwen', 0, 100000, '2025-02-27 19:24:18', NULL, 'zhouhx');
 -- ----------------------------
 -- Table structure for auth_group
 -- ----------------------------
