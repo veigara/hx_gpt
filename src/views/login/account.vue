@@ -68,7 +68,7 @@ const onLogin = () => {
 	justify-content: center;
 	margin-bottom: 35px;
 	font-size: 24px;
-	color: #444;
+	color: #fff;
 	letter-spacing: 4px;
 }
 

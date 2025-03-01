@@ -6,8 +6,8 @@
 			<Register v-if="loginType == 'register'"></Register>
 			<account v-else></account>			
 			<div class="login-more">
-				<el-button v-if="loginType == 'register'" type="info" link @click="loginSwitch('account')">登录</el-button>
-				<el-button v-else type="info" link @click="loginSwitch('register')">注册</el-button>
+				<el-button text v-if="loginType == 'register'" type="success" link @click="loginSwitch('account')">登录</el-button>
+				<el-button  text v-else type="success" link @click="loginSwitch('register')">注册</el-button>
 			</div>
 		</div>
 	</div>
@@ -57,11 +57,12 @@ const loginSwitch = (type: string) => {
 	width: 520px;
 }
 .login-form {
-	background-color: #fff;
+	//background-color: #fff;
 	flex: 0 1 auto;
 	padding: 40px;
 	border-radius: 6px;
 	box-shadow: 1px 1px 8px #aaa6a6;
+	border: 1px solid #fff;
 	box-sizing: border-box;
 	width: 440px;
 
