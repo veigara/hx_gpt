@@ -68,6 +68,18 @@ service.interceptors.response.use(
 	},
 	error => {
 		console.log(error)
+		const status = error?.response.status
+		if(status && status === 401){
+			ElNotification({
+				title: '错误',
+				message: '登录过期，请重新登录',
+				type: 'error',
+				duration: 1000
+			})
+			store.userStore?.setToken('')
+			location.reload()
+			return	
+		}
 		const code= error?.code
 		if(code && code === 'ERR_NETWORK'){
 			ElNotification({
