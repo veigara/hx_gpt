@@ -129,7 +129,7 @@
 							@keyup="sendKeyClick">
 						</el-input>
 						<el-input v-else v-model="chatBotMst" :autosize="{ minRows: 1 }" type="textarea"
-							class="chat_textarea_input" placeholder="输入消息/clearMenu,然后点击发送清除触发命令"
+							class="chat_textarea_input" placeholder="输入消息/,然后点击发送清除触发命令"
 							>
 						</el-input>
 					</div>
@@ -273,7 +273,7 @@ const sendBotMsgClick = async(event: any) => {
 	if(isMobile()){
 		// 手机端整合了快捷键的判断
 		const input = chatBotMst.value.trim()
-		if(input.trim() == '/clearMenu'){
+		if(input.trim() == '/'){
 			// 打开快捷键
 			fnDialogRef.value.init()
 			chatBotMst.value = ''
