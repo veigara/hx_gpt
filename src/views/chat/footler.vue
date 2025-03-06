@@ -438,6 +438,10 @@ const init = (modelKey: string) => {
 		// 不存在则获取所有的模型
 		getModelList()
 	}
+	// 重置按钮
+	knowledge.value = ''
+	convOff.value= false
+	searchOnline.value= false
 }
 
 // 清除所有历史记录的事件

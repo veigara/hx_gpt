@@ -381,7 +381,7 @@ const scrollbarToBotom = async (smooth: boolean) => {
 	} else {
 		if (smooth) {
 			// 缓慢滚动
-			let baseHeight = 20; // 每次滚动的距离
+			let baseHeight = 200; // 每次滚动的距离
 			const height = scrollTop + clientHeight
 			const intervalId = setInterval(() => {
 				baseHeight += 50;
@@ -390,7 +390,7 @@ const scrollbarToBotom = async (smooth: boolean) => {
 				if (newScrollTop >= scrollHeight) {
 					clearInterval(intervalId);
 				}
-			}, 200);
+			}, 100);
 		} else {
 			scrollbarRef?.value?.setScrollTop(scrollHeight);
 		}
