@@ -169,7 +169,7 @@ def search_text(index_name: str, query: str, top_k: int = 10):
         # 执行相似度搜索，并返回最相关的前top_k个结果
         # 简单查询
         # results = vector_store.similarity_search(query, k=top_k)
-        # 最大边界相关性
+        # 最大边界相关性(设置 fetch_k 参数，用来告诉向量数据库我们最终需要 k 个结果返回。fetch_k=20 ，也就是我们最初获取 20 个文档，k=4 表示返回最不同的 2 个文档。)
         results = vector_store.max_marginal_relevance_search(query, k=top_k, fetch_k=20)
         logger.debug(f"知识库检索搜索成功: {results}")
         # 如果没有搜索结果，返回空列表
