@@ -440,7 +440,7 @@ const init = (modelKey: string) => {
 	}
 	// 重置按钮
 	knowledge.value = ''
-	convOff.value= false
+	convOff.value= true
 	searchOnline.value= false
 }
 
