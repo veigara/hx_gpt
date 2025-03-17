@@ -231,3 +231,7 @@ docker-compose up -d
 pip install "unstructured[docx]"  # 安装Word文档支持
 pip install "unstructured[all-docs]"  # 安装所有文档类型支持
 ```
+### 5.优化计划
+
+1、知识库索引优化，增加检索方式
+2、智能体流程设计，多种智能体协作
