@@ -390,7 +390,7 @@ const scrollbarToBotom = async (smooth: boolean) => {
 				if (newScrollTop >= scrollHeight) {
 					clearInterval(intervalId);
 				}
-			}, 100);
+			}, 20);
 		} else {
 			scrollbarRef?.value?.setScrollTop(scrollHeight);
 		}
