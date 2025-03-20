@@ -143,7 +143,7 @@ def to_dict(data: AiAgent) -> dict:
     user_name = data.user_name
     model_name = None
     if model_key is not None:
-        model = GET_MODEL_DETAIL(model_key=model_key)
+        model = GET_MODEL_DETAIL(user_name, model_key=model_key)
         if model is not None and len(model) > 0:
             model_name = model[0]["model_name"]
     return {
