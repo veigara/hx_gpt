@@ -58,7 +58,7 @@ from datetime import timedelta
 
 # JWT 相关设置
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=180),  # 访问令牌的有效时间
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),  # 访问令牌的有效时间
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),  # 刷新令牌的有效时间
     "ROTATE_REFRESH_TOKENS": False,  # 是否允许刷新令牌循环
     "BLACKLIST_AFTER_ROTATION": True,  # 刷新令牌后是否加入黑名单
@@ -130,7 +130,7 @@ DATABASES = {
         "NAME": "hx_gpt",
         "USER": "root",  # 数据库用户名
         "PASSWORD": "123456",  # 数据库密码
-        "HOST": "mysql8",  # 数据库主机地址
+        "HOST": "127.0.0.1",  # 数据库主机地址
         "PORT": "3306",  # 数据库端口号
         # 'OPTIONS': {
         #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
