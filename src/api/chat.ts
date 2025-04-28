@@ -85,3 +85,7 @@ export const useSnipHistoryBuildApi = (params: any) => {
 export const useHistoryToAgentApi = (params: any) => {
 	return service.post('/chat/build_hisorty_to_agent',params)
 }
+
+export const useCopyHistoryApi = (params: any) => {
+	return service.post('/chat/copy_history',params)
+}

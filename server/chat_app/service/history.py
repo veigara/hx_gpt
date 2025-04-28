@@ -310,3 +310,14 @@ def build_hisorty_to_agent(user_name, agent_title, history_id):
 def get_historys_by_agent_id(agent_id) -> list:
     """根据角色体id获取所有聊天记录"""
     return SEARCH_AI_HISTORY_AGENT_ID(agent_id=agent_id)
+
+
+def copy_history(user_name, history_id) -> dict:
+    """复制聊天记录"""
+    history_data = load_history(history_id)
+    if history_data is None:
+        raise AgentException("INTERNAL_ERROR", "未找到聊天记录")
+    title = history_data.get("title")
+    history_data["title"] = f"{title}-Copy"
+    history_data["id"] = None
+    return save_history(user_name, history_data)

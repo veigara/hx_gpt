@@ -48,7 +48,9 @@
 							<div class="history-menu-item" @click="topHistory(item)">
 								<span><svg-icon icon="icon-add-top" /></span>置顶此对话
 							</div>
-
+							<div class="history-menu-item" @click="copyHistory(item)">
+								<span><svg-icon icon="icon-chat_copy" /></span>复制记录
+							</div>
 							<div class="history-menu-item" @click="covertAgent(item)">
 								<span><svg-icon icon="icon-agent" /></span>转为角色体
 							</div>
@@ -71,7 +73,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useGetHistorysApi, useRenameHistoryApi, useDelHistoryApi, useTopHistoryApi, useHistoryToAgentApi } from '@/api/chat'
+import { useGetHistorysApi, useRenameHistoryApi, useDelHistoryApi, useTopHistoryApi, useHistoryToAgentApi,useCopyHistoryApi } from '@/api/chat'
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { Plus, Refresh } from '@element-plus/icons-vue'
 import { debounce } from 'lodash';
@@ -268,6 +270,25 @@ const covertAgent = (data: JSON) => {
 		})
 
 
+}
+
+// 复制记录
+const copyHistory = (data: JSON) => {
+	const params = { "history_id": data.id }
+	useCopyHistoryApi(params).then(res => {
+		ElNotification({
+			title: '成功',
+			message: '操作成功',
+			type: 'success'
+		})
+		getUserHistory();
+	}).catch((error) => {
+		ElNotification({
+			title: '操作失败',
+			message: error.message,
+			type: 'error'
+		})
+	})
 }
 </script>
 

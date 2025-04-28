@@ -163,4 +163,6 @@ urlpatterns = [
     # jwt 认证
     path("token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
+    # 复制聊天记录
+    path("chat/copy_history", chat_web.copy_chat_history, name="copy_chat_history"),
 ]

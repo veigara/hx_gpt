@@ -542,6 +542,23 @@ def build_chat_hisorty_to_agent(request):
         return response_server_err(e, msg="转为角色体失败")
 
 
+@csrf_exempt
+@require_http_methods(["POST"])
+@check_permission
+def copy_chat_history(request):
+    """
+    复制聊天记录
+    """
+    try:
+        user_name = get_user_name(request)
+        payload = json.loads(request.body.decode("utf-8"))
+        history_id = payload.get("history_id")
+        res = copy_history(user_name, history_id)
+        return response_server_success(res)
+    except Exception as e:
+        return response_server_err(e, msg="复制聊天记录失败")
+
+
 class ModelData:
     def __init__(self, label, model_name, description, model_type):
         self.label = label
